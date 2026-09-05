@@ -1,5 +1,10 @@
 # Where the agentOS / Node gap comes from
 
+The subsequent [startup pass](runtime-startup-pass.md) reduces code staging and
+cold index-inspection transport. Its repeated measurements do not show a warm
+shell-execution improvement; the decomposition below remains the explanation
+for the large remaining gap.
+
 The tested JavaScript computation is already near direct-Node speed. The large
 OpenClaw gap appears when the turn performs filesystem operations and invokes
 shell commands. This is evidence for specific runtime-boundary costs, not a

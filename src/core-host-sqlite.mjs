@@ -11,6 +11,6 @@ export async function createCoreHostSqlite(root) {
   const bytes = await readFile(url);
   const digest = createHash('sha256').update(bytes).digest('hex');
   if (digest !== manifest.schemaCollector?.sha256) throw new Error('Unverified schema collector artifact');
-  const { collectSqliteTableContract } = await import(`${url.href}?sha256=${digest}`);
-  return createHostSqlite(root, { collectTableContract: collectSqliteTableContract });
+  const { collectSqliteTableContract, collectSqliteNamedIndexContract } = await import(`${url.href}?sha256=${digest}`);
+  return createHostSqlite(root, { collectTableContract: collectSqliteTableContract, collectNamedIndexContract: collectSqliteNamedIndexContract });
 }

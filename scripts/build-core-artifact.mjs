@@ -20,8 +20,8 @@ const prepared = profile === 'core' ? prepareCoreProfile(source) : { source };
 // Extract the original read-only collector before installing the guest hook.
 // It accepts an already-authorized database handle; it opens no connections.
 const schemaCollector = sliceCoreArtifact(prepared.source, {
-  roots: ['init_sqlite_schema_sql', 'collectSqliteTableContract'], registerRuntime: false,
-  wrapper: '\ninit_sqlite_schema_sql(); export { collectSqliteTableContract };\n',
+  roots: ['init_sqlite_schema_sql', 'collectSqliteTableContract', 'collectSqliteNamedIndexContract'], registerRuntime: false,
+  wrapper: '\ninit_sqlite_schema_sql(); export { collectSqliteTableContract, collectSqliteNamedIndexContract };\n',
 });
 if (/^import\s/m.test(schemaCollector.source) || Buffer.byteLength(schemaCollector.source) > 40000) {
   throw new Error('Schema collector dependency boundary expanded');
@@ -30,6 +30,10 @@ const collectorAnchor = 'function collectSqliteTableContract(Ot,Zt){';
 if (prepared.source.split(collectorAnchor).length !== 2) throw new Error('Schema collector hook boundary changed');
 prepared.source = prepared.source.replace(collectorAnchor, collectorAnchor +
   'if(typeof Ot.collectOpenClawTableContract===`function`)return Ot.collectOpenClawTableContract(Zt);');
+const indexAnchor = 'function collectSqliteNamedIndexContract(Ot,Zt){';
+if (prepared.source.split(indexAnchor).length !== 2) throw new Error('Named index collector hook boundary changed');
+prepared.source = prepared.source.replace(indexAnchor, indexAnchor +
+  'if(typeof Ot.collectOpenClawNamedIndexContract===`function`)return Ot.collectOpenClawNamedIndexContract(Zt);');
 const ast = ts.createSourceFile('worker.mjs', prepared.source, ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
 const replacements = [];
 const modules = new Map([

@@ -17,17 +17,22 @@ const profileSchema = 'CREATE TABLE delta (id INTEGER PRIMARY KEY, "é" TEXT, "z
 function compareProfileSchema() {
   const batched = collectSqliteSchemaIssues(profileDatabase, profileSchema);
   const batchedTable = collectSqliteTableContract(profileDatabase, 'delta');
+  const batchedIndex = collectSqliteNamedIndexContract(profileDatabase, 'delta_idx');
   const batch = profileDatabase.collectOpenClawTableContract;
-  let individual, individualTable;
+  const indexBatch = profileDatabase.collectOpenClawNamedIndexContract;
+  let individual, individualTable, individualIndex;
   profileDatabase.collectOpenClawTableContract = undefined;
+  profileDatabase.collectOpenClawNamedIndexContract = undefined;
   try {
     individual = collectSqliteSchemaIssues(profileDatabase, profileSchema);
     individualTable = collectSqliteTableContract(profileDatabase, 'delta');
+    individualIndex = collectSqliteNamedIndexContract(profileDatabase, 'delta_idx');
   }
-  finally { profileDatabase.collectOpenClawTableContract = batch; }
+  finally { profileDatabase.collectOpenClawTableContract = batch; profileDatabase.collectOpenClawNamedIndexContract = indexBatch; }
   const serializeContract = value => JSON.stringify(value, (key, item) => item instanceof Map ? { entries: [...item] } : item);
   if (serializeContract(batchedTable) !== serializeContract(individualTable)) throw new Error('Batched table contract differs from guest collector');
   if (JSON.stringify(batched) !== JSON.stringify(individual)) throw new Error('Batched schema issues differ from guest collector');
+  if (JSON.stringify(batchedIndex) !== JSON.stringify(individualIndex)) throw new Error('Batched named index differs from guest collector');
   return batched;
 }
 try {

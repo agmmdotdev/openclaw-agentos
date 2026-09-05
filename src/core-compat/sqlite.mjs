@@ -36,6 +36,7 @@ export class DatabaseSync {
     this.isOpen = true;
   }
   collectOpenClawTableContract(tableName) { return call({ op: 'openclaw-table-contract', handle: this.handle, tableName }); }
+  collectOpenClawNamedIndexContract(indexName) { return call({ op: 'openclaw-named-index-contract', handle: this.handle, indexName }); }
   exec(sql) { return call({ op: 'exec', handle: this.handle, sql }); }
   get isTransaction() { return call({ op: 'state', handle: this.handle }).isTransaction; }
   close() { call({ op: 'close', handle: this.handle }); this.isOpen = false; }

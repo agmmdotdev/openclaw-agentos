@@ -98,6 +98,13 @@ listener-table representation. See the report for these compatibility limits.
 
 ## Performance and placement
 
+The latest [startup pass](docs/runtime-startup-pass.md) shares read-only core
+artifacts through a published mount and batches named-index inspection. In two
+51-turn runs per configuration, staging falls from **492 to 16 ms**, cold SQL
+calls from **1,700 to 1,373**, and launch-to-first-result from **3.58 to 3.24 s**.
+Staging plus cold-turn CPU is about **16% lower**. Idle memory averages only
+7 MiB lower with overlapping ranges; warm shell CPU and latency do not improve.
+
 The [workload decomposition](docs/runtime-bottlenecks.md) finds near-Node speed
 for the tested JS computation, but high filesystem and shell costs. Warm core
 turns measure 25 ms without tools, 41 ms with read and 338 ms with read plus
@@ -119,13 +126,15 @@ It disables spare V8 isolates through `AGENTOS_V8_WARM_ISOLATES=0` and retains t
 existing compact glibc allocator settings. The launcher checks the agentOS
 version because that environment switch is internal to the published runtime.
 The guest heap remains 256 MiB; all default software and shell tools remain.
-`test:core:compact` retains the previous allocator-only control and `test:core`
-retains defaults. See the report for measurements and rejected experiments.
+`test:core:compact` retains the previous allocator settings and `test:core`
+retains the runtime's default environment. Both now use the read-only code
+mount; set `CORE_ARTIFACT_MODE=upload` for the previous staging path. See the
+reports for measurements and rejected experiments.
 
-[Schema batching](docs/schema-batching.md) still reduces cold binding calls
-from 3,306 to 1,700 while retaining the original metadata collector, drift
-checks and rollback behavior. The host collector adds 12.5 KB; the guest bundle
-remains 16.6 MB.
+[Schema batching](docs/schema-batching.md) first reduced cold binding calls
+from 3,306 to 1,700; named-index batching now reduces that to 1,373 while retaining
+the original metadata collectors, drift checks and rollback behavior. The host
+collector is 12.9 KB; the guest bundle remains 16.6 MB.
 
 A new multi-instance probe also found that agentOS 0.2.19 replaces host binding
 handlers/policies when VMs share a sidecar. The core harness now requests its

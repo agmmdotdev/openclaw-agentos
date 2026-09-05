@@ -25,7 +25,7 @@ export function decode([kind, value]) {
   throw new Error('Invalid SQLite wire value');
 }
 
-export function createHostSqlite(root, { collectTableContract } = {}) {
+export function createHostSqlite(root, { collectTableContract, collectNamedIndexContract } = {}) {
   mkdirSync(root, { recursive: true, mode: 0o700 });
   const databases = new Map();
   const stats = { calls: 0, opens: 0, version: undefined, failures: [] };
@@ -60,6 +60,10 @@ export function createHostSqlite(root, { collectTableContract } = {}) {
           if (!collectTableContract) throw new Error('Schema collector is not configured');
           if (typeof request.tableName !== 'string' || request.tableName.length > 4096) throw new Error('Invalid table name');
           value = collectTableContract(db, request.tableName);
+        } else if (request.op === 'openclaw-named-index-contract') {
+          if (!collectNamedIndexContract) throw new Error('Named index collector is not configured');
+          if (typeof request.indexName !== 'string' || request.indexName.length > 4096) throw new Error('Invalid index name');
+          value = collectNamedIndexContract(db, request.indexName);
         } else if (request.op === 'statement') {
           if (!['get', 'all', 'run', 'columns'].includes(request.method)) throw new Error('Unsupported SQLite statement operation');
           const statement = db.prepare(request.sql);

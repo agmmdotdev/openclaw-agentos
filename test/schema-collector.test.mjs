@@ -6,7 +6,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { createCoreHostSqlite } from '../src/core-host-sqlite.mjs';
 import { encode, decode } from '../src/host-sqlite.mjs';
-import { collectSqliteTableContract } from '../artifacts/core/schema-collector.mjs';
+import { collectSqliteTableContract, collectSqliteNamedIndexContract } from '../artifacts/core/schema-collector.mjs';
 
 test('batched upstream schema collector matches direct SQLite and observes DDL/rollback without caching', async () => {
   const root = mkdtempSync(join(tmpdir(), 'core-schema-test-'));
@@ -30,7 +30,17 @@ test('batched upstream schema collector matches direct SQLite and observes DDL/r
       CREATE TABLE "odd\"\"name" ("col\"\"name" TEXT UNIQUE);`;
     const exec = sql => { db.exec(sql); call({ op: 'exec', handle, sql }); };
     const inspect = name => call({ op: 'openclaw-table-contract', handle, tableName: name });
+    const inspectIndex = name => call({ op: 'openclaw-named-index-contract', handle, indexName: name });
+    const compareIndexes = () => {
+      for (const name of ['example_value', 'example_expression', 'sqlite_autoindex_composite_1', 'missing', "x'); DROP TABLE example;--"]) {
+        assert.deepEqual(inspectIndex(name), collectSqliteNamedIndexContract(db, name));
+      }
+    };
     exec(sql);
+    compareIndexes();
+    assert.equal(inspectIndex('example_value').partial, 1);
+    assert.equal(inspectIndex('example_value').unique, 1);
+    assert.ok(inspectIndex('example_expression').terms.some(term => term.kind === 'expression'));
     for (const name of ['example','audit','searchable','composite','odd"name','missing',"x'); DROP TABLE example;--"]) {
       assert.deepEqual(inspect(name), collectSqliteTableContract(db, name));
     }
@@ -39,14 +49,24 @@ test('batched upstream schema collector matches direct SQLite and observes DDL/r
     assert.equal(inspect('composite').withoutRowid, 1);
     assert.equal(inspect('example').triggers.length, 1);
     exec('BEGIN; ALTER TABLE example ADD COLUMN added BLOB; DROP INDEX example_value');
+    compareIndexes();
+    assert.equal(inspectIndex('example_value'), undefined);
+    exec('CREATE INDEX example_value ON example(note)');
+    compareIndexes();
+    assert.equal(inspectIndex('example_value').unique, 0);
     assert.deepEqual(inspect('example'), collectSqliteTableContract(db, 'example'));
     assert.ok(inspect('example').definition.columns.has('added'));
     exec('ROLLBACK');
+    compareIndexes();
+    assert.equal(inspectIndex('example_value').unique, 1);
     assert.deepEqual(inspect('example'), collectSqliteTableContract(db, 'example'));
     assert.equal(inspect('example').definition.columns.has('added'), false);
     assert.throws(() => call({ op: 'openclaw-table-contract', handle, tableName: 'example' }, foreign), /Unknown SQLite handle/);
     assert.throws(() => call({ op: 'openclaw-table-contract', handle, tableName: 1 }), /Invalid table name/);
+    assert.throws(() => call({ op: 'openclaw-named-index-contract', handle, indexName: 'example_value' }, foreign), /Unknown SQLite handle/);
+    assert.throws(() => call({ op: 'openclaw-named-index-contract', handle, indexName: 1 }), /Invalid index name/);
     call({ op: 'close', handle });
     assert.throws(() => inspect('example'), /Unknown SQLite handle/);
+    assert.throws(() => inspectIndex('example_value'), /Unknown SQLite handle/);
   } finally { db.close(); service.dispose(); foreign.dispose(); rmSync(root, { recursive: true, force: true }); }
 });

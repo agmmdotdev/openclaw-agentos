@@ -1,5 +1,10 @@
 # Batch upstream schema inspection across the host boundary
 
+This report records the first table-collector pass. The subsequent
+[startup pass](runtime-startup-pass.md) also batches the original named-index
+collector, reducing cold binding calls from 1,700 to 1,373. Historical figures
+and the original collector size below describe the table-only implementation.
+
 This pass reduces cold-start SQL transport by running OpenClaw's existing
 read-only table-contract collector alongside the host SQLite connection.
 The guest still performs schema comparison, migration decisions and integrity

@@ -7,9 +7,13 @@ import { mkdtemp, rm, realpath } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join, dirname } from 'node:path';
 import { createRequire } from 'node:module';
-import { randomUUID } from 'node:crypto';
+import { randomUUID, createHash } from 'node:crypto';
 import { compileFixture } from './compile-async.mjs';
+import { createCoreArtifactStore } from '../src/core-artifact-store.mjs';
 
+const artifactMode = process.env.CORE_ARTIFACT_MODE ?? 'host_dir';
+if (!['upload', 'host_dir'].includes(artifactMode)) throw new Error('Unknown CORE_ARTIFACT_MODE');
+let artifactStore;
 const sqliteRoot = await mkdtemp(join(tmpdir(), 'openclaw-agentos-sqlite-'));
 await mkdir(join(sqliteRoot, 'databases'));
 const sqlite = await createCoreHostSqlite(join(sqliteRoot, 'databases'));
@@ -29,7 +33,40 @@ const options = {
 };
 let vm;
 const reports = [];
+let completed = false;
 try {
+  if (artifactMode === 'host_dir') { artifactStore = await createCoreArtifactStore(); options.mounts.push(artifactStore.mount); }
+  async function stage() {
+    const stageFs = artifactStore?.filesystem ?? vm.filesystem;
+    const fixture = await readFile('test/fixtures/core-turn.mjs', 'utf8');
+    const failures = await readFile('test/fixtures/core-failures.mjs', 'utf8');
+    const manifest = JSON.parse(await readFile('artifacts/core/manifest.json', 'utf8'));
+    const profileFixture = manifest.profile === 'core' ? await readFile('test/fixtures/core-profile.mjs', 'utf8') : '';
+    // Execute a streamed entry in both modes, preserving the runtime's large
+    // entry path instead of loading the worker as a capped dependency response.
+    const runner = await compileFixture('\nfor (const coreProbePhase of (process.env.CORE_PHASES ?? \'tools\').split(\',\')) { await (async () => {\n' + fixture + '\n})(); }\nif (process.env.CORE_FAILURES === \'1\') { await (async () => {\n' + failures + '\n})(); }\n' + profileFixture);
+    if (artifactStore) await stageFs.writeEntry('artifacts/core/worker.mjs', '/core/probe.mjs', '\n' + runner, manifest.outputSha256);
+    else {
+      const worker = await readFile('artifacts/core/worker.mjs');
+      if (createHash('sha256').update(worker).digest('hex') !== manifest.outputSha256) throw new Error('Unverified core worker artifact');
+      await writeLargeFile(vm, '/core/probe.mjs', Buffer.concat([worker, Buffer.from('\n' + runner)]));
+    }
+    await stageFs.mkdir('/core/compat', { recursive: true });
+    for (const name of await readdir('artifacts/core/compat')) {
+      const bytes = await readFile(`artifacts/core/compat/${name}`);
+      if (createHash('sha256').update(bytes).digest('hex') !== manifest.compatibilityFiles[name]) throw new Error(`Unverified core adapter: ${name}`);
+      await stageFs.writeFile(`/core/compat/${name}`, bytes);
+    }
+    const packageRequire = createRequire(await realpath('node_modules/openclaw/package.json'));
+    await stageFs.writeFile('/core/web-tree-sitter.wasm', await readFile(join(dirname(packageRequire.resolve('web-tree-sitter')), 'web-tree-sitter.wasm')));
+    await stageFs.mkdir('/core/node_modules/tree-sitter-bash', { recursive: true });
+    await stageFs.writeFile('/core/node_modules/tree-sitter-bash/package.json', JSON.stringify({ name: 'tree-sitter-bash', version: '0.25.1' }));
+    await stageFs.writeFile('/core/node_modules/tree-sitter-bash/tree-sitter-bash.wasm', await readFile(packageRequire.resolve('tree-sitter-bash/tree-sitter-bash.wasm')));
+    await stageFs.writeFile('/core/capabilities.mjs', await compileFixture(await readFile('test/fixtures/capabilities.mjs', 'utf8')));
+    artifactStore?.seal();
+  }
+
+  if (artifactStore) await stage();
   // Published chunked_local initializes its root as guest uid 0 even with uid
   // config supplied. Provision ownership once, then run tests as guest uid 1000.
   const setup = await AgentOs.create({ ...options, user: { uid: 0, gid: 0 } });
@@ -38,26 +75,7 @@ try {
     if (result.exitCode !== 0) throw new Error(`Mount ownership setup failed: ${result.stderr}`);
   } finally { await setup.dispose(); }
   vm = await AgentOs.create(options);
-  async function stage() {
-  const worker = await readFile('artifacts/core/worker.mjs', 'utf8');
-  const fixture = await readFile('test/fixtures/core-turn.mjs', 'utf8');
-  const failures = await readFile('test/fixtures/core-failures.mjs', 'utf8');
-  const manifest = JSON.parse(await readFile('artifacts/core/manifest.json', 'utf8'));
-  const profileFixture = manifest.profile === 'core' ? await readFile('test/fixtures/core-profile.mjs', 'utf8') : '';
-  // Retain the streamed entry path: the full control exceeds the 16 MiB
-  // dependency response cap and the reduced profile is close to that limit.
-  const runner = await compileFixture('\nfor (const coreProbePhase of (process.env.CORE_PHASES ?? \'tools\').split(\',\')) { await (async () => {\n' + fixture + '\n})(); }\nif (process.env.CORE_FAILURES === \'1\') { await (async () => {\n' + failures + '\n})(); }\n' + profileFixture);
-  await writeLargeFile(vm, '/core/probe.mjs', Buffer.from(worker + '\n' + runner));
-  await vm.filesystem.mkdir('/core/compat', { recursive: true });
-  for (const name of await readdir('artifacts/core/compat')) await vm.filesystem.writeFile(`/core/compat/${name}`, await readFile(`artifacts/core/compat/${name}`));
-  const packageRequire = createRequire(await realpath('node_modules/openclaw/package.json'));
-  await vm.filesystem.writeFile('/core/web-tree-sitter.wasm', await readFile(join(dirname(packageRequire.resolve('web-tree-sitter')), 'web-tree-sitter.wasm')));
-  await vm.filesystem.mkdir('/core/node_modules/tree-sitter-bash', { recursive: true });
-  await vm.filesystem.writeFile('/core/node_modules/tree-sitter-bash/package.json', JSON.stringify({ name: 'tree-sitter-bash', version: '0.25.1' }));
-  await vm.filesystem.writeFile('/core/node_modules/tree-sitter-bash/tree-sitter-bash.wasm', await readFile(packageRequire.resolve('tree-sitter-bash/tree-sitter-bash.wasm')));
-  }
-  await stage();
-  await vm.filesystem.writeFile('/core/capabilities.mjs', await compileFixture(await readFile('test/fixtures/capabilities.mjs', 'utf8')));
+  if (!artifactStore) await stage();
   const capabilities = await vm.process.execFile('node', ['/core/capabilities.mjs'], { timeoutMs: 30000, output: { capture: 'all' } });
   reports.push({ generation: 'capabilities', result: capabilities });
   console.log(JSON.stringify({ generation: 'capabilities', result: capabilities }, null, 2));
@@ -67,7 +85,7 @@ try {
       await vm.dispose();
       sqlite.dispose();
       vm = await AgentOs.create(options);
-      await stage();
+      if (!artifactStore) await stage();
       if (!(await vm.filesystem.exists('/state/transcript.json'))) throw new Error('Guest transcript did not survive VM recreation');
     }
     const started = performance.now();
@@ -79,10 +97,13 @@ try {
     const report = { generation, durationMs: Math.round(performance.now() - started), sqliteCalls: sqlite.stats.calls - before, result };
     reports.push(report);
     console.log(JSON.stringify(report, null, 2));
+    if (/failed to asynchronously prepare wasm|Aborted\(Error:.*\/core\//.test(result.stderr ?? '')) throw new Error('Core parser asset failed to load');
     if (result.outcome !== 'succeeded' || result.exitCode !== 0) { process.exitCode = 1; }
   }
+  completed = true;
 } finally {
   await mkdir('artifacts/results', { recursive: true });
-  await writeFile('artifacts/results/core-probe.json', JSON.stringify({ recordedAt: new Date().toISOString(), node: process.version, openclaw: '2026.8.1', agentos: '0.2.19', runtimeEnvironment: Object.fromEntries(['MALLOC_ARENA_MAX', 'MALLOC_TRIM_THRESHOLD_', 'MALLOC_MMAP_THRESHOLD_', 'AGENTOS_V8_WARM_ISOLATES'].map(key => [key, process.env[key] ?? null])), sqlite: sqlite.stats, reports }, null, 2) + '\n');
-  await vm?.dispose(); sqlite.dispose(); await vm?.sidecar.dispose(); await rm(sqliteRoot, { recursive: true, force: true });
+  const validationPassed = completed && reports.length === 3 && reports.every(report => report.result.exitCode === 0 && report.result.outcome === 'succeeded');
+  await writeFile('artifacts/results/core-probe.json', JSON.stringify({ recordedAt: new Date().toISOString(), node: process.version, artifactMode, validationPassed, openclaw: '2026.8.1', agentos: '0.2.19', runtimeEnvironment: Object.fromEntries(['MALLOC_ARENA_MAX', 'MALLOC_TRIM_THRESHOLD_', 'MALLOC_MMAP_THRESHOLD_', 'AGENTOS_V8_WARM_ISOLATES'].map(key => [key, process.env[key] ?? null])), sqlite: sqlite.stats, reports }, null, 2) + '\n');
+  await vm?.dispose(); sqlite.dispose(); await vm?.sidecar.dispose(); await artifactStore?.dispose(); await rm(sqliteRoot, { recursive: true, force: true });
 }
