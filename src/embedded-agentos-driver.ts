@@ -1,7 +1,10 @@
 import { AgentOs, type ProcessDescriptor } from "@rivet-dev/agentos-core";
 import type { WorkerLeaseStatus } from "openclaw/plugin-sdk/plugin-entry";
 import { downloadBootstrap } from "./bootstrap-download.js";
-import { applyOpenClawCompatibility } from "./compatibility.js";
+import {
+  applyOpenClawCompatibility,
+  OPENCLAW_AGENTOS_NODE_BUILTINS,
+} from "./compatibility.js";
 import type { AgentOsProfile } from "./config.js";
 import type { AgentOsDriver } from "./types.js";
 import { writeLargeFile } from "./write-large-file.js";
@@ -61,6 +64,7 @@ export function createEmbeddedAgentOsDriver(options: {
       const existing = leases.get(allocation.leaseId);
       if (existing) return;
       const vm = await AgentOs.create({
+        allowedNodeBuiltins: [...OPENCLAW_AGENTOS_NODE_BUILTINS],
         permissions: {
           fs: "allow",
           childProcess: "allow",

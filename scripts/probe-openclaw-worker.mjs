@@ -1,8 +1,11 @@
 import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
-import { AgentOs } from "@rivet-dev/agentos-core";
 import { patchOpenClawSource } from "../dist/src/compatibility.js";
 import { writeLargeFile } from "../dist/src/write-large-file.js";
+
+const agentOsModuleSpecifier =
+  process.env.AGENTOS_CORE_MODULE ?? "@rivet-dev/agentos-core";
+const { AgentOs } = await import(agentOsModuleSpecifier);
 
 const repository = resolve(process.env.OPENCLAW_REPO ?? "../openclaw-2.0");
 const workerPath = resolve(repository, "dist/worker/worker.mjs");

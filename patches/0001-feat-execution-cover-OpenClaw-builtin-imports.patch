@@ -1,0 +1,445 @@
+From 3c37fbc58555abdaa80ffbdab83d33d516a3ca83 Mon Sep 17 00:00:00 2001
+From: Codex <codex@openai.com>
+Date: Thu, 3 Sep 2026 08:34:09 -0600
+Subject: [PATCH] feat(execution): cover OpenClaw builtin imports
+
+---
+ .../execution/assets/polyfill-registry.json   |  1 +
+ crates/execution/src/javascript.rs            | 13 ++-
+ crates/execution/tests/javascript_v8.rs       | 86 +++++++++++++++++++
+ .../bridge-src/builtins/builtin-modules.ts    |  2 +
+ .../build-tools/bridge-src/builtins/crypto.ts | 50 ++++++++++-
+ .../bridge-src/builtins/module-loader.ts      |  5 ++
+ .../build-tools/bridge-src/builtins/perf.ts   | 79 ++++++++++++++++-
+ 7 files changed, 231 insertions(+), 5 deletions(-)
+
+diff --git a/crates/execution/assets/polyfill-registry.json b/crates/execution/assets/polyfill-registry.json
+index 3286cc4..d122617 100644
+--- a/crates/execution/assets/polyfill-registry.json
++++ b/crates/execution/assets/polyfill-registry.json
+@@ -45,6 +45,7 @@
+         "perf_hooks",
+         "process",
+         "readline",
++        "readline/promises",
+         "sqlite",
+         "stream/consumers",
+         "stream/promises",
+diff --git a/crates/execution/src/javascript.rs b/crates/execution/src/javascript.rs
+index 1b16904..f657278 100644
+--- a/crates/execution/src/javascript.rs
++++ b/crates/execution/src/javascript.rs
+@@ -5476,6 +5476,7 @@ fn normalize_builtin_specifier(specifier: &str) -> Option<String> {
+         | "punycode"
+         | "querystring"
+         | "readline"
++        | "readline/promises"
+         | "repl"
+         | "sqlite"
+         | "stream"
+@@ -5677,7 +5678,7 @@ export { empty as dot, empty as junit, empty as spec, empty as tap };
+         );
+     }
+ 
+-    if module_name == "readline" {
++    if matches!(module_name, "readline" | "readline/promises") {
+         return String::from(
+             r#"class MiniEmitter {
+   constructor() {
+@@ -6701,6 +6702,7 @@ fn builtin_named_exports(module_name: &str) -> &'static [&'static str] {
+             "DiffieHellman",
+             "ECDH",
+             "KeyObject",
++            "X509Certificate",
+             "constants",
+             "createCipheriv",
+             "createDecipheriv",
+@@ -6725,6 +6727,7 @@ fn builtin_named_exports(module_name: &str) -> &'static [&'static str] {
+             "getFips",
+             "getHashes",
+             "getRandomValues",
++            "hash",
+             "pbkdf2",
+             "pbkdf2Sync",
+             "privateDecrypt",
+@@ -6734,6 +6737,7 @@ fn builtin_named_exports(module_name: &str) -> &'static [&'static str] {
+             "randomBytes",
+             "randomFill",
+             "randomFillSync",
++            "randomInt",
+             "randomUUID",
+             "scrypt",
+             "scryptSync",
+@@ -6826,6 +6830,7 @@ fn builtin_named_exports(module_name: &str) -> &'static [&'static str] {
+             "fstat",
+             "fstatSync",
+             "fsyncSync",
++            "globSync",
+             "lstat",
+             "lstatSync",
+             "lutimes",
+@@ -6876,6 +6881,8 @@ fn builtin_named_exports(module_name: &str) -> &'static [&'static str] {
+             "writeFile",
+             "writeFileSync",
+             "writeSync",
++            "writev",
++            "writevSync",
+         ],
+         "fs/promises" => &[
+             "access",
+@@ -6964,6 +6971,7 @@ fn builtin_named_exports(module_name: &str) -> &'static [&'static str] {
+             "builtinModules",
+             "createRequire",
+             "findSourceMap",
++            "flushCompileCache",
+             "isBuiltin",
+             "syncBuiltinESMExports",
+             "wrap",
+@@ -7091,9 +7099,10 @@ fn builtin_named_exports(module_name: &str) -> &'static [&'static str] {
+             "PerformanceObserver",
+             "constants",
+             "createHistogram",
++            "monitorEventLoopDelay",
+             "performance",
+         ],
+-        "readline" => &["createInterface"],
++        "readline" | "readline/promises" => &["createInterface"],
+         "sqlite" => &["DatabaseSync", "StatementSync", "constants"],
+         "stream" => &[
+             "Duplex",
+diff --git a/crates/execution/tests/javascript_v8.rs b/crates/execution/tests/javascript_v8.rs
+index df4c26e..f180f3a 100644
+--- a/crates/execution/tests/javascript_v8.rs
++++ b/crates/execution/tests/javascript_v8.rs
+@@ -3070,6 +3070,91 @@ if (seen[0] !== "alpha" || seen[1] !== "beta" || seen[2] !== "gamma") {
+     assert!(stderr.is_empty(), "unexpected stderr: {stderr}");
+ }
+ 
++fn javascript_execution_v8_exposes_openclaw_builtin_compatibility_surface() {
++    let temp = tempdir().expect("create temp dir");
++    let mut engine = support::javascript_engine();
++    let context = engine.create_context(CreateJavascriptContextRequest {
++        vm_id: String::from("vm-js"),
++        bootstrap_module: None,
++        compile_cache_root: None,
++    });
++
++    let execution = engine
++        .start_execution(StartJavascriptExecutionRequest {
++            limits: Default::default(),
++            argv0: None,
++            guest_runtime: Default::default(),
++            vm_id: String::from("vm-js"),
++            context_id: context.context_id,
++            argv: vec![String::from("./entry.mjs")],
++            env: BTreeMap::new(),
++            cwd: temp.path().to_path_buf(),
++            wasm_module_bytes: None,
++            inline_code: Some(String::from(
++                r#"
++import readlinePromises from "node:readline/promises";
++import { X509Certificate, hash, randomInt } from "node:crypto";
++import { closeSync, globSync, openSync, readFileSync, writeFileSync, writev } from "node:fs";
++import { flushCompileCache } from "node:module";
++import { monitorEventLoopDelay } from "node:perf_hooks";
++
++if (typeof readlinePromises.createInterface !== "function") throw new Error("readline/promises alias missing");
++if (hash("sha256", "agentos-openclaw", "hex").length !== 64) throw new Error("crypto.hash failed");
++for (let index = 0; index < 32; index += 1) {
++  const value = randomInt(-7, 11);
++  if (!Number.isInteger(value) || value < -7 || value >= 11) throw new Error("crypto.randomInt out of range");
++}
++await new Promise((resolve, reject) => {
++  randomInt(5, (error, value) => error ? reject(error) : value >= 0 && value < 5 ? resolve() : reject(new Error("async crypto.randomInt out of range")));
++});
++
++let x509Error;
++try {
++  new X509Certificate("not-a-certificate");
++} catch (error) {
++  x509Error = error;
++}
++if (x509Error?.code !== "ERR_NOT_IMPLEMENTED") throw new Error("X509Certificate must fail explicitly");
++
++writeFileSync("openclaw-audit.txt", "seed");
++if (!globSync("openclaw-*.txt").includes("openclaw-audit.txt")) throw new Error("fs.globSync failed");
++const fd = openSync("openclaw-writev.txt", "w");
++await new Promise((resolve, reject) => {
++  writev(fd, [Buffer.from("open"), Buffer.from("claw")], 0, (error, bytesWritten) => {
++    if (error) reject(error);
++    else if (bytesWritten !== 8) reject(new Error(`unexpected writev byte count: ${bytesWritten}`));
++    else resolve();
++  });
++});
++closeSync(fd);
++if (readFileSync("openclaw-writev.txt", "utf8") !== "openclaw") throw new Error("fs.writev failed");
++
++if (flushCompileCache() !== undefined) throw new Error("flushCompileCache must return undefined");
++const delay = monitorEventLoopDelay({ resolution: 5 });
++if (typeof delay.enable !== "function" || typeof delay.disable !== "function" || typeof delay.percentile !== "function") {
++  throw new Error("monitorEventLoopDelay surface missing");
++}
++if (!delay.enable()) throw new Error("monitorEventLoopDelay did not enable");
++await new Promise((resolve) => setTimeout(resolve, 15));
++if (delay.count < 1 || delay.percentile(99) < 1 || delay.max < 1) throw new Error("monitorEventLoopDelay did not record");
++if (!delay.disable()) throw new Error("monitorEventLoopDelay did not disable");
++delay.reset();
++if (delay.count !== 0) throw new Error("monitorEventLoopDelay did not reset");
++"#,
++            )),
++        })
++        .expect("start JavaScript execution");
++
++    let result = execution.wait().expect("wait for JavaScript execution");
++    let stdout = String::from_utf8(result.stdout).expect("stdout utf8");
++    let stderr = String::from_utf8(result.stderr).expect("stderr utf8");
++    assert_eq!(
++        result.exit_code, 0,
++        "stdout:\n{stdout}\nstderr:\n{stderr}"
++    );
++    assert!(stderr.is_empty(), "unexpected stderr: {stderr}");
++}
++
+ fn javascript_execution_v8_builtin_wrappers_expose_common_named_exports() {
+     let temp = tempdir().expect("create temp dir");
+     let mut engine = support::javascript_engine();
+@@ -7187,6 +7272,7 @@ fn javascript_v8_suite() {
+     javascript_execution_resolves_dependencies_from_package_specific_symlink_mounts();
+     javascript_execution_v8_timer_callbacks_fire_and_clear_correctly();
+     javascript_execution_v8_readline_polyfill_emits_lines();
++    javascript_execution_v8_exposes_openclaw_builtin_compatibility_surface();
+     javascript_execution_v8_builtin_wrappers_expose_common_named_exports();
+     javascript_execution_v8_child_process_conformance_matches_host_node();
+     javascript_execution_v8_web_stream_globals_support_basic_io();
+diff --git a/packages/build-tools/bridge-src/builtins/builtin-modules.ts b/packages/build-tools/bridge-src/builtins/builtin-modules.ts
+index 819f42a..d3f8fdc 100644
+--- a/packages/build-tools/bridge-src/builtins/builtin-modules.ts
++++ b/packages/build-tools/bridge-src/builtins/builtin-modules.ts
+@@ -77,6 +77,7 @@ class BuiltinModuleRegistry {
+ 		"punycode",
+ 		"querystring",
+ 		"readline",
++		"readline/promises",
+ 		"repl",
+ 		"sqlite",
+ 		"stream",
+@@ -754,6 +755,7 @@ function loadBuiltinModule(request) {
+ 		case "querystring":
+ 			return builtinQuerystringStdlibModule;
+ 		case "readline":
++		case "readline/promises":
+ 			return {
+ 				createInterface(options = {}) {
+ 					const input = options.input ?? null;
+diff --git a/packages/build-tools/bridge-src/builtins/crypto.ts b/packages/build-tools/bridge-src/builtins/crypto.ts
+index bd8092d..a583af6 100644
+--- a/packages/build-tools/bridge-src/builtins/crypto.ts
++++ b/packages/build-tools/bridge-src/builtins/crypto.ts
+@@ -21,12 +21,22 @@ var ERR_INVALID_THIS2 = "ERR_INVALID_THIS";
+ 
+ var ERR_ILLEGAL_CONSTRUCTOR = "ERR_ILLEGAL_CONSTRUCTOR";
+ 
++var RANDOM_INT_ENTROPY_RANGE = 281474976710656;
++
++var MAX_RANDOM_INT_RANGE = RANDOM_INT_ENTROPY_RANGE - 1;
++
+ function createNodeTypeError2(message, code) {
+   const error = new TypeError(message);
+   error.code = code;
+   return error;
+ }
+ 
++class UnsupportedX509Certificate {
++  constructor() {
++    throwUnsupportedCryptoApi("X509Certificate");
++  }
++}
++
+ class SandboxDOMException extends Error {
+   constructor(message = "", name = "Error") {
+     super(message);
+@@ -1009,6 +1019,7 @@ class BuiltinDiffieHellmanSession {
+ }
+ 
+ var builtinCryptoModule = {
++  X509Certificate: UnsupportedX509Certificate,
+   KeyObject: BuiltinKeyObject,
+   DiffieHellman: BuiltinDiffieHellmanSession,
+   ECDH: BuiltinDiffieHellmanSession,
+@@ -1056,6 +1067,10 @@ var builtinCryptoModule = {
+   createHash(algorithm) {
+     return createBuiltinHash(algorithm);
+   },
++  hash(algorithm, data, outputEncoding = "hex") {
++    const digest = createBuiltinHash(algorithm).update(data);
++    return outputEncoding === "buffer" ? digest.digest() : digest.digest(outputEncoding);
++  },
+   createHmac(algorithm, key) {
+     return createBuiltinHmac(algorithm, key);
+   },
+@@ -1301,6 +1316,39 @@ var builtinCryptoModule = {
+     cryptoPolyfill.getRandomValues(bytes);
+     return import_buffer2.Buffer.from(bytes);
+   },
++  randomInt(min, max, callback) {
++    let minimum = 0;
++    let maximum = min;
++    let done = max;
++    if (typeof max === "number") {
++      minimum = min;
++      maximum = max;
++      done = callback;
++    }
++    if (!Number.isSafeInteger(minimum) || !Number.isSafeInteger(maximum)) {
++      throw new TypeError('The "min" and "max" arguments must be safe integers');
++    }
++    const range = maximum - minimum;
++    if (range <= 0 || range > MAX_RANDOM_INT_RANGE) {
++      throw new RangeError(
++        `The value of "max - min" is out of range. It must be > 0 and <= ${MAX_RANDOM_INT_RANGE}`
++      );
++    }
++    if (done !== void 0 && typeof done !== "function") {
++      throw new TypeError('The "callback" argument must be of type function');
++    }
++    const randomLimit = RANDOM_INT_ENTROPY_RANGE - RANDOM_INT_ENTROPY_RANGE % range;
++    let randomValue;
++    do {
++      randomValue = builtinCryptoModule.randomBytes(6).readUIntBE(0, 6);
++    } while (randomValue >= randomLimit);
++    const result = minimum + randomValue % range;
++    if (done) {
++      queueMicrotask(() => done(null, result));
++      return;
++    }
++    return result;
++  },
+   randomUUID() {
+     return cryptoPolyfill.randomUUID();
+   },
+@@ -1310,4 +1358,4 @@ var builtinCryptoModule = {
+   subtle: subtleCrypto,
+   webcrypto: cryptoPolyfill
+ };
+-export { BuiltinCipherTransform, BuiltinDiffieHellmanSession, BuiltinKeyObject, BuiltinSignContext, BuiltinVerifyContext, ERR_ILLEGAL_CONSTRUCTOR, ERR_INVALID_THIS2, SandboxCrypto, SandboxCryptoKey, SandboxDOMException, SandboxSubtleCrypto, assertCryptoReceiver, assertSubtleReceiver, builtinCryptoModule, callCryptoSync, createBuiltinHash, createBuiltinHmac, createBuiltinKeyObject, createCryptoKey, createDomLikeError, createNodeTypeError2, createUnsupportedCryptoApiError, cryptoPolyfill, cryptoPolyfillInstance, decodeGeneratedCryptoValue, deserializeBridgeValue, diffieHellmanSessionFinalizer, encodeCryptoResult, isBufferLikeValue, isBuiltinKeyObject, isIntegerTypedArray, kBuiltinCryptoKeyObjectToken, kCryptoKeyToken, kCryptoToken, kSubtleToken, normalizeAlgorithm, normalizeBridgeAlgorithm, normalizeCipherOptions, normalizeCryptoAlgorithmName, normalizeDiffieHellmanArgs, normalizeDirectCryptoKeyInput, serializeBridgeValue, serializeCryptoKeyInput, serializeOptionalCryptoOptions, subtleCall, subtleCrypto, throwUnsupportedCryptoApi, toArrayBuffer, toBase64, toCryptoBuffer, toSymmetricKeyBuffer };
++export { BuiltinCipherTransform, BuiltinDiffieHellmanSession, BuiltinKeyObject, BuiltinSignContext, BuiltinVerifyContext, ERR_ILLEGAL_CONSTRUCTOR, ERR_INVALID_THIS2, SandboxCrypto, SandboxCryptoKey, SandboxDOMException, SandboxSubtleCrypto, UnsupportedX509Certificate, assertCryptoReceiver, assertSubtleReceiver, builtinCryptoModule, callCryptoSync, createBuiltinHash, createBuiltinHmac, createBuiltinKeyObject, createCryptoKey, createDomLikeError, createNodeTypeError2, createUnsupportedCryptoApiError, cryptoPolyfill, cryptoPolyfillInstance, decodeGeneratedCryptoValue, deserializeBridgeValue, diffieHellmanSessionFinalizer, encodeCryptoResult, isBufferLikeValue, isBuiltinKeyObject, isIntegerTypedArray, kBuiltinCryptoKeyObjectToken, kCryptoKeyToken, kCryptoToken, kSubtleToken, normalizeAlgorithm, normalizeBridgeAlgorithm, normalizeCipherOptions, normalizeCryptoAlgorithmName, normalizeDiffieHellmanArgs, normalizeDirectCryptoKeyInput, serializeBridgeValue, serializeCryptoKeyInput, serializeOptionalCryptoOptions, subtleCall, subtleCrypto, throwUnsupportedCryptoApi, toArrayBuffer, toBase64, toCryptoBuffer, toSymmetricKeyBuffer };
+diff --git a/packages/build-tools/bridge-src/builtins/module-loader.ts b/packages/build-tools/bridge-src/builtins/module-loader.ts
+index a54f835..34680bf 100644
+--- a/packages/build-tools/bridge-src/builtins/module-loader.ts
++++ b/packages/build-tools/bridge-src/builtins/module-loader.ts
+@@ -306,6 +306,11 @@ var moduleModule = Object.assign(Module, {
+   syncBuiltinESMExports: Module.syncBuiltinESMExports,
+   // findSourceMap (stub)
+   findSourceMap: Module.findSourceMap,
++  // The guest runtime does not retain Node's on-disk compile cache. Keep the
++  // lifecycle API as a truthful no-op so callers can release a cache when one
++  // exists without branching on runtime identity.
++  flushCompileCache() {
++  },
+   // SourceMap class (stub)
+   SourceMap
+ });
+diff --git a/packages/build-tools/bridge-src/builtins/perf.ts b/packages/build-tools/bridge-src/builtins/perf.ts
+index fbf11e7..7b3e98d 100644
+--- a/packages/build-tools/bridge-src/builtins/perf.ts
++++ b/packages/build-tools/bridge-src/builtins/perf.ts
+@@ -1,5 +1,5 @@
+ import { getNowMs } from "./process.js";
+-import { _queueMicrotask } from "./timers.js";
++import { _queueMicrotask, clearInterval, setInterval } from "./timers.js";
+ 
+ function createPerfHooksOutOfRangeError(name, requirement, value) {
+   const error = new RangeError(
+@@ -73,6 +73,78 @@ function createPerformanceHistogram() {
+   };
+ }
+ 
++function createEventLoopDelayHistogram(options = {}) {
++  const resolution = Number(options?.resolution ?? 10);
++  if (!Number.isInteger(resolution) || resolution < 1) {
++    throw createPerfHooksOutOfRangeError("options.resolution", ">= 1", options?.resolution);
++  }
++  const values = [];
++  let timer = null;
++  let expectedAt = 0;
++  const sortedValues = () => values.slice().sort((left, right) => left - right);
++  const percentile = (value) => {
++    const normalized = Number(value);
++    if (!Number.isFinite(normalized) || normalized <= 0 || normalized > 100) {
++      throw createPerfHooksOutOfRangeError("percentile", "> 0 && <= 100", value);
++    }
++    if (values.length === 0) return 0;
++    const sorted = sortedValues();
++    const index = Math.min(
++      sorted.length - 1,
++      Math.max(0, Math.ceil(normalized / 100 * sorted.length) - 1)
++    );
++    return sorted[index];
++  };
++  const monitor = {
++    enable() {
++      if (timer) return false;
++      expectedAt = builtinPerformance.now() + resolution;
++      timer = setInterval(() => {
++        const now = builtinPerformance.now();
++        values.push(Math.max(1, Math.round((now - expectedAt) * 1e6)));
++        if (values.length > 8192) values.shift();
++        expectedAt = now + resolution;
++      }, resolution);
++      timer?.unref?.();
++      return true;
++    },
++    disable() {
++      if (!timer) return false;
++      clearInterval(timer);
++      timer = null;
++      return true;
++    },
++    reset() {
++      values.length = 0;
++    },
++    percentile,
++    get percentiles() {
++      return new Map([50, 75, 90, 99, 100].map((value) => [value, percentile(value)]));
++    },
++    get count() {
++      return values.length;
++    },
++    get exceeds() {
++      return 0;
++    },
++    get min() {
++      return values.length === 0 ? 0 : Math.min(...values);
++    },
++    get max() {
++      return values.length === 0 ? 0 : Math.max(...values);
++    },
++    get mean() {
++      return values.length === 0 ? Number.NaN : values.reduce((sum, value) => sum + value, 0) / values.length;
++    },
++    get stddev() {
++      if (values.length === 0) return Number.NaN;
++      const mean = monitor.mean;
++      return Math.sqrt(values.reduce((sum, value) => sum + (value - mean) ** 2, 0) / values.length);
++    }
++  };
++  return monitor;
++}
++
+ var builtinPerformance = (() => {
+   const marks = /* @__PURE__ */ new Map();
+   const measures = [];
+@@ -283,6 +355,9 @@ var builtinPerfHooksModule = {
+   createHistogram() {
+     return createPerformanceHistogram();
+   },
++  monitorEventLoopDelay(options) {
++    return createEventLoopDelayHistogram(options);
++  },
+   performance: builtinPerformance
+ };
+-export { builtinPerfHooksModule, builtinPerformance, createPerfHooksOutOfRangeError, createPerformanceHistogram, createPerformanceObserverEntryList, normalizePerformanceEntry };
++export { builtinPerfHooksModule, builtinPerformance, createEventLoopDelayHistogram, createPerfHooksOutOfRangeError, createPerformanceHistogram, createPerformanceObserverEntryList, normalizePerformanceEntry };
+-- 
+2.51.1
+

@@ -1,5 +1,17 @@
 import { describe, expect, it } from "vitest";
-import { patchOpenClawSource } from "../src/compatibility.js";
+import {
+  OPENCLAW_AGENTOS_NODE_BUILTINS,
+  patchOpenClawSource,
+} from "../src/compatibility.js";
+
+describe("OPENCLAW_AGENTOS_NODE_BUILTINS", () => {
+  it("matches the audited worker policy after the temporary readline rewrite", () => {
+    expect(OPENCLAW_AGENTOS_NODE_BUILTINS).toHaveLength(36);
+    expect(OPENCLAW_AGENTOS_NODE_BUILTINS).toContain("crypto");
+    expect(OPENCLAW_AGENTOS_NODE_BUILTINS).toContain("worker_threads");
+    expect(OPENCLAW_AGENTOS_NODE_BUILTINS).not.toContain("readline/promises");
+  });
+});
 
 describe("patchOpenClawSource", () => {
   it("aliases the unsupported promises subpath to AgentOS readline", () => {

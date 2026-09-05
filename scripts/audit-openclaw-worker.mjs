@@ -2,7 +2,10 @@ import { createHash } from "node:crypto";
 import { builtinModules } from "node:module";
 import { readFile, writeFile } from "node:fs/promises";
 import { resolve } from "node:path";
-import { AgentOs } from "@rivet-dev/agentos-core";
+
+const agentOsModuleSpecifier =
+  process.env.AGENTOS_CORE_MODULE ?? "@rivet-dev/agentos-core";
+const { AgentOs } = await import(agentOsModuleSpecifier);
 
 const RESULT_MARKER = "OPENCLAW_AGENTOS_AUDIT=";
 const REGISTRY_MARKER = "OPENCLAW_AGENTOS_BUILTINS=";
@@ -204,7 +207,13 @@ const packagePath = resolve(repository, "package.json");
 const worker = await readFile(workerPath, "utf8");
 const openClawPackage = JSON.parse(await readFile(packagePath, "utf8"));
 const agentOsPackage = JSON.parse(
-  await readFile(resolve("node_modules/@rivet-dev/agentos-core/package.json"), "utf8"),
+  await readFile(
+    resolve(
+      process.env.AGENTOS_CORE_PACKAGE_JSON ??
+        "node_modules/@rivet-dev/agentos-core/package.json",
+    ),
+    "utf8",
+  ),
 );
 const inventory = inventoryBuiltinImports(worker);
 const registeredBuiltins = new Set(await discoverAgentOsBuiltins());

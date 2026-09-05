@@ -3,6 +3,51 @@ import type { AgentOs } from "@rivet-dev/agentos-core";
 const READLINE_PROMISES_SPECIFIER = "node:readline/promises";
 const READLINE_SPECIFIER = "node:readline";
 
+/**
+ * Node builtins imported by the pinned OpenClaw worker after applying the
+ * temporary readline/promises rewrite. Keeping this explicit makes AgentOS's
+ * runtime policy match the artifact we audited instead of silently relying on
+ * its smaller default allow-list.
+ */
+export const OPENCLAW_AGENTOS_NODE_BUILTINS = [
+  "assert",
+  "async_hooks",
+  "buffer",
+  "child_process",
+  "crypto",
+  "diagnostics_channel",
+  "dns",
+  "dns/promises",
+  "events",
+  "fs",
+  "fs/promises",
+  "http",
+  "http2",
+  "https",
+  "module",
+  "net",
+  "os",
+  "path",
+  "path/win32",
+  "perf_hooks",
+  "process",
+  "readline",
+  "stream",
+  "stream/promises",
+  "string_decoder",
+  "timers",
+  "timers/promises",
+  "tls",
+  "tty",
+  "url",
+  "util",
+  "util/types",
+  "v8",
+  "vm",
+  "worker_threads",
+  "zlib",
+] as const;
+
 const patchScript = String.raw`
 import { readdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
