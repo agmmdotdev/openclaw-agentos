@@ -1,0 +1,363 @@
+{
+  "method": {
+    "memory": "MiB; sampled process-tree PSS includes Node driver and native sidecars; RSS also retained",
+    "cpu": "Sum of maximum sampled CPU ticks per PID/start-time identity; approximate, may miss the final sample before exit",
+    "latency": "Same read + shell exec turn, synthetic inference, six turns per guest; cold means fresh process/storage with warm host file cache",
+    "scope": "Small local experiment, not production capacity or cloud billing"
+  },
+  "runs": [
+    {
+      "file": "benchmark-1vm-1.json",
+      "runtime": "agentos",
+      "configuredInstances": 1,
+      "passed": true,
+      "placement": "shared-default",
+      "splitInitializer": false,
+      "instances": [
+        {
+          "index": 0,
+          "coldTurnMs": 17678,
+          "launchToFirstResultMs": 20481.427149,
+          "launchToReadyMs": 2794.1032990000003,
+          "warmTurnMs": [
+            299,
+            329,
+            280,
+            363,
+            404
+          ],
+          "coldSqliteCalls": 3283,
+          "coldHostSqlMs": 197.31080899998778
+        }
+      ],
+      "sampledTreeCpuSeconds": 31.16,
+      "peakPssMiB": 1134.3408203125,
+      "peakRssMiB": 1136.08203125,
+      "allIdlePssMiB": 1040.4580078125,
+      "baselinePssMiB": 66.361328125,
+      "emptyVmsPssMiB": 238.3662109375,
+      "stagedPssMiB": 406.478515625,
+      "disposedVmsPssMiB": 753.4033203125,
+      "disposedSidecarsPssMiB": null
+    },
+    {
+      "file": "benchmark-1vm-2.json",
+      "runtime": "agentos",
+      "configuredInstances": 1,
+      "passed": true,
+      "placement": "shared-default",
+      "splitInitializer": false,
+      "instances": [
+        {
+          "index": 0,
+          "coldTurnMs": 17743,
+          "launchToFirstResultMs": 20138.106399,
+          "launchToReadyMs": 2388.2174070000005,
+          "warmTurnMs": [
+            310,
+            321,
+            489,
+            418,
+            261
+          ],
+          "coldSqliteCalls": 3283,
+          "coldHostSqlMs": 211.24824999999782
+        }
+      ],
+      "sampledTreeCpuSeconds": 30.14,
+      "peakPssMiB": 1125.4267578125,
+      "peakRssMiB": 1127.16796875,
+      "allIdlePssMiB": 1042.2509765625,
+      "baselinePssMiB": 66.74609375,
+      "emptyVmsPssMiB": 237.93359375,
+      "stagedPssMiB": 384.927734375,
+      "disposedVmsPssMiB": 756.7666015625,
+      "disposedSidecarsPssMiB": null
+    },
+    {
+      "file": "benchmark-1vm-3.json",
+      "runtime": "agentos",
+      "configuredInstances": 1,
+      "passed": true,
+      "placement": "shared-default",
+      "splitInitializer": false,
+      "instances": [
+        {
+          "index": 0,
+          "coldTurnMs": 19439,
+          "launchToFirstResultMs": 26288.969396999997,
+          "launchToReadyMs": 6807.544116,
+          "warmTurnMs": [
+            308,
+            387,
+            557,
+            362,
+            540
+          ],
+          "coldSqliteCalls": 3283,
+          "coldHostSqlMs": 373.13740900002995
+        }
+      ],
+      "sampledTreeCpuSeconds": 38.34,
+      "peakPssMiB": 1221.3251953125,
+      "peakRssMiB": 1223.06640625,
+      "allIdlePssMiB": 1130.0166015625,
+      "baselinePssMiB": 66.951171875,
+      "emptyVmsPssMiB": 238.8427734375,
+      "stagedPssMiB": 383.419921875,
+      "disposedVmsPssMiB": 843.0830078125,
+      "disposedSidecarsPssMiB": null
+    },
+    {
+      "file": "benchmark-1vm-4.json",
+      "runtime": "agentos",
+      "configuredInstances": 1,
+      "passed": true,
+      "placement": "one-sidecar-pool-per-vm",
+      "splitInitializer": false,
+      "instances": [
+        {
+          "index": 0,
+          "coldTurnMs": 17828,
+          "launchToFirstResultMs": 20624.088759000002,
+          "launchToReadyMs": 2789.866252,
+          "warmTurnMs": [
+            283,
+            326,
+            315,
+            408,
+            354
+          ],
+          "coldSqliteCalls": 3283,
+          "coldHostSqlMs": 202.1136550000465,
+          "coldGuestSqlMs": 2083
+        }
+      ],
+      "sampledTreeCpuSeconds": 31.99,
+      "peakPssMiB": 1131.3642578125,
+      "peakRssMiB": 1133.10546875,
+      "allIdlePssMiB": 1043.4228515625,
+      "baselinePssMiB": 66.546875,
+      "emptyVmsPssMiB": 238.0693359375,
+      "stagedPssMiB": 394.958984375,
+      "disposedVmsPssMiB": 756.2822265625,
+      "disposedSidecarsPssMiB": 89.0009765625
+    },
+    {
+      "file": "benchmark-1vm-5.json",
+      "runtime": "agentos",
+      "configuredInstances": 1,
+      "passed": true,
+      "placement": "one-sidecar-pool-per-vm",
+      "splitInitializer": true,
+      "instances": [
+        {
+          "index": 0,
+          "coldTurnMs": 17684,
+          "launchToFirstResultMs": 19882.241721000002,
+          "launchToReadyMs": 2187.6036929999996,
+          "warmTurnMs": [
+            314,
+            325,
+            293,
+            340,
+            325
+          ],
+          "coldSqliteCalls": 3283,
+          "coldHostSqlMs": 192.7157450000077,
+          "coldGuestSqlMs": 1911
+        }
+      ],
+      "sampledTreeCpuSeconds": 29.66,
+      "peakPssMiB": 1159.5595703125,
+      "peakRssMiB": 1161.3046875,
+      "allIdlePssMiB": 1073.3564453125,
+      "baselinePssMiB": 67.208984375,
+      "emptyVmsPssMiB": 239.1357421875,
+      "stagedPssMiB": 386.369140625,
+      "disposedVmsPssMiB": 785.9248046875,
+      "disposedSidecarsPssMiB": 84.4228515625
+    },
+    {
+      "file": "benchmark-2vm-1.json",
+      "runtime": "agentos",
+      "configuredInstances": 2,
+      "passed": false,
+      "placement": "shared-default",
+      "splitInitializer": false,
+      "instances": [
+        {
+          "index": 1,
+          "coldTurnMs": 18101,
+          "launchToFirstResultMs": 21919.593382,
+          "launchToReadyMs": 3810.9335729999993,
+          "warmTurnMs": [
+            325,
+            364,
+            318,
+            372,
+            376
+          ],
+          "coldSqliteCalls": 3284,
+          "coldHostSqlMs": 221.41339799999878
+        }
+      ],
+      "sampledTreeCpuSeconds": 40.46,
+      "peakPssMiB": 1568.2041015625,
+      "peakRssMiB": 1569.94140625,
+      "allIdlePssMiB": 1293.6181640625,
+      "baselinePssMiB": 66.794921875,
+      "emptyVmsPssMiB": 261.9169921875,
+      "stagedPssMiB": 478.662109375,
+      "disposedVmsPssMiB": 1024.0986328125,
+      "disposedSidecarsPssMiB": null
+    },
+    {
+      "file": "benchmark-2vm-2.json",
+      "runtime": "agentos",
+      "configuredInstances": 2,
+      "passed": true,
+      "placement": "one-sidecar-pool-per-vm",
+      "splitInitializer": false,
+      "instances": [
+        {
+          "index": 0,
+          "coldTurnMs": 18305,
+          "launchToFirstResultMs": 21725.95116,
+          "launchToReadyMs": 3412.335341,
+          "warmTurnMs": [
+            522,
+            355,
+            356,
+            459,
+            342
+          ],
+          "coldSqliteCalls": 3283,
+          "coldHostSqlMs": 198.04086499994992,
+          "coldGuestSqlMs": 2423
+        },
+        {
+          "index": 1,
+          "coldTurnMs": 18349,
+          "launchToFirstResultMs": 21667.71158,
+          "launchToReadyMs": 3308.540546,
+          "warmTurnMs": [
+            507,
+            365,
+            413,
+            509,
+            454
+          ],
+          "coldSqliteCalls": 3283,
+          "coldHostSqlMs": 206.75622099997418,
+          "coldGuestSqlMs": 2451
+        }
+      ],
+      "sampledTreeCpuSeconds": 63.25,
+      "peakPssMiB": 2117.0224609375,
+      "peakRssMiB": 2196.1328125,
+      "allIdlePssMiB": 1944.3544921875,
+      "baselinePssMiB": 66.689453125,
+      "emptyVmsPssMiB": 351.146484375,
+      "stagedPssMiB": 651.12890625,
+      "disposedVmsPssMiB": 1333.41845703125,
+      "disposedSidecarsPssMiB": 77.4033203125
+    },
+    {
+      "file": "benchmark-native-1.json",
+      "runtime": "native-node",
+      "configuredInstances": 1,
+      "passed": true,
+      "placement": "native-process",
+      "splitInitializer": false,
+      "instances": [
+        {
+          "index": 0,
+          "coldTurnMs": 290.4922569999999,
+          "launchToFirstResultMs": 2136.852445000841,
+          "launchToReadyMs": 1846.1142289997952,
+          "warmTurnMs": [
+            36.392695,
+            31.92035399999986,
+            32.73581699999977,
+            35.92059700000027,
+            36.198875000000044
+          ]
+        }
+      ],
+      "sampledTreeCpuSeconds": 3.1,
+      "peakPssMiB": 985.6220703125,
+      "peakRssMiB": 986.45703125,
+      "allIdlePssMiB": 571.9287109375,
+      "baselinePssMiB": null,
+      "emptyVmsPssMiB": null,
+      "stagedPssMiB": null,
+      "disposedVmsPssMiB": null,
+      "disposedSidecarsPssMiB": null
+    },
+    {
+      "file": "benchmark-native-2.json",
+      "runtime": "native",
+      "configuredInstances": 1,
+      "passed": true,
+      "placement": "native-process",
+      "splitInitializer": false,
+      "instances": [
+        {
+          "index": 0,
+          "coldTurnMs": 287.2593639999998,
+          "launchToFirstResultMs": 2073.3705130005546,
+          "launchToReadyMs": 1785.6334009993589,
+          "warmTurnMs": [
+            31.605043000000023,
+            29.60394499999984,
+            27.69035299999996,
+            28.85925700000007,
+            29.826248999999734
+          ]
+        }
+      ],
+      "sampledTreeCpuSeconds": 2.93,
+      "peakPssMiB": 978.9619140625,
+      "peakRssMiB": 979.796875,
+      "allIdlePssMiB": 571.595703125,
+      "baselinePssMiB": null,
+      "emptyVmsPssMiB": null,
+      "stagedPssMiB": null,
+      "disposedVmsPssMiB": null,
+      "disposedSidecarsPssMiB": null
+    },
+    {
+      "file": "benchmark-native-compiled-1.json",
+      "runtime": "native-compiled",
+      "configuredInstances": 1,
+      "passed": true,
+      "placement": "native-process",
+      "splitInitializer": false,
+      "instances": [
+        {
+          "index": 0,
+          "coldTurnMs": 437.949443,
+          "launchToFirstResultMs": 2262.6366980002786,
+          "launchToReadyMs": 1824.0435690004233,
+          "warmTurnMs": [
+            42.894228999999996,
+            40.97257099999979,
+            35.037189000000126,
+            40.38143799999989,
+            52.48461099999986
+          ]
+        }
+      ],
+      "sampledTreeCpuSeconds": 3.32,
+      "peakPssMiB": 1048.2197265625,
+      "peakRssMiB": 1049.0546875,
+      "allIdlePssMiB": 665.6201171875,
+      "baselinePssMiB": null,
+      "emptyVmsPssMiB": null,
+      "stagedPssMiB": null,
+      "disposedVmsPssMiB": null,
+      "disposedSidecarsPssMiB": null
+    }
+  ]
+}

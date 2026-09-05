@@ -88,6 +88,21 @@ iterator intrinsic. New upstream artifacts require review; this is more than an
 import alias. The child-process adapter also depends on the pinned runtime’s
 listener-table representation. See the report for these compatibility limits.
 
+## Performance and placement
+
+The [runtime benchmark](docs/runtime-benchmark.md) finds **about 1 GiB idle
+memory per active instance**, 20–26 seconds from guest launch to the first
+completed turn, and warm-turn medians around 0.3–0.4 seconds. Direct Node runs
+the same workload substantially faster with lower idle memory. The current
+prototype has not achieved the lightweight/cheap goal.
+
+A new multi-instance probe also found that agentOS 0.2.19 replaces host binding
+handlers/policies when VMs share a sidecar. The core harness now requests its
+own sidecar pool and explicitly disposes it after the VM. Separate-pool routing
+and two concurrent core instances pass; shared-sidecar modes remain unsupported.
+Run `npm run probe:bindings` for the standalone evidence. Closing a VM alone does
+not reclaim all sidecar resident memory.
+
 ## Historical provider prototype
 
 The original TypeScript `WorkerProvider`, embedded lifecycle driver and their

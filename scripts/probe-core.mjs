@@ -7,12 +7,16 @@ import { mkdtemp, rm, realpath } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join, dirname } from 'node:path';
 import { createRequire } from 'node:module';
+import { randomUUID } from 'node:crypto';
 import { compileFixture } from './compile-async.mjs';
 
 const sqliteRoot = await mkdtemp(join(tmpdir(), 'openclaw-agentos-sqlite-'));
 await mkdir(join(sqliteRoot, 'databases'));
 const sqlite = createHostSqlite(join(sqliteRoot, 'databases'));
 const options = {
+  // Concurrent VMs with different bindings cannot share agentOS 0.2.19's host
+  // callback handler. Retain this pool across recreation of this one tenant.
+  sidecar: { kind: 'shared', pool: `openclaw-core-${randomUUID()}` },
   mounts: ['workspace', 'state'].map(name => ({ path: `/${name}`, plugin: { id: 'chunked_local', config: { metadataPath: join(sqliteRoot, `${name}.sqlite`), blockRoot: join(sqliteRoot, `${name}-blocks`), uid: 1000, gid: 1000, dirMode: 0o700, fileMode: 0o600 } } })),
   bindings: [sqlite.collection],
   allowedNodeBuiltins: [...OPENCLAW_AGENTOS_NODE_BUILTINS, 'querystring', 'console', 'sqlite', 'stream/web', 'constants', 'inspector'],
@@ -78,5 +82,5 @@ try {
 } finally {
   await mkdir('artifacts/results', { recursive: true });
   await writeFile('artifacts/results/core-probe.json', JSON.stringify({ recordedAt: new Date().toISOString(), node: process.version, openclaw: '2026.8.1', agentos: '0.2.19', sqlite: sqlite.stats, reports }, null, 2) + '\n');
-  await vm?.dispose(); sqlite.dispose(); await rm(sqliteRoot, { recursive: true, force: true });
+  await vm?.dispose(); sqlite.dispose(); await vm?.sidecar.dispose(); await rm(sqliteRoot, { recursive: true, force: true });
 }

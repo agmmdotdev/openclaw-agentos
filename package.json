@@ -35,7 +35,11 @@
     "test:core": "node scripts/probe-core.mjs",
     "test:host-sqlite": "node --test test/host-sqlite.test.mjs",
     "probe:async-context": "node scripts/probe-async-context.mjs",
-    "core:report": "node scripts/summarize-core-results.mjs"
+    "core:report": "node scripts/summarize-core-results.mjs",
+    "bench:build": "node scripts/benchmark/build.mjs",
+    "bench:core": "python3 scripts/benchmark/measure.py",
+    "bench:report": "python3 scripts/benchmark/summarize.py",
+    "probe:bindings": "node scripts/probe-binding-isolation.mjs"
   },
   "dependencies": {
     "@rivet-dev/agentos-core": "0.2.19",

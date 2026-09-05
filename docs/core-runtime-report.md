@@ -207,6 +207,15 @@ These limits are recorded rather than hidden behind passing core assertions.
 
 ## Performance interpretation
 
+**Update:** [the measured benchmark](runtime-benchmark.md) now provides native
+Node controls, process-tree memory and concurrent-instance evidence. The
+current runtime is materially slower and larger at idle than Node for this
+workload. Shared-sidecar binding routing also failed; the harness now uses a
+unique sidecar pool and closes it explicitly after VM disposal. Separate-pool
+routing passes its standalone gate. The original sequential results below
+remain valid but do not establish multi-tenant placement.
+
+
 Observed runs before final packaging were approximately:
 
 - First five-tool turn: 17–18 seconds after loading; about 20–22 seconds for the

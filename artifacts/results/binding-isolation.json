@@ -1,0 +1,222 @@
+{
+  "recordedAt": "2026-09-05T07:45:22.136Z",
+  "agentos": "0.2.19",
+  "separatePoolsIsolationPassed": true,
+  "sharedCatalogIsolationPassed": false,
+  "reports": [
+    {
+      "mode": "shared-same-names",
+      "calls": [
+        {
+          "caller": "first",
+          "target": "who",
+          "result": {
+            "exitCode": 0,
+            "stdout": "{\"status\":0,\"stdout\":\"{\\\"ok\\\":true,\\\"result\\\":\\\"second\\\"}\",\"stderr\":\"\"}\n",
+            "stderr": "",
+            "stdoutTruncated": false,
+            "stderrTruncated": false,
+            "outcome": "succeeded"
+          },
+          "invoked": [
+            "second"
+          ]
+        },
+        {
+          "caller": "second",
+          "target": "who",
+          "result": {
+            "exitCode": 0,
+            "stdout": "{\"status\":0,\"stdout\":\"{\\\"ok\\\":true,\\\"result\\\":\\\"second\\\"}\",\"stderr\":\"\"}\n",
+            "stderr": "",
+            "stdoutTruncated": false,
+            "stderrTruncated": false,
+            "outcome": "succeeded"
+          },
+          "invoked": [
+            "second"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "shared-unique-names",
+      "calls": [
+        {
+          "caller": "first",
+          "target": "first",
+          "result": {
+            "exitCode": 0,
+            "stdout": "{\"status\":1,\"stdout\":\"\",\"stderr\":\"Unknown binding \\\"first:read\\\"\\n\"}\n",
+            "stderr": "",
+            "stdoutTruncated": false,
+            "stderrTruncated": false,
+            "outcome": "succeeded"
+          },
+          "invoked": []
+        },
+        {
+          "caller": "first",
+          "target": "second",
+          "result": {
+            "exitCode": 0,
+            "stdout": "{\"status\":1,\"stdout\":\"\",\"stderr\":\"ENOENT: command not found: agentos-second\",\"error\":\"ENOENT: command not found: agentos-second\"}\n",
+            "stderr": "",
+            "stdoutTruncated": false,
+            "stderrTruncated": false,
+            "outcome": "succeeded"
+          },
+          "invoked": []
+        },
+        {
+          "caller": "second",
+          "target": "first",
+          "result": {
+            "exitCode": 0,
+            "stdout": "{\"status\":1,\"stdout\":\"\",\"stderr\":\"ENOENT: command not found: agentos-first\",\"error\":\"ENOENT: command not found: agentos-first\"}\n",
+            "stderr": "",
+            "stdoutTruncated": false,
+            "stderrTruncated": false,
+            "outcome": "succeeded"
+          },
+          "invoked": []
+        },
+        {
+          "caller": "second",
+          "target": "second",
+          "result": {
+            "exitCode": 0,
+            "stdout": "{\"status\":0,\"stdout\":\"{\\\"ok\\\":true,\\\"result\\\":\\\"second\\\"}\",\"stderr\":\"\"}\n",
+            "stderr": "",
+            "stdoutTruncated": false,
+            "stderrTruncated": false,
+            "outcome": "succeeded"
+          },
+          "invoked": [
+            "second"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "separate-pools",
+      "calls": [
+        {
+          "caller": "first",
+          "target": "first",
+          "result": {
+            "exitCode": 0,
+            "stdout": "{\"status\":0,\"stdout\":\"{\\\"ok\\\":true,\\\"result\\\":\\\"first\\\"}\",\"stderr\":\"\"}\n",
+            "stderr": "",
+            "stdoutTruncated": false,
+            "stderrTruncated": false,
+            "outcome": "succeeded"
+          },
+          "invoked": [
+            "first"
+          ]
+        },
+        {
+          "caller": "first",
+          "target": "second",
+          "result": {
+            "exitCode": 0,
+            "stdout": "{\"status\":1,\"stdout\":\"\",\"stderr\":\"ENOENT: command not found: agentos-second\",\"error\":\"ENOENT: command not found: agentos-second\"}\n",
+            "stderr": "",
+            "stdoutTruncated": false,
+            "stderrTruncated": false,
+            "outcome": "succeeded"
+          },
+          "invoked": []
+        },
+        {
+          "caller": "second",
+          "target": "first",
+          "result": {
+            "exitCode": 0,
+            "stdout": "{\"status\":1,\"stdout\":\"\",\"stderr\":\"ENOENT: command not found: agentos-first\",\"error\":\"ENOENT: command not found: agentos-first\"}\n",
+            "stderr": "",
+            "stdoutTruncated": false,
+            "stderrTruncated": false,
+            "outcome": "succeeded"
+          },
+          "invoked": []
+        },
+        {
+          "caller": "second",
+          "target": "second",
+          "result": {
+            "exitCode": 0,
+            "stdout": "{\"status\":0,\"stdout\":\"{\\\"ok\\\":true,\\\"result\\\":\\\"second\\\"}\",\"stderr\":\"\"}\n",
+            "stderr": "",
+            "stdoutTruncated": false,
+            "stderrTruncated": false,
+            "outcome": "succeeded"
+          },
+          "invoked": [
+            "second"
+          ]
+        }
+      ]
+    },
+    {
+      "mode": "shared-catalog",
+      "calls": [
+        {
+          "caller": "first",
+          "target": "first",
+          "result": {
+            "exitCode": 0,
+            "stdout": "{\"status\":1,\"stdout\":\"\",\"stderr\":\"EACCES: blocked by binding.invoke policy for first:read\\n\"}\n",
+            "stderr": "",
+            "stdoutTruncated": false,
+            "stderrTruncated": false,
+            "outcome": "succeeded"
+          },
+          "invoked": []
+        },
+        {
+          "caller": "first",
+          "target": "second",
+          "result": {
+            "exitCode": 0,
+            "stdout": "{\"status\":1,\"stdout\":\"\",\"stderr\":\"blocked by binding.invoke policy for second:read\\n\"}\n",
+            "stderr": "",
+            "stdoutTruncated": false,
+            "stderrTruncated": false,
+            "outcome": "succeeded"
+          },
+          "invoked": []
+        },
+        {
+          "caller": "second",
+          "target": "first",
+          "result": {
+            "exitCode": 0,
+            "stdout": "{\"status\":1,\"stdout\":\"\",\"stderr\":\"blocked by binding.invoke policy for first:read\\n\"}\n",
+            "stderr": "",
+            "stdoutTruncated": false,
+            "stderrTruncated": false,
+            "outcome": "succeeded"
+          },
+          "invoked": []
+        },
+        {
+          "caller": "second",
+          "target": "second",
+          "result": {
+            "exitCode": 0,
+            "stdout": "{\"status\":0,\"stdout\":\"{\\\"ok\\\":true,\\\"result\\\":\\\"second\\\"}\",\"stderr\":\"\"}\n",
+            "stderr": "",
+            "stdoutTruncated": false,
+            "stderrTruncated": false,
+            "outcome": "succeeded"
+          },
+          "invoked": [
+            "second"
+          ]
+        }
+      ]
+    }
+  ]
+}
