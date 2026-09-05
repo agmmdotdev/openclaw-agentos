@@ -8,7 +8,7 @@ const scenarios = core.reports.map(report => ({
   durationMs: report.durationMs,
   sqliteCalls: report.sqliteCalls,
   checks: report.result.stdout.split('\n').flatMap(line => {
-    const match = /^(CAPABILITIES_RESULT|CORE_RESULT|FAILURE_CASES_RESULT)=(.*)$/.exec(line);
+    const match = /^(CAPABILITIES_RESULT|CORE_RESULT|CORE_PROFILE_RESULT|FAILURE_CASES_RESULT)=(.*)$/.exec(line);
     return match ? [{ kind: match[1], ...JSON.parse(match[2]) }] : [];
   }),
 }));

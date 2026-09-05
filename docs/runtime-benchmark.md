@@ -1,178 +1,199 @@
-# OpenClaw / agentOS runtime measurements
+# Smaller core: measured against direct Node
 
-The current adapter makes the core flow execute, but it has **not achieved the
-lightweight, inexpensive runtime goal**. This workload runs faster and uses less
-idle memory directly on Node. Both approaches pay a substantial loading cost
-for the large standalone worker.
+The core artifact is now **16.6 MB instead of 53.6 MB**, a 69% reduction. Fixing
+the login-shell probe removes a 15-second stall. With the tested Linux glibc
+allocator settings, idle process-tree memory is roughly half the earlier
+configuration. The same reduced core still runs faster and uses less idle
+memory directly on Node; this work does not establish Node parity.
 
-## Results
+## Workload and comparison
 
-Same OpenClaw 2026.8.1 core, one `read` and one shell `exec` per turn, three
-inference calls, real transcript commits, and five subsequent warm turns.
-Inference is deterministic and makes no network requests.
+Each run uses the pinned OpenClaw 2026.8.1 core, real `read` and shell `exec`
+tools, three deterministic inference calls per turn, real transcript commits,
+and five warm continuation turns. No model network latency is included.
 
-Memory below is measured **process-tree PSS**, in MiB (1 MiB = 1,048,576 bytes).
-It includes the Node host and all native agentOS sidecar processes. It is not
-the configured guest heap limit. RSS and every sample are also retained.
+PSS below includes the Node host and all native sidecar processes. Values are
+MiB, not the guest heap limit. All sampled RSS/PSS and event timestamps are in
+`artifacts/results/benchmark-*.json`; `benchmark-summary.json` aggregates them.
 
-| Configuration | Launch to first completed turn | Warm turn | Idle PSS | Peak PSS |
+| Configuration | Launch → first result | Warm-turn run medians | Idle PSS | Peak PSS |
 | --- | ---: | ---: | ---: | ---: |
-| Native Node, published worker; 2 runs | 2.07–2.14 s | Run medians 30–36 ms | 572 MiB | 979–986 MiB |
-| Native Node, lowered worker with native builtins; 1 run | 2.26 s | Median 41 ms | 666 MiB | 1,048 MiB |
-| agentOS, one instance; 5 runs | 19.88–26.29 s | Run medians 321–387 ms | 1,040–1,130 MiB | 1,125–1,221 MiB |
-| agentOS, two concurrent instances, separate sidecars; 1 run | 21.67–21.73 s per instance | Pooled median 434 ms | 1,944 MiB total | 2,117 MiB total |
+| Previous agentOS, full artifact, 5 runs | 19.88–26.29 s | 321–387 ms | 1,040–1,130 | 1,125–1,221 |
+| Reduced agentOS, default allocator, 1 run | 4.44 s | 304 ms | 816 | 907 |
+| Reduced agentOS, compact allocator, 4 runs | 4.06–4.42 s | 297–329 ms | 514–549 | 619–658 |
+| Published worker on Node, default allocator, 2 runs | 2.07–2.14 s | 30–36 ms | 572 | 979–986 |
+| Published worker on Node, compact allocator, 1 run | 1.93 s | 30 ms | 499 | 897 |
+| Same reduced core on Node, compact allocator, 3 runs | 1.00–1.22 s | 26–29 ms | 273 | 575–686 |
+| Two reduced agentOS instances, compact allocator, 1 run | 4.87–4.98 s per instance | 405 ms pooled | 901 total | 1,123 total |
 
-Launch timing excludes compilation, VM provisioning and artifact transfer. The
-benchmark builds before starting the measured process. For native Node, launch
-starts at OS process creation; for agentOS, it starts when the host submits the
-already-staged guest entry. Native timing therefore includes a little more host
-startup work. The direct Node baseline preserves the real core but uses native
-SQLite and builtins. It is a comparison of the complete configurations, not an
-isolated JavaScript engine benchmark.
+The main optimized rows use agentOS trials 15–18 and native-core trials 2–4.
+Two-instance trial 3 uses independent sidecar pools and SQL services. Trial 18
+and native-core trial 4 verify the final build with restored upstream license
+notices. Final-build checks measured 4.31 s / 518 MiB idle for agentOS and
+1.22 s / 273 MiB idle for Node; raw reports include their exact hashes.
+The earlier untuned native-core trial 1 ran alongside a correctness test and is
+excluded from the main comparison.
 
-AgentOS trial 3 was slower and larger than the other single-instance trials; it
-is retained in the range. Do not interpret a five-run sample as a stable p95.
-The lowered Node control shows that async lowering alone does not explain the
-large latency gap. That control restores native builtin imports; it keeps the
-three native async-iterator intrinsic references needed by lowered code.
+The compact allocator settings are applied equally to the Node baseline and
+the agentOS host/sidecars. Comparing optimized agentOS only against the old,
+large Node artifact would hide the remaining gap: the reduced Node core needs
+about half the idle memory, roughly a quarter of the cold latency, and roughly
+a tenth of the warm latency. Memory is much closer to the original Node worker,
+but the reduced Node core is the stronger target.
 
-## Where time and memory go
+Launch timing excludes compilation, VM creation and staging. Node timing starts
+at OS process creation; agentOS timing starts at submission of the staged entry.
+Fresh storage is used for each run, but host file caches are not flushed. These
+are small local samples on shared Linux infrastructure, not p95s, production
+capacity tests, cloud billing estimates or Cloudflare deployment results.
 
-A representative instrumented single-instance run (`benchmark-1vm-4.json`):
+## Changes that produced the gains
 
-| Checkpoint / operation | Measurement |
-| --- | ---: |
-| SDK-loaded host baseline, before a VM | 66.5 MiB PSS |
-| Provisioned empty VM, including mounts and setup | 238.1 MiB PSS |
-| Code and parser assets staged | 395.0 MiB PSS |
-| Idle after six successful core turns | 1,043.4 MiB PSS |
-| After VM disposal and outer Node GC | 756.3 MiB PSS |
-| After explicit sidecar disposal | 89.0 MiB PSS |
-| Cold core turn after worker-ready checkpoint | 17.83 s |
-| SQLite binding calls during that turn | 3,283 |
-| Time inside guest SQLite adapter calls | 2.08 s |
-| Time inside host SQLite binding handler | 0.20 s |
+### 1. Repair the exact login-shell probe
 
-The SQL call count initially suggested transport was the main bottleneck. Direct
-timing disproves that: guest SQLite calls account for about **12%** of the cold
-turn, including encoding, transport, host work and decoding. A separate 50-query
-`SELECT 1` calibration takes 24–31 ms in the guest adapter, versus roughly a
-tenth of a millisecond with native Node SQLite. Transport is expensive relative
-to native SQLite, but eliminating it alone cannot remove the remaining cold
-startup time.
+Targeted timing in trial 11 measures `getShellPathFromLoginShell()` at **15,007
+ms** on its first call. The default agentOS shell's `env -0` does not complete
+within the timeout. `printenv -0` returns the required NUL-delimited environment.
+The child-process adapter matches only OpenClaw's exact `/bin/sh` login probe
+and substitutes the environment-print command. It retains the login flags,
+startup files, NUL sentinel, options and real process errors.
 
-Calling `init_embedded_agent_runtime()` separately in trial 5 took less than the
-guest clock's 1 ms resolution and did not remove the slow first turn. The large
-cost is in first-turn runtime work after loading, not simply that lazy module
-initializer. A guest CPU/call profile is still needed to identify the remaining
-hot paths. Do not attribute those unmeasured paths to SQLite or the compiler.
+The regression checks verify Buffer output, NUL boundaries, a multiline value
+containing `=`, a real shell PATH, and the exit status of an unrelated failing
+command. We did not lower the timeout, return a fabricated environment or skip
+command parsing. This adapter covers the default `/bin/sh` probe; it does not
+claim to repair every shell or agentOS's `env` utility globally.
 
-The representative single-instance process tree accumulated about 32 sampled
-CPU-seconds across the complete lifecycle; the two-instance run about 63.
-These include loading, six turns, calibration and disposal, and CPU across
-multiple native threads. They are approximate sampled totals, not billable CPU.
-Python `RUSAGE_CHILDREN` alone missed the persistent sidecar, so totals are
-computed from each observed PID's CPU ticks. Earlier raw reports retain their
-narrower rusage fields; `benchmark-summary.json` uses the corrected calculation.
+Shell-only trial 12 used the full artifact and completed its first core turn
+in 3.28 seconds after worker-ready, versus about 18 seconds before the fix.
+Its launch-to-first-result was 5.72 seconds. That isolates the timeout fix from
+the later size and allocator changes.
 
-The configured 256 MiB V8 heap cap does not bound process-tree memory. Native
-runtime allocations, VFS state, source/code, host buffers and other runtime
-state are outside that single number. This experiment does not apportion each
-allocation. The Node baseline's large peak also shows that the 46.6 MB worker
-itself is costly to load; the transformed worker is 53.6 MB.
+### 2. Build an explicit, pinned core profile
 
-VM disposal leaves substantial resident memory in the process-global native
-sidecar. This measurement does not prove a leak: allocators/caches can retain
-freed memory. Outer Node GC did not reclaim it. Explicit sidecar disposal did.
-A service needs to manage that lifecycle when evicting an instance.
+`core-profile.mjs` and `slice-core-artifact.mjs` operate on the verified published
+worker. They leave installed packages and reference source untouched. They:
 
-## Shared-sidecar binding failure
+- Reject an unreviewed input SHA-256.
+- Replace two disabled lazy boundaries with explicit unsupported errors:
+  gateway compaction runtime and source extension transformation. The existing
+  embedded worker sets compaction disabled and `noExtensions: true`.
+- Trace lexical references from the existing embedded initializer and turn
+  function, splitting merged variable declarations and comma-separated eager
+  calls so unrelated modules can be removed.
+- Preserve selected declaration text, source order, eager calls to retained
+  initializers and standalone runtime registration. Retain legal notices.
+- Remove the worker CLI entry, then apply the existing import adapters and
+  async lowering. There are ten retained import rewrites and two retained
+  native async-iterator intrinsic replacements.
 
-The first two-VM run failed and is preserved as `benchmark-2vm-1.json`. Both
-VMs' callbacks reached the second VM's host binding handler. The first VM's SQL
-service recorded zero calls; the second received both workloads and a database
-lock error. This run is **not valid density evidence**.
+The final native core is **14,597,354 bytes**, and the lowered guest core is
+**16,598,563 bytes**. Input remains 46,593,544 bytes. The manifest records sizes,
+hashes, removed boundaries, retained unit counts and adapter/compiler details.
 
-A standalone probe without OpenClaw reproduces the routing issue:
+The first slicer attempt missed eager initialization before channel metadata
+use. The corrected transformation preserves those calls, and a focused
+regression checks eager ordering, local destructuring versus property labels,
+legal notices and changed-boundary rejection. Full integration tests pass.
+This is a pinned artifact transformation, not a general-purpose proof of dead
+code elimination. Arbitrary dynamic code, browser/channel paths and extension
+loading are outside the validated core profile. The active agent loop, coding
+tools, permission checks, real command parser, transcript commits and terminal
+ordering remain upstream implementations.
 
-| Configuration in agentOS 0.2.19 | Observed behavior |
+`CORE_PROFILE=full npm run core:build` retains the full control. Use the default
+`npm run core:build` for the reduced profile. This is still an artifact patch,
+even though neither upstream source repository is forked.
+
+### 3. Reduce allocator retention through launch configuration
+
+The compact Linux/glibc profile sets these before starting the host:
+
+```sh
+MALLOC_ARENA_MAX=1
+MALLOC_TRIM_THRESHOLD_=65536
+MALLOC_MMAP_THRESHOLD_=65536
+```
+
+The benchmark applies these to the measured subprocess and inherited sidecars;
+it does not alter the runtime binary. Trial 13 measured 816 MiB idle with the
+reduced artifact and defaults. Trial 14, an intermediate two-arena/128 KiB trim
+experiment, measured 559 MiB. Trials 15–18 use the one-arena/64 KiB configuration.
+The sampler now records the effective allocator environment explicitly.
+
+For representative trial 16, PSS was 222 MiB after empty-VM provisioning,
+241 MiB after staging, 529 MiB idle, 364 MiB after VM disposal/outer-host GC,
+and 80 MiB after explicit sidecar disposal. The complete lifecycle accumulated
+about 10.6 sampled CPU-seconds, versus roughly 32 in the earlier representative
+full configuration. This includes six turns, calibration and lifecycle work;
+it is not billable CPU.
+
+Allocator settings have workload-dependent throughput tradeoffs. The two-instance
+run passed, but a high-concurrency host requires its own validation. The ordinary
+core test leaves allocator defaults intact; `test:core:compact` opts in.
+
+## Remaining limits and rejected approaches
+
+After the timeout fix, SQLite transport is a material remaining cold-turn cost.
+Trial 16 made **3,306 cold-turn binding calls**, taking **2.17 seconds** in the
+guest adapter versus **0.22 seconds** inside the host SQL handler. The whole cold
+turn after ready took 3.62 seconds. Warm turns amortize schema initialization,
+but guest shell/process and filesystem boundaries remain slower than Node.
+No schema, integrity check or authorization check was removed to reduce calls.
+
+The diagnostic trail is retained rather than silently mixed with final runs:
+
+| Experiment | Outcome |
 | --- | --- |
-| Shared sidecar, same binding names | Both guests invoke the second handler |
-| Shared sidecar, unique binding names | First guest's own binding becomes unknown |
-| Shared sidecar, one full catalog, per-VM permission rules | First guest's own binding is rejected by the replacement host policy |
-| Separate sidecar pools | Each guest invokes its own handler; attempts to invoke the other guest's binding fail |
+| Bundle the published embedded-runtime chunk directly | Still pulls thousands of modules plus external packages; rejected |
+| Ordinary tree shaking / identifier minification | Insufficient reduction; not adopted |
+| Trials 6–7: replace apparently slow async `lstat` with a synchronous delegate | No cold-turn improvement; reverted |
+| Trials 8–11: targeted runtime timing | Session setup and parser initialization are short; the login-shell probe accounts for the 15-second gap |
+| Trial 10: tree-sitter parser loading / command parsing | About 87 / 95 ms initially; actual process spawn about 23 ms |
+| Trial 12: shell fix alone | Cold-turn improvement confirmed with full artifact |
+| Trial 13: reduced profile, allocator defaults | Size/launch gain confirmed; idle memory still 816 MiB |
+| Trials 14–17: allocator experiments and repeats | Further memory reduction without changing core algorithms |
 
-The integration and benchmark now request a unique sidecar pool per active
-core environment. Restoring the same environment can retain its pool. All
-bound VMs must be disposed before disposing that pool. These are published
-agentOS native subprocesses, not containers or source forks.
+The guest inspector API is a stub, so these are targeted elapsed-time probes,
+not a CPU flame graph. In particular, async filesystem elapsed time included
+waiting for other work; it was not evidence of filesystem CPU cost.
 
-The separate-pool two-instance workload passes all twelve core turns with
-independent SQL call counts and handlers. This is bounded routing evidence,
-not a general security certification, simultaneous turns inside one VM, or a
-proof that arbitrary customer workloads are isolated.
+Shared-sidecar host-binding replacement remains unresolved in published agentOS
+0.2.19. The separate binding probe still rejects shared modes and passes separate
+pool routing plus foreign-binding rejection. Keep a dedicated pool per active
+core environment and dispose its sidecar on eviction. Merely disposing the VM
+leaves resident allocations. The [baseline report](runtime-benchmark-baseline.md)
+preserves the routing investigation and failed shared-sidecar control.
 
-A shared dispatcher with capability-based routing would be a larger adapter
-design requiring its own authorization tests. It has not been implemented.
-Simply allowing every VM to invoke every binding would remove the isolation
-property and is not a fix.
-
-## What this means for the architecture
-
-1. Keep the compatibility work, but do not sell the current deployment shape as
-   lightweight. A live instance is around a GiB in this experiment, and safe
-   two-instance placement is close to linear in memory.
-2. Investigate a smaller upstream core entry and profile the first turn before
-   scaling this bundle. The Node control establishes a concrete performance
-   target and helps separate application costs from adapter/runtime costs.
-3. Manage a bounded warm pool and explicitly retire its sidecars. Frequent cold
-   recreation currently costs roughly 20 seconds before the first answer, even
-   without model latency. Keeping every inactive user resident is not supported
-   by these measurements as a cheap strategy.
-4. Keep Gateway, channels and Cloudflare deployment out of this phase. These are
-   local Node-hosted agentOS results, not evidence of Cloudflare deployability.
-
-No dollar estimate or production instances-per-machine promise follows from
-this sample. Memory headroom, concurrent tool processes, longer transcripts,
-real model streams, storage growth, host services and failure recovery have not
-been capacity-tested. The environment reported an 8-CPU quota and 20 GiB memory
-limit; it is shared infrastructure, not a reserved production server.
+No containers, OpenClaw source fork, agentOS source changes, Rust build, Gateway
+implementation, GitHub upload or Cloudflare deployment were introduced. The
+result is a substantially improved local core prototype, with a measured and
+still significant advantage for direct Node on the equivalent reduced core.
 
 ## Reproduce
 
-Linux is required for the memory sampler. Use the pinned dependencies and Node
-version described in the README, then:
+Use the pinned dependencies, Node 24 and Linux/glibc described in the README:
 
 ```sh
 npm run core:build
-npm run bench:build
-npm run bench:core -- --instances 1 --trial 1
-npm run bench:core -- --instances 1 --trial 2
-npm run bench:core -- --instances 1 --trial 3
-npm run bench:core -- --instances 2 --trial 2
-npm run bench:core -- --native --trial 1
-npm run bench:core -- --native --trial 2
-npm run bench:core -- --native --compiled --trial 1
-BENCH_SPLIT_INIT=1 npm run bench:core -- --instances 1 --trial 5
-npm run bench:report
+npm run test:core:compact
+npm run test:core-profile
+npm run probe:async-context
 npm run probe:bindings
-npm run test:core
+npm run test:host-sqlite
+npm run core:report
+npm run bench:build
+npm run bench:core -- --instances 1 --allocator compact --trial 20
+npm run bench:core -- --instances 2 --allocator compact --trial 20
+npm run bench:core -- --native --core --allocator compact --trial 20
+npm run bench:core -- --native --allocator compact --trial 20
+npm run bench:report
 ```
 
-Current driver defaults use separate pools. Historical single-instance trials
-1–3 used one VM in the default shared pool; trial 4 adds guest SQL timing and
-explicit sidecar disposal. Trial 5 additionally separates the initializer.
-The raw failing shared-sidecar run remains a diagnostic control; the standalone
-binding probe exercises all four placement/catalog configurations on each run.
-
-The sampler reads `/proc/<pid>/smaps_rollup` every 100 ms and records descendants.
-It resolves PID namespaces explicitly because this environment's mounted
-`/proc` uses outer PIDs. An initial zero-memory attempt was rejected and rerun;
-the sampler refuses to publish zero as valid memory data. PSS prorates shared
-pages; summing RSS can double-count shared mappings. Samples can miss short
-peaks. Reported idle values are medians while the live guest waits after its
-workload; multi-instance idle uses the overlapping idle interval.
-
-Fresh temporary storage is used for each run and deleted afterward. Host file
-caches are not flushed. No real model API calls, container launches, production
-traffic, cloud deployment, GitHub upload or upstream issue submission occurred.
+Profiling controls are `BENCH_PROFILE_CORE=1`, `BENCH_PROFILE_FS=1` and
+`BENCH_SPLIT_INIT=1`. Do not pool instrumented runs with performance runs.
+The sampler reads the Linux process tree every 100 ms, rejects zero-memory
+measurement failures, accounts for PID namespaces, and retains raw samples.
+PSS prorates shared pages; summed RSS can double-count shared mappings. Short
+peaks may fall between samples. Test tools assert actual outputs, exit statuses,
+transcript lengths and terminal completion before a run is counted as passing.

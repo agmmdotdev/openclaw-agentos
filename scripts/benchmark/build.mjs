@@ -24,6 +24,9 @@ function mark(label, data = {}) { console.log('BENCH_EVENT=' + JSON.stringify({ 
 ` + nativeFixture.slice(markerEnd);
 nativeFixture = nativeFixture.replaceAll("'/workspace/seed.txt'", "benchWorkspace + '/seed.txt'").replaceAll("'/workspace'", 'benchWorkspace').replaceAll("'/state/transcript.json'", "benchState + '/transcript.json'").replaceAll("'/state'", 'benchState').replaceAll("'cat /workspace/seed.txt'", "'cat ' + benchWorkspace + '/seed.txt'");
 await writeFile('artifacts/core/native-benchmark.mjs', upstream + '\nasync function runOpenClawCoreTurn(params) { init_embedded_agent_runtime(); return runWorkerEmbeddedTurn(params); }\nawait (async()=>{\n' + nativeFixture + '\n})();\n');
+const nativeCore = await readFile('artifacts/core/native-core.mjs', 'utf8');
+if (createHash('sha256').update(nativeCore).digest('hex') !== manifest.nativeCoreSha256) throw new Error('Native core differs from manifest');
+await writeFile('artifacts/core/native-core-benchmark.mjs', nativeCore + '\nawait (async()=>{\n' + nativeFixture + '\n})();\n');
 // The native baseline resolves the same parser WASM assets beside its entry.
 const { mkdir, realpath } = await import('node:fs/promises');
 const { createRequire } = await import('node:module');

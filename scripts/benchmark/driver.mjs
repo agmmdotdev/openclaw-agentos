@@ -67,6 +67,25 @@ function call(request) {
 export function getBenchmarkSqlTiming() { return { calls: benchmarkSqlCalls, milliseconds: benchmarkSqlMilliseconds }; }
 `;
       }
+      if (name === 'fs.mjs' && process.env.BENCH_PROFILE_FS === '1') {
+        content += `
+const benchmarkFsTiming = {};
+function benchmarkWrapFs(object, key, promise) {
+ const original = object[key];
+ if (typeof original !== 'function') return;
+ object[key] = function (...args) {
+  const entry = benchmarkFsTiming[(promise ? 'promises.' : '') + key] ??= { calls: 0, milliseconds: 0 };
+  entry.calls++; const start = performance.now();
+  const end = () => { entry.milliseconds += performance.now() - start; };
+  try { const result = Reflect.apply(original, this, args); if (promise) return result.then(value => { end(); return value; }, error => { end(); throw error; }); end(); return result; }
+  catch(error) { end(); throw error; }
+ };
+}
+for (const key of Object.keys(fs)) if (key.endsWith('Sync')) benchmarkWrapFs(fs, key, false);
+for (const key of Object.keys(fs.promises)) benchmarkWrapFs(fs.promises, key, true);
+globalThis.__benchmarkFsTiming = () => benchmarkFsTiming;
+`;
+      }
       await vm.filesystem.writeFile(`/core/compat/${name}`, content);
     }
     const packageRequire = createRequire(await realpath('node_modules/openclaw/package.json'));
@@ -79,7 +98,7 @@ export function getBenchmarkSqlTiming() { return { calls: benchmarkSqlCalls, mil
   mark('staged'); await settle();
   mark('launch:start');
   const results = await Promise.all(resources.map(async ({ vm, index, sqlite }) => {
-    const result = await vm.process.execFile('node', ['/core/benchmark.mjs', '--internal-worker-prewarm'], { env: { OPENCLAW_STATE_DIR: '/state/openclaw', OPENCLAW_CHILD_OOM_SCORE_ADJ: '0', BENCH_WARM_TURNS: '5', BENCH_SPLIT_INIT: process.env.BENCH_SPLIT_INIT ?? '0' }, timeoutMs: 180000, output: { capture: 'all' } });
+    const result = await vm.process.execFile('node', ['/core/benchmark.mjs', '--internal-worker-prewarm'], { env: { OPENCLAW_STATE_DIR: '/state/openclaw', OPENCLAW_CHILD_OOM_SCORE_ADJ: '0', BENCH_WARM_TURNS: '5', BENCH_SPLIT_INIT: process.env.BENCH_SPLIT_INIT ?? '0', BENCH_PROFILE_CORE: process.env.BENCH_PROFILE_CORE ?? '0' }, timeoutMs: 180000, output: { capture: 'all' } });
     mark('process:end', { instance: index, result, sqlite: sqlite.stats });
     return result;
   }));

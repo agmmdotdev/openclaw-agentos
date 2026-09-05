@@ -30,3 +30,18 @@ if (typeof prototype.removeAllListeners !== 'function') {
   });
 }
 export default childProcess;
+
+const nativeExecFileSync = childProcess.execFileSync;
+const loginEnvironmentCommand = "printf '\\0'; env -0";
+// The published agentOS env command hangs with -0; printenv -0 has the same
+// environment-only output. Match only OpenClaw's exact login-shell probe,
+// retaining its shell, flags, startup files, sentinel, options and errors.
+export function execFileSync(file, args, options) {
+  const loginProbe = file === '/bin/sh' && Array.isArray(args)
+    && ((args.length === 3 && args[0] === '-l' && args[1] === '-c')
+      || (args.length === 2 && args[0] === '-lic'))
+    && args.at(-1) === loginEnvironmentCommand;
+  return nativeExecFileSync(file, loginProbe
+    ? [...args.slice(0, -1), "printf '\\0'; printenv -0"] : args, options);
+}
+childProcess.execFileSync = execFileSync;

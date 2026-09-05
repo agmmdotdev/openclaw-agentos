@@ -4,7 +4,7 @@ import { TextDecoder } from './compat/text-decoder.mjs';
 import { AsyncLocalStorage } from './compat/async-hooks.mjs';
 import { DatabaseSync } from './compat/sqlite.mjs';
 import { monitorEventLoopDelay } from './compat/perf-hooks.mjs';
-import { spawn } from './compat/child-process.mjs';
+import { spawn, execFileSync } from './compat/child-process.mjs';
 let count = 0;
 const failures = [];
 const check = (value, description) => { if (!value) failures.push(description); count++; };
@@ -40,6 +40,17 @@ for (const code of [0, 7]) {
   child.removeAllListeners(); child.emit(symbol);
   check(retainedCalls === 1, 'removeAllListeners clears symbol events');
 }
+// Preserve shell startup, NUL boundaries, embedded newlines and process failures.
+const shellEnv = execFileSync('/bin/sh', ['-l', '-c', "printf '\\0'; env -0"], {
+  encoding: 'buffer', timeout: 2500, stdio: ['ignore', 'pipe', 'pipe'],
+  env: { ...process.env, CORE_ENV_FIXTURE: 'line one\nline two=three' },
+});
+check(Buffer.isBuffer(shellEnv) && shellEnv[0] === 0, 'login probe retains NUL sentinel');
+check(shellEnv.toString().split('\0').includes('CORE_ENV_FIXTURE=line one\nline two=three'), 'login probe preserves multiline environment values');
+check(shellEnv.toString().split('\0').some(entry => entry.startsWith('PATH=') && entry.length > 5), 'login probe returns real shell PATH');
+let shellFailure;
+try { execFileSync('/bin/sh', ['-c', 'exit 7'], { encoding: 'utf8' }); } catch (error) { shellFailure = error.status; }
+check(shellFailure === 7, 'non-probe execFileSync keeps genuine exit status');
 const db = new DatabaseSync('/state/capabilities.sqlite');
 db.exec('CREATE TABLE IF NOT EXISTS vals(n INTEGER, b BLOB); DELETE FROM vals; BEGIN IMMEDIATE');
 check(db.isTransaction, 'real transaction state');

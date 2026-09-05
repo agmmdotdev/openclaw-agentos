@@ -1,4 +1,8 @@
-# Core runtime experiment — failure fixes
+# Core runtime experiment — compatibility fixes
+
+The newer [runtime benchmark](runtime-benchmark.md) documents the reduced core
+profile, login-shell fix, allocator settings and current Node comparison. Timing
+observations later in this investigation describe the earlier full artifact.
 
 ## Decision and scope
 
@@ -24,7 +28,7 @@ was implemented. The older provider driver is unchanged.
 - Latest agentOS version returned by the registry during this work: 0.2.19.
 
 The builder fails closed on a different worker digest. It parses the
-bundle's import preamble with TypeScript, rewrites eleven import specifiers, and adds
+bundle with TypeScript, slices the core profile, rewrites ten retained import specifiers, and adds
 `runOpenClawCoreTurn(params)`. That wrapper calls the upstream generated
 `init_embedded_agent_runtime()` before `runWorkerEmbeddedTurn(params)`.
 Failing to invoke that initializer leaves module-local constants unset; simply
@@ -32,9 +36,9 @@ exporting the function is not sufficient.
 
 The builder then lowers async functions, async generators and for-await loops
 with esbuild 0.28.2. It preserves function names and modern non-async syntax.
-Three exact native async-iterator prototype expressions are replaced with an
-imported intrinsic that remains native. The worker entry retains module-level
-waiting, with its operation moved into a lowered function. These matches are
+Two retained native async-iterator prototype expressions (three in the full profile) are replaced with an
+imported intrinsic that remains native. The reduced profile removes the worker CLI entry. The full control retains
+module-level waiting, with its operation moved into a lowered function. These matches are
 count-checked against the pinned input.
 
 The build manifest records input/output hashes, compiler version/settings,
@@ -73,6 +77,7 @@ reasoning or an external provider's HTTP/SSE transport.
 | Missing Latin-1 TextDecoder | Windows-1252 decoding for supported WHATWG labels, UTF-8 delegated to native |
 | Missing AsyncLocalStorage static bind/snapshot | Capture known adapter instances for callback binding |
 | Incorrect async store lifetime and native-await propagation | Restore stores synchronously; lower async syntax to captured promise continuations |
+| Login-shell environment probe hangs for 15 seconds | Match the exact default-shell probe and use working `printenv -0`, retaining NUL records and shell startup |
 | Child-process cleanup throws on missing `removeAllListeners` | Add event-scoped/all listener removal to the pinned child-process prototype |
 | Unlisted dynamic builtins | Explicit allow-list additions, discovered during execution |
 | SQLite 3.46.0 rejected for WAL safety | Host SQLite adapter, preserving OpenClaw's version check |
@@ -149,7 +154,8 @@ This is a **static compiled-code boundary**, not a general runtime repair:
 - Lowering can affect reflection and scheduling. Three stream ponyfills inspected
   the native async-generator prototype; those exact expressions now use an
   uncompiled intrinsic module. Broader reflection compatibility is unproven.
-- Compiler output is 53,604,203 bytes versus 46,593,544 input bytes. This does not
+- Reduced compiler output is 16,598,563 bytes versus 46,593,544 input bytes
+  (the previous full compiled artifact was 53,604,203 bytes). This does not
   establish guest memory overhead or a production cost advantage.
 - The tests establish exercised context behavior, not secure concurrent customer
   isolation or support for simultaneous OpenClaw turns in one VM.
@@ -239,7 +245,7 @@ turns, negative cases and restoration, preserving every result in one report.
 It exits nonzero if any capability or integrated scenario fails. The independent
 async-context probe also exits nonzero on adapted-path or compiled-Node
 divergence; failing raw-runtime controls are diagnostic evidence. The latest
-core gate passes all three generations, 125 capability assertions (100 are
+core gate passes all three generations, 129 capability assertions (100 are
 random-integer bounds), and eight failure/background scenarios. Unit tests and TypeScript
 checks remain separate from the real-runtime compatibility gate.
 

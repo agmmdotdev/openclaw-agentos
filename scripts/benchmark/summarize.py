@@ -40,6 +40,9 @@ for path in sorted(folder.glob('benchmark-*.json')):
             if 'guestSql' in cold_start: instance['coldGuestSqlMs']=cold_end['guestSql']['milliseconds']-cold_start['guestSql']['milliseconds']
         instances.append(instance)
     rows.append({'file':path.name,'runtime':report.get('runtime','native' if native else 'agentos'),
+        'profile':report.get('coreManifest',{}).get('profile','full'),
+        'allocatorEnvironment':report.get('allocatorEnvironment',{}),
+        'diagnostics':report.get('diagnostics',{}),
         'configuredInstances':report['instances'],'passed':report['exitCode']==0,
         'placement':event('baseline').get('placement','shared-default') if event('baseline') else 'native-process',
         'splitInitializer':report.get('splitInitializer',False),'instances':instances,

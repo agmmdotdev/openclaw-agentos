@@ -9,10 +9,15 @@ parser.add_argument('--trial', type=int, default=1)
 parser.add_argument('--interval', type=float, default=0.1)
 parser.add_argument('--native', action='store_true')
 parser.add_argument('--compiled', action='store_true', help='Use the lowered native Node baseline; requires --native')
+parser.add_argument('--core', action='store_true', help='Use the smaller native core; requires --native')
+parser.add_argument('--allocator', choices=['default', 'compact'], default='default', help='compact: glibc arena/trim settings, applied equally to host and descendants')
 args = parser.parse_args()
+if args.core and (not args.native or args.compiled): parser.error('--core requires --native without --compiled')
 if args.compiled and not args.native: parser.error('--compiled requires --native')
 root = Path(__file__).resolve().parents[2]
-native_label = 'native-compiled' if args.compiled else 'native'
+if args.core and json.loads((root / 'artifacts/core/manifest.json').read_text()).get('profile') != 'core':
+    parser.error('--core requires a reduced core build')
+native_label = 'native-core' if args.core else 'native-compiled' if args.compiled else 'native'
 output = root / (f'artifacts/results/benchmark-{native_label}-{args.trial}.json' if args.native else f'artifacts/results/benchmark-{args.instances}vm-{args.trial}.json')
 
 def proc_info(pid):
@@ -56,10 +61,13 @@ before = resource.getrusage(resource.RUSAGE_CHILDREN)
 started = time.monotonic()
 native_root = tempfile.mkdtemp(prefix='openclaw-native-bench-') if args.native else None
 env = os.environ.copy()
+if args.allocator == 'compact':
+    if platform.libc_ver()[0] != 'glibc': parser.error('compact allocator profile requires glibc')
+    env.update(MALLOC_ARENA_MAX='1', MALLOC_TRIM_THRESHOLD_='65536', MALLOC_MMAP_THRESHOLD_='65536')
 if native_root:
     for directory in ['workspace', 'state']: Path(native_root, directory).mkdir()
     env.update(BENCH_ROOT=native_root, OPENCLAW_STATE_DIR=f'{native_root}/state/openclaw', OPENCLAW_CHILD_OOM_SCORE_ADJ='0')
-native_entry = 'artifacts/core/native-compiled-benchmark.mjs' if args.compiled else 'artifacts/core/native-benchmark.mjs'
+native_entry = 'artifacts/core/native-core-benchmark.mjs' if args.core else 'artifacts/core/native-compiled-benchmark.mjs' if args.compiled else 'artifacts/core/native-benchmark.mjs'
 command = ['node', native_entry, '--internal-worker-prewarm'] if args.native else ['node', '--expose-gc', 'scripts/benchmark/driver.mjs', str(args.instances)]
 process = subprocess.Popen(command, cwd=root, env=env,
     stdout=subprocess.PIPE, stderr=subprocess.PIPE, start_new_session=True)
@@ -129,6 +137,9 @@ report = {
     'recordedAt': time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime()),
     'instances': args.instances, 'trial': args.trial, 'sampleIntervalMs': args.interval * 1000,
     'runtime': native_label if args.native else 'agentos', 'splitInitializer': env.get('BENCH_SPLIT_INIT') == '1',
+    'allocatorEnvironment': {k: env.get(k) for k in ['MALLOC_ARENA_MAX', 'MALLOC_TRIM_THRESHOLD_', 'MALLOC_MMAP_THRESHOLD_']},
+    'coreManifest': json.loads((root / 'artifacts/core/manifest.json').read_text()),
+    'diagnostics': {k: env.get(k, '0') for k in ['BENCH_PROFILE_CORE', 'BENCH_PROFILE_FS']},
     'method': 'Linux smaps_rollup RSS/PSS summed across isolated benchmark driver and descendants; compiler runs separately',
     'environment': {'platform': platform.platform(), 'cpuCount': os.cpu_count(),
         'cpuMax': read_optional('/sys/fs/cgroup/cpu.max'), 'memoryMax': read_optional('/sys/fs/cgroup/memory.max')},

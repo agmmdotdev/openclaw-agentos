@@ -42,9 +42,11 @@ try {
   const worker = await readFile('artifacts/core/worker.mjs', 'utf8');
   const fixture = await readFile('test/fixtures/core-turn.mjs', 'utf8');
   const failures = await readFile('test/fixtures/core-failures.mjs', 'utf8');
-  // A single entry file uses the runtime's streamed launch path; importing the
-  // compiled bundle as a dependency exceeds agentOS 0.2.19's bridge response cap.
-  const runner = await compileFixture('\nfor (const coreProbePhase of (process.env.CORE_PHASES ?? \'tools\').split(\',\')) { await (async () => {\n' + fixture + '\n})(); }\nif (process.env.CORE_FAILURES === \'1\') { await (async () => {\n' + failures + '\n})(); }\n');
+  const manifest = JSON.parse(await readFile('artifacts/core/manifest.json', 'utf8'));
+  const profileFixture = manifest.profile === 'core' ? await readFile('test/fixtures/core-profile.mjs', 'utf8') : '';
+  // Retain the streamed entry path: the full control exceeds the 16 MiB
+  // dependency response cap and the reduced profile is close to that limit.
+  const runner = await compileFixture('\nfor (const coreProbePhase of (process.env.CORE_PHASES ?? \'tools\').split(\',\')) { await (async () => {\n' + fixture + '\n})(); }\nif (process.env.CORE_FAILURES === \'1\') { await (async () => {\n' + failures + '\n})(); }\n' + profileFixture);
   await writeLargeFile(vm, '/core/probe.mjs', Buffer.from(worker + '\n' + runner));
   await vm.filesystem.mkdir('/core/compat', { recursive: true });
   for (const name of await readdir('artifacts/core/compat')) await vm.filesystem.writeFile(`/core/compat/${name}`, await readFile(`artifacts/core/compat/${name}`));

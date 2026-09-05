@@ -12,7 +12,8 @@ adapter boundary. This remains a prototype, not a production runtime.
 
 - Uses the actual standalone worker from the published OpenClaw package.
 - Verifies its SHA-256 before touching the generated artifact.
-- Rewrites eleven import specifiers to local JavaScript compatibility modules.
+- Slices a pinned core profile, preserving selected declarations and eager initializer order.
+- Rewrites ten retained import specifiers to local JavaScript compatibility modules.
 - Lowers async functions and generators to promise continuations, preserving
   context through agentOS’s existing promise callback capture.
 - Exposes the existing `runWorkerEmbeddedTurn` through a small wrapper that
@@ -22,6 +23,11 @@ adapter boundary. This remains a prototype, not a production runtime.
 - Delegates SQLite to a scoped host Node SQLite service through agentOS's
   published binding API. OpenClaw's SQLite safety check remains intact.
 - Persists workspace and transcript data through agentOS `chunked_local` mounts.
+
+The reduced profile explicitly rejects gateway compaction and source extension
+loading, which the existing embedded worker already disables. It removes the
+worker CLI entry; gateway and channel integration remain separate work.
+`CORE_PROFILE=full npm run core:build` retains the full control artifact.
 
 These are **artifact patches**, even though neither source project is forked.
 The private core boundary is version-specific, not a stable upstream SDK.
@@ -83,18 +89,27 @@ static worker; the harness compiles its fixtures. Uncompiled plugins, dynamicall
 generated code and arbitrary native-await callbacks are **not covered**. Merely
 installing the AsyncLocalStorage adapter does not fix native `await`.
 
-Three pinned stream-ponyfill reflection expressions use a separate native async
+Two retained stream-ponyfill reflection expressions (three in the full control) use a separate native async
 iterator intrinsic. New upstream artifacts require review; this is more than an
 import alias. The child-process adapter also depends on the pinned runtime’s
 listener-table representation. See the report for these compatibility limits.
 
 ## Performance and placement
 
-The [runtime benchmark](docs/runtime-benchmark.md) finds **about 1 GiB idle
-memory per active instance**, 20–26 seconds from guest launch to the first
-completed turn, and warm-turn medians around 0.3–0.4 seconds. Direct Node runs
-the same workload substantially faster with lower idle memory. The current
-prototype has not achieved the lightweight/cheap goal.
+The [runtime benchmark](docs/runtime-benchmark.md) now measures a **16.6 MB
+compiled core**, down from 53.6 MB. With the tested glibc allocator settings,
+a single instance reaches its first result in about **4.1–4.4 seconds** and
+idles at **514–549 MiB process-tree PSS**. Warm turns remain around 0.3 seconds.
+The equivalent reduced Node core is still faster (about 1.0–1.2 seconds cold, 26–29 ms
+warm) and smaller in steady-state memory (273 MiB). These are local measurements
+with deterministic inference, not production cost or Cloudflare evidence.
+
+Use `npm run test:core:compact` to exercise the tuned Linux configuration, or
+`npm run bench:core -- --allocator compact --trial 20` to measure it. The
+allocator profile sets `MALLOC_ARENA_MAX=1`, `MALLOC_TRIM_THRESHOLD_=65536`, and
+`MALLOC_MMAP_THRESHOLD_=65536` before starting the host and sidecars. The ordinary
+`test:core` command leaves allocator defaults intact. Settings need validation
+for a future high-concurrency service.
 
 A new multi-instance probe also found that agentOS 0.2.19 replaces host binding
 handlers/policies when VMs share a sidecar. The core harness now requests its

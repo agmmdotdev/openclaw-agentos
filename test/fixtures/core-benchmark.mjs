@@ -2,10 +2,46 @@ import { spawnSync as benchSpawnSync } from 'node:child_process';
 import { DatabaseSync as BenchDatabase, getBenchmarkSqlTiming } from './compat/sqlite.mjs';
 const check = (condition, message) => { if (!condition) throw new Error(message); };
 function mark(label, data = {}) {
-  const result = benchSpawnSync('agentos-bench', ['mark', '--json', JSON.stringify({ label, data: JSON.stringify({ ...data, guestSql: getBenchmarkSqlTiming() }) })], { encoding: 'utf8' });
+  const result = benchSpawnSync('agentos-bench', ['mark', '--json', JSON.stringify({ label, data: JSON.stringify({ ...data, guestSql: getBenchmarkSqlTiming(), fsProfile: globalThis.__benchmarkFsTiming?.() }) })], { encoding: 'utf8' });
   check(result.status === 0, `benchmark marker failed: ${result.stderr}`);
 }
 mark('worker-ready');
+if (process.env.BENCH_PROFILE_CORE === '1') {
+  init_embedded_agent_runtime();
+  function profileFunction(fn, name) {
+    return function (...args) {
+      mark(`profile:${name}:start`);
+      const start = performance.now();
+      const end = () => mark(`profile:${name}:end`, { durationMs: performance.now() - start });
+      try { const result = Reflect.apply(fn, this, args); if (result?.then) return result.then(value => { end(); return value; }, error => { end(); throw error; }); end(); return result; }
+      catch(error) { end(); throw error; }
+    };
+  }
+  for (const name of ['compile', 'instantiate', 'compileStreaming', 'instantiateStreaming']) {
+    if (typeof WebAssembly[name] === 'function') WebAssembly[name] = profileFunction(WebAssembly[name], `wasm.${name}`);
+  }
+  for (const name of ['Module', 'Instance']) {
+    const original = WebAssembly[name];
+    WebAssembly[name] = new Proxy(original, { construct(target, args, newTarget) {
+      const start = performance.now(); mark(`profile:wasm.${name}:start`);
+      try { return Reflect.construct(target, args, newTarget); }
+      finally { mark(`profile:wasm.${name}:end`, { durationMs: performance.now() - start }); }
+    } });
+  }
+  if (typeof getShellPathFromLoginShell === 'function') getShellPathFromLoginShell = profileFunction(getShellPathFromLoginShell, 'login-shell');
+  if (typeof loadParser === 'function') loadParser = profileFunction(loadParser, 'load-bash-parser');
+  if (typeof parseBashForCommandExplanation === 'function') parseBashForCommandExplanation = profileFunction(parseBashForCommandExplanation, 'parse-bash');
+  if (typeof runExecProcess === 'function') runExecProcess = profileFunction(runExecProcess, 'exec-process');
+  loadWorkspaceBootstrapFiles = profileFunction(loadWorkspaceBootstrapFiles, 'bootstrap');
+  createCoreCodingTools = profileFunction(createCoreCodingTools, 'tools');
+  createAgentSession = profileFunction(createAgentSession, 'session');
+  ModelRegistry.inMemory = profileFunction(ModelRegistry.inMemory, 'models');
+  AuthStorage.inMemory = profileFunction(AuthStorage.inMemory, 'auth');
+  SettingsManager.inMemory = profileFunction(SettingsManager.inMemory, 'settings');
+  const originalLoader = createEmbeddedAgentResourceLoader;
+  createEmbeddedAgentResourceLoader = function (...args) { const result = originalLoader(...args); result.reload = profileFunction(result.reload.bind(result), 'resources'); return result; };
+}
+
 fs.writeFileSync('/workspace/seed.txt', 'benchmark-seed\n');
 if (process.env.BENCH_SPLIT_INIT === '1') {
   mark('module-init:start');
@@ -28,6 +64,7 @@ for (let turn = 0; turn <= warmTurns; turn++) {
     prompt: 'Read the seed file and confirm it using the shell.', initialMessages: history,
     modelRef: { provider: 'openai', model: 'gpt-4.1' }, allowedToolNames: ['read', 'exec'],
     inference: { stream(request) {
+      if (process.env.BENCH_PROFILE_CORE === '1') mark('profile:inference', { turn, call: calls });
       if (calls > 0) {
         const result = request.context.messages.findLast(m => m.role === 'toolResult');
         check(result && !result.isError && result.content.some(p => p.text?.includes('benchmark-seed')), `tool output failed: ${JSON.stringify(result)}`);
