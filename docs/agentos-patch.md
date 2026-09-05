@@ -1,5 +1,9 @@
 # agentOS compatibility patch
 
+> Historical provider/runtime-patch work. The current no-fork core experiment
+> and remaining failures are documented in [core-runtime-report.md](core-runtime-report.md).
+> The Rust patch is not used by the current experiment.
+
 The repository includes
 [`patches/0001-feat-execution-cover-OpenClaw-builtin-imports.patch`](../patches/0001-feat-execution-cover-OpenClaw-builtin-imports.patch).
 It applies to agentOS commit

@@ -1,0 +1,256 @@
+{
+  "versions": {
+    "node": "v24.19.0",
+    "openclaw": "2026.8.1",
+    "agentos": "0.2.19",
+    "sqlite": "3.53.3"
+  },
+  "compatibilityGate": "failed",
+  "scenarios": [
+    {
+      "generation": "capabilities",
+      "processOutcome": "failed",
+      "checks": [
+        {
+          "kind": "CAPABILITIES_RESULT",
+          "assertions": 116,
+          "failures": [
+            "async local contexts remain isolated across await"
+          ],
+          "parallel": [
+            "second",
+            "second"
+          ],
+          "sqlite": "host-backed",
+          "unsupported": [
+            "X509Certificate",
+            "monitorEventLoopDelay"
+          ]
+        }
+      ]
+    },
+    {
+      "generation": "initial",
+      "processOutcome": "failed",
+      "durationMs": 21368,
+      "sqliteCalls": 3386,
+      "checks": [
+        {
+          "kind": "CORE_RESULT",
+          "phase": "tools",
+          "durationMs": 17693,
+          "calls": 6,
+          "tools": [
+            "write",
+            "read",
+            "edit",
+            "exec",
+            "apply_patch"
+          ],
+          "transcriptMessages": 12,
+          "priorMessages": 0,
+          "events": [
+            {
+              "kind": "lifecycle",
+              "phase": "start"
+            },
+            {
+              "kind": "tool",
+              "phase": "start"
+            },
+            {
+              "kind": "tool",
+              "phase": "result"
+            },
+            {
+              "kind": "tool",
+              "phase": "start"
+            },
+            {
+              "kind": "tool",
+              "phase": "result"
+            },
+            {
+              "kind": "tool",
+              "phase": "start"
+            },
+            {
+              "kind": "tool",
+              "phase": "result"
+            },
+            {
+              "kind": "tool",
+              "phase": "start"
+            },
+            {
+              "kind": "tool",
+              "phase": "result"
+            },
+            {
+              "kind": "tool",
+              "phase": "start"
+            },
+            {
+              "kind": "tool",
+              "phase": "result"
+            },
+            {
+              "kind": "assistant"
+            },
+            {
+              "kind": "lifecycle",
+              "phase": "finishing"
+            }
+          ],
+          "order": [
+            "commit",
+            "commit",
+            "commit",
+            "commit",
+            "commit",
+            "commit",
+            "commit",
+            "commit",
+            "commit",
+            "commit",
+            "commit",
+            "commit",
+            "terminal"
+          ]
+        },
+        {
+          "kind": "CORE_RESULT",
+          "phase": "resume",
+          "durationMs": 330,
+          "calls": 3,
+          "tools": [
+            "read",
+            "exec"
+          ],
+          "transcriptMessages": 6,
+          "priorMessages": 12,
+          "events": [
+            {
+              "kind": "lifecycle",
+              "phase": "start"
+            },
+            {
+              "kind": "tool",
+              "phase": "start"
+            },
+            {
+              "kind": "tool",
+              "phase": "result"
+            },
+            {
+              "kind": "tool",
+              "phase": "start"
+            },
+            {
+              "kind": "tool",
+              "phase": "update"
+            },
+            {
+              "kind": "tool",
+              "phase": "result"
+            },
+            {
+              "kind": "assistant"
+            },
+            {
+              "kind": "lifecycle",
+              "phase": "finishing"
+            }
+          ],
+          "order": [
+            "commit",
+            "commit",
+            "commit",
+            "commit",
+            "commit",
+            "commit",
+            "terminal"
+          ]
+        },
+        {
+          "kind": "FAILURE_CASES_RESULT",
+          "completed": [
+            "pre-aborted",
+            "inference-error",
+            "transcript-error",
+            "read-only",
+            "missing-file"
+          ],
+          "failures": [
+            {
+              "name": "background-process",
+              "message": "ASSERTION: background process: ASSERTION: background process must settle: {\"role\":\"toolResult\",\"toolCallId\":\"bg-poll-7\",\"toolName\":\"process\",\"content\":[{\"type\":\"text\",\"text\":\"(no new output)\\n\\nProcess exited with unknown exit code.\"}],\"details\":{\"status\":\"failed\",\"sessionId\":\"dawn-glade\",\"name\":\"node setTimeout(() => conso...('background-ok'), 50)\",\"aggregated\":\"background-ok\\n\"},\"isError\":false,\"timestamp\":1788590463586}"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "generation": "restored",
+      "processOutcome": "succeeded",
+      "durationMs": 19876,
+      "sqliteCalls": 3422,
+      "checks": [
+        {
+          "kind": "CORE_RESULT",
+          "phase": "resume",
+          "durationMs": 17722,
+          "calls": 3,
+          "tools": [
+            "read",
+            "exec"
+          ],
+          "transcriptMessages": 6,
+          "priorMessages": 18,
+          "events": [
+            {
+              "kind": "lifecycle",
+              "phase": "start"
+            },
+            {
+              "kind": "tool",
+              "phase": "start"
+            },
+            {
+              "kind": "tool",
+              "phase": "result"
+            },
+            {
+              "kind": "tool",
+              "phase": "start"
+            },
+            {
+              "kind": "tool",
+              "phase": "update"
+            },
+            {
+              "kind": "tool",
+              "phase": "result"
+            },
+            {
+              "kind": "assistant"
+            },
+            {
+              "kind": "lifecycle",
+              "phase": "finishing"
+            }
+          ],
+          "order": [
+            "commit",
+            "commit",
+            "commit",
+            "commit",
+            "commit",
+            "commit",
+            "terminal"
+          ]
+        }
+      ]
+    }
+  ]
+}

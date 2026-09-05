@@ -2,7 +2,7 @@
   "name": "@agmmdotdev/openclaw-agentos",
   "version": "0.1.0",
   "private": true,
-  "description": "OpenClaw 2.0 WorkerProvider backed by Rivet agentOS",
+  "description": "OpenClaw core on published agentOS: artifact adapters and runtime experiments",
   "type": "module",
   "license": "MIT",
   "packageManager": "pnpm@10.13.1",
@@ -30,10 +30,15 @@
     "test:watch": "vitest",
     "audit:worker": "pnpm build && node scripts/audit-openclaw-worker.mjs --report docs/compatibility-audit.md",
     "audit:worker:strict": "pnpm build && node scripts/audit-openclaw-worker.mjs --strict",
-    "probe:worker": "pnpm build && node scripts/probe-openclaw-worker.mjs"
+    "probe:worker": "pnpm build && node scripts/probe-openclaw-worker.mjs",
+    "core:build": "tsc -p tsconfig.build.json && node scripts/build-core-artifact.mjs",
+    "test:core": "node scripts/probe-core.mjs",
+    "test:host-sqlite": "node --test test/host-sqlite.test.mjs",
+    "probe:async-context": "node scripts/probe-async-context.mjs"
   },
   "dependencies": {
-    "@rivet-dev/agentos-core": "0.2.19"
+    "@rivet-dev/agentos-core": "0.2.19",
+    "zod": "4.4.3"
   },
   "peerDependencies": {
     "openclaw": ">=2026.8.1 <2027"

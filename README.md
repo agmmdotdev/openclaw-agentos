@@ -1,101 +1,83 @@
-# OpenClaw agentOS Worker Provider
+# OpenClaw core on agentOS
 
-An out-of-tree OpenClaw 2.0 `WorkerProvider` that provisions isolated
-[Rivet agentOS](https://github.com/rivet-dev/agentos) VMs. OpenClaw itself is
-not forked.
+An out-of-tree experiment running OpenClaw **2026.8.1** core turns inside the
+published **agentOS 0.2.19** runtime. No containers, OpenClaw source fork,
+agentOS source changes, or Rust build are used in the current experiment.
 
-## Status
+**Status: core tool turns work; the compatibility gate intentionally fails.**
+The tests found incorrect async-context propagation and an unresolved
+background-process completion failure. This is not a production runtime.
 
-This repository implements the first integration boundary:
+## Current core boundary
 
-- a valid `agentos` OpenClaw worker-provider plugin;
-- deterministic, idempotent lease identities;
-- `worker-turn`-only placement and node enrollment;
-- an embedded agentOS lifecycle driver;
-- exact bootstrap download, byte-count and SHA-256 verification;
-- bounded streaming transfer for bootstrap and worker artifacts larger than a
-  single agentOS RPC frame;
-- bootstrap installation inside the VM and OpenClaw node startup;
-- an isolated compatibility rewrite for agentOS's missing
-  `node:readline/promises` alias;
-- an explicit 36-builtin runtime allow-list derived from the pinned worker;
-- cleanup and provider contract tests;
-- a compatibility probe for the built OpenClaw worker artifact; and
-- a reviewable agentOS source patch for the five remaining import blockers.
+- Uses the actual standalone worker from the published OpenClaw package.
+- Verifies its SHA-256 before touching the generated artifact.
+- Rewrites nine import specifiers to local JavaScript compatibility modules.
+- Exposes the existing `runWorkerEmbeddedTurn` through a small wrapper that
+  invokes its generated module initializer.
+- Keeps OpenClaw's agent loop, coding tools, tool policy, transcript projection,
+  and terminal-event ordering in the agentOS guest.
+- Delegates SQLite to a scoped host Node SQLite service through agentOS's
+  published binding API. OpenClaw's SQLite safety check remains intact.
+- Persists workspace and transcript data through agentOS `chunked_local` mounts.
 
-The embedded driver is deliberately a development implementation. Its VM map
-lives in the Gateway process, so a Gateway restart cannot adopt those in-memory
-VMs. Production durability will use an agentOS/Rivet actor driver while keeping
-the same `AgentOsDriver` interface.
+These are **artifact patches**, even though neither source project is forked.
+The private core boundary is version-specific, not a stable upstream SDK.
 
-The provider is not production-runnable yet. The published agentOS 0.2.19
-runtime still has five blocking builtin modules; the first full-worker failure
-is its missing `node:crypto` `X509Certificate` export. This repository now
-contains an agentOS patch that closes the static import surface, but the native
-patched runtime has not yet been built and exercised end to end. In particular,
-`X509Certificate` deliberately throws `ERR_NOT_IMPLEMENTED`, so certificate
-parsing and pinned-TLS flows remain unsupported rather than being faked. See
-[docs/compatibility.md](docs/compatibility.md) and
-[docs/agentos-patch.md](docs/agentos-patch.md).
+Inference is injected deterministically in the tests. No model API credentials
+are needed, and guest network access is denied. The real OpenClaw core consumes
+those responses and executes its real tools; the model's reasoning and external
+provider transports are not tested.
 
-## Compatibility baseline
+## Results
 
-| Component | Pinned version |
+| Test | Result |
 | --- | --- |
-| OpenClaw | `2026.8.1` (OpenClaw 2.0) |
-| agentOS | `0.2.19` |
-| Node.js | `>=22.22.3` |
+| Core turn with `write`, `read`, `edit`, `exec`, `apply_patch` | Pass |
+| Continued turn in the same guest process | Pass |
+| Workspace and transcript restoration after VM disposal/recreation | Pass |
+| Pre-aborted turn, inference failure, transcript failure | Pass |
+| Read-only tool restrictions; recovery from missing-file errors | Pass |
+| Host SQLite transactions, blobs, 64-bit integers, persistence and isolation | Pass |
+| Existing provider contract tests | 11 pass |
+| AsyncLocalStorage across overlapping awaits | **Fail in published agentOS, independently reproduced without adapters** |
+| Background exec followed by `process.poll` | **Fail: output arrives, completion has unknown exit code** |
 
-## Development
+See [the detailed report](docs/core-runtime-report.md),
+[raw results](artifacts/results/core-probe.json), and
+[standalone async-context evidence](artifacts/results/async-context.json).
 
-```bash
-corepack pnpm install --frozen-lockfile
-corepack pnpm check
-corepack pnpm test
-corepack pnpm build
+## Reproduce
+
+Tested on Linux x64 with host Node **24.19.0**, whose SQLite is **3.53.3**.
+The SQLite host adapter requires `DatabaseSync.setAuthorizer`; older supported
+Node versions of the historical provider alone are not sufficient evidence.
+
+```sh
+pnpm install --frozen-lockfile --ignore-scripts
+npm run check
+npm run test
+npm run test:host-sqlite
+npm run core:build
+npm run test:core
+npm run probe:async-context
 ```
 
-To test the actual OpenClaw worker bundle inside agentOS, first build OpenClaw
-2.0 and then run:
+`test:core` and `probe:async-context` currently exit **1** because the known
+compatibility failures are assertions, not skipped tests. Passing core results
+and failing cases are written together to `artifacts/results/`.
 
-```bash
-OPENCLAW_REPO=../openclaw-2.0 corepack pnpm audit:worker
-OPENCLAW_REPO=../openclaw-2.0 corepack pnpm probe:worker
-```
+`core:build` regenerates the large worker artifact under `artifacts/core/`.
+That directory and installed dependencies are excluded from git and the source
+archive. The source archive includes the repository's git history.
 
-The audit checks every statically imported Node builtin and named/default
-export. `audit:worker:strict` exits non-zero when it finds blockers, making it
-suitable as an upgrade gate in CI.
+## Historical provider prototype
 
-Against published agentOS 0.2.19, this probe is expected to exit non-zero and
-report the missing `X509Certificate` export. The audit and probe also accept
-`AGENTOS_CORE_MODULE` plus `AGENTOS_CORE_PACKAGE_JSON` so a locally built
-agentOS patch can be selected without changing this repository's dependency.
+The original TypeScript `WorkerProvider`, embedded lifecycle driver and their
+contract tests remain in `src/`. They have **not** been wired to this new core
+experiment and are not production-runnable. Gateway enrollment, channels,
+Cloudflare deployment and actor adoption remain outside this phase.
 
-## OpenClaw profile
-
-The provider accepts these worker-profile settings:
-
-```json
-{
-  "network": "allow",
-  "maxFilesystemBytes": 1073741824,
-  "v8HeapLimitMb": 256,
-  "installTimeoutMs": 600000
-}
-```
-
-Network access is required for a real worker to connect outbound to its
-Gateway. The one-GiB filesystem limit is intentional: OpenClaw's verified
-bootstrap archive is at most 25 MiB, but its installed dependency tree is much
-larger.
-
-## Boundary
-
-The Gateway remains authoritative for placement state, transcripts, provider
-credentials, bootstrap generation and tool authority. agentOS owns only the
-isolated execution VM, its virtual filesystem, process tree and outbound
-network policy.
-
-See [docs/architecture.md](docs/architecture.md) for the lifecycle and known
-gaps.
+The Rust patch in `patches/` and `docs/agentos-patch.md` is historical and is
+**not applied or needed** by the current tests. The raw builtin audit also
+remains useful as evidence about the unchanged published runtime.

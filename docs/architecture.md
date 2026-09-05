@@ -1,5 +1,9 @@
 # Architecture
 
+> Historical provider/runtime-patch work. The current no-fork core experiment
+> and remaining failures are documented in [core-runtime-report.md](core-runtime-report.md).
+> The Rust patch is not used by the current experiment.
+
 ## Lifecycle
 
 1. OpenClaw persists placement intent.
