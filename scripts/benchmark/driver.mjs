@@ -7,7 +7,8 @@ import { randomUUID } from 'node:crypto';
 import { z } from 'zod';
 import { writeLargeFile } from '../../dist/src/write-large-file.js';
 import { OPENCLAW_AGENTOS_NODE_BUILTINS } from '../../dist/src/compatibility.js';
-import { createHostSqlite } from '../../src/host-sqlite.mjs';
+import { decode as decodeSqlRequest } from '../../src/host-sqlite.mjs';
+import { createCoreHostSqlite } from '../../src/core-host-sqlite.mjs';
 
 const instances = Number(process.argv[2] ?? 1);
 if (![1, 2, 4].includes(instances)) throw new Error('Expected 1, 2 or 4 instances');
@@ -19,11 +20,17 @@ try {
   mark('baseline', { placement: 'one-sidecar-pool-per-vm' }); await settle();
   for (let index = 0; index < instances; index++) {
     const directory = join(root, String(index)); await mkdir(directory);
-    const sqlite = createHostSqlite(join(directory, 'databases'));
+    const sqlite = await createCoreHostSqlite(join(directory, 'databases'));
     let hostSqlMilliseconds = 0;
     const executeSql = sqlite.collection.bindings.call.execute;
     sqlite.collection.bindings.call.execute = request => {
       const started = performance.now();
+      if (process.env.BENCH_PROFILE_SQL === '1') {
+        const decoded = decodeSqlRequest(JSON.parse(request.payload));
+        const key = decoded.op + ':' + (decoded.sql ?? '').replace(/\s+/g, ' ').trim();
+        const profile = sqlite.stats.profile ??= {};
+        profile[key] = (profile[key] ?? 0) + 1;
+      }
       try { return executeSql(request); }
       finally { hostSqlMilliseconds += performance.now() - started; }
     };
@@ -55,6 +62,11 @@ try {
     for (const name of await readdir('artifacts/core/compat')) {
       let content = await readFile(`artifacts/core/compat/${name}`, 'utf8');
       if (name === 'sqlite.mjs') {
+        if (process.env.BENCH_SQL_SCHEMA_MODE === 'individual') {
+          const batchMethod = 'collectOpenClawTableContract(tableName)';
+          if (content.split(batchMethod).length !== 2) throw new Error('Schema batching control boundary changed');
+          content = content.replace(batchMethod, '__disabledCollectOpenClawTableContract(tableName)');
+        }
         const anchor = 'function call(request) {';
         if (content.split(anchor).length !== 2) throw new Error('SQLite benchmark instrumentation boundary changed');
         content = content.replace(anchor, 'function benchmarkRawCall(request) {') + `
@@ -65,6 +77,21 @@ function call(request) {
   finally { benchmarkSqlMilliseconds += performance.now() - start; }
 }
 export function getBenchmarkSqlTiming() { return { calls: benchmarkSqlCalls, milliseconds: benchmarkSqlMilliseconds }; }
+`;
+      }
+      if (name === 'child-process.mjs' && process.env.BENCH_PROFILE_PROCESS === '1') {
+        content += `
+const benchmarkNativeSpawn = childProcess.spawn;
+let benchmarkProcessId = 0;
+export function spawn(...args) {
+  const id = ++benchmarkProcessId, start = performance.now();
+  const child = Reflect.apply(benchmarkNativeSpawn, childProcess, args);
+  for (const event of ['spawn', 'exit', 'close', 'error']) child.once(event, (code, signal) => {
+    console.error('PROCESS_PROFILE=' + JSON.stringify({ id, file: args[0], event, elapsedMs: performance.now() - start, code: typeof code === 'number' ? code : undefined, signal }));
+  });
+  return child;
+}
+childProcess.spawn = spawn;
 `;
       }
       if (name === 'fs.mjs' && process.env.BENCH_PROFILE_FS === '1') {

@@ -34,7 +34,7 @@
     "core:build": "tsc -p tsconfig.build.json && node scripts/build-core-artifact.mjs",
     "test:core": "node scripts/probe-core.mjs",
     "test:core:compact": "MALLOC_ARENA_MAX=1 MALLOC_TRIM_THRESHOLD_=65536 MALLOC_MMAP_THRESHOLD_=65536 node scripts/probe-core.mjs",
-    "test:core-profile": "node --test test/slice-core-artifact.test.mjs",
+    "test:core-profile": "node --test test/slice-core-artifact.test.mjs test/schema-collector.test.mjs",
     "test:host-sqlite": "node --test test/host-sqlite.test.mjs",
     "probe:async-context": "node scripts/probe-async-context.mjs",
     "core:report": "node scripts/summarize-core-results.mjs",

@@ -21,7 +21,9 @@ adapter boundary. This remains a prototype, not a production runtime.
 - Keeps OpenClaw's agent loop, coding tools, tool policy, transcript projection,
   and terminal-event ordering in the agentOS guest.
 - Delegates SQLite to a scoped host Node SQLite service through agentOS's
-  published binding API. OpenClaw's SQLite safety check remains intact.
+  published binding API. The original table-metadata collector runs beside that
+  connection in one call; schema validation and the SQLite safety check remain
+  intact. Use `createCoreHostSqlite()` for the verified collector configuration.
 - Persists workspace and transcript data through agentOS `chunked_local` mounts.
 
 The reduced profile explicitly rejects gateway compaction and source extension
@@ -98,14 +100,18 @@ listener-table representation. See the report for these compatibility limits.
 
 The [runtime benchmark](docs/runtime-benchmark.md) now measures a **16.6 MB
 compiled core**, down from 53.6 MB. With the tested glibc allocator settings,
-a single instance reaches its first result in about **4.1–4.4 seconds** and
-idles at **514–549 MiB process-tree PSS**. Warm turns remain around 0.3 seconds.
-The equivalent reduced Node core is still faster (about 1.0–1.2 seconds cold, 26–29 ms
-warm) and smaller in steady-state memory (273 MiB). These are local measurements
+the latest batching pass measures **3.50 seconds median to the first result**,
+versus **4.46 seconds** with individual SQL calls. The five batched runs span
+3.40–6.14 seconds; the slow outlier is retained. Idle memory remains about
+520–547 MiB and warm turns about 0.3 seconds. Direct Node still measures around
+1.17 seconds cold, 27 ms warm and 272 MiB idle. These are small local samples
 with deterministic inference, not production cost or Cloudflare evidence.
+See [schema batching](docs/schema-batching.md) for the code boundary and
+in-guest drift/rollback comparisons. The guest bundle remains 16.6 MB; the
+extracted host collector adds 12.5 KB.
 
 Use `npm run test:core:compact` to exercise the tuned Linux configuration, or
-`npm run bench:core -- --allocator compact --trial 20` to measure it. The
+`npm run bench:core -- --allocator compact --trial 30` to measure it. The
 allocator profile sets `MALLOC_ARENA_MAX=1`, `MALLOC_TRIM_THRESHOLD_=65536`, and
 `MALLOC_MMAP_THRESHOLD_=65536` before starting the host and sidecars. The ordinary
 `test:core` command leaves allocator defaults intact. Settings need validation

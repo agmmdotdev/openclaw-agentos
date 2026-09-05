@@ -2,7 +2,7 @@ import ts from 'typescript';
 
 // Generated-module reachability for this pinned standalone artifact. Original
 // declaration text is retained, including lazy initializer bodies and order.
-export function sliceCoreArtifact(source) {
+export function sliceCoreArtifact(source, options = {}) {
   const file = '/worker.mjs';
   const ast = ts.createSourceFile(file, source, ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
   const host = ts.createCompilerHost({});
@@ -51,7 +51,7 @@ export function sliceCoreArtifact(source) {
     }
     visit(unit.statement);
   }
-  const roots = ['init_embedded_agent_runtime', 'runWorkerEmbeddedTurn'];
+  const roots = options.roots ?? ['init_embedded_agent_runtime', 'runWorkerEmbeddedTurn'];
   const selected = new Set();
   function retain(unit) { if (!unit || selected.has(unit)) return; selected.add(unit); for (const dependency of unit.dependencies) retain(dependency); }
   for (const name of roots) {
@@ -60,8 +60,8 @@ export function sliceCoreArtifact(source) {
     retain(unit);
   }
   // Standalone runtime registration is intentionally eager in upstream.
-  const registrations = units.filter(u => u.eager && u.statement.getText(ast).startsWith('setWorkerDeployRuntime('));
-  if (registrations.length !== 1) throw new Error('Core registration boundaries changed');
+  const registrations = options.registerRuntime === false ? [] : units.filter(u => u.eager && u.statement.getText(ast).startsWith('setWorkerDeployRuntime('));
+  if (options.registerRuntime !== false && registrations.length !== 1) throw new Error('Core registration boundaries changed');
   registrations.forEach(retain);
   // Preserve eager upstream calls to every retained initializer in source order.
   // Some modules rely on these registrations instead of declaring their own init
@@ -93,6 +93,6 @@ export function sliceCoreArtifact(source) {
   // notices preceding a split var declaration. Never discard licensing text
   // merely because the minifier attached it to a declaration we removed.
   const legalNotices = [...new Set(source.match(/\/\*![\s\S]*?\*\//g) ?? [])].join('\n');
-  const output = legalNotices + '\n' + units.filter(u => selected.has(u)).map(u => u.prefix ? u.prefix + u.statement.getText(ast) + ';' : u.statement.getFullText(ast) + (u.eager ? ';' : '')).join('\n') + '\nexport async function runOpenClawCoreTurn(params) { init_embedded_agent_runtime(); return runWorkerEmbeddedTurn(params); }\n';
+  const output = legalNotices + '\n' + units.filter(u => selected.has(u)).map(u => u.prefix ? u.prefix + u.statement.getText(ast) + ';' : u.statement.getFullText(ast) + (u.eager ? ';' : '')).join('\n') + (options.wrapper ?? '\nexport async function runOpenClawCoreTurn(params) { init_embedded_agent_runtime(); return runWorkerEmbeddedTurn(params); }\n');
   return { source: output, report: { roots, paths, largest, inputStatements: units.length, retainedStatements: selected.size, removedBytes: Buffer.byteLength(source) - Buffer.byteLength(output), legalNoticeBytes: Buffer.byteLength(legalNotices), eagerInitializers: [...selected].filter(u => u.eager).length, retainedRegistrations: registrations.map(u => u.statement.getText(ast).slice(0,180)) } };
 }

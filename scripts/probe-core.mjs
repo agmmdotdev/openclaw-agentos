@@ -2,7 +2,7 @@ import { AgentOs } from '@rivet-dev/agentos-core';
 import { readFile, readdir, mkdir, writeFile } from 'node:fs/promises';
 import { writeLargeFile } from '../dist/src/write-large-file.js';
 import { OPENCLAW_AGENTOS_NODE_BUILTINS } from '../dist/src/compatibility.js';
-import { createHostSqlite } from '../src/host-sqlite.mjs';
+import { createCoreHostSqlite } from '../src/core-host-sqlite.mjs';
 import { mkdtemp, rm, realpath } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join, dirname } from 'node:path';
@@ -12,7 +12,7 @@ import { compileFixture } from './compile-async.mjs';
 
 const sqliteRoot = await mkdtemp(join(tmpdir(), 'openclaw-agentos-sqlite-'));
 await mkdir(join(sqliteRoot, 'databases'));
-const sqlite = createHostSqlite(join(sqliteRoot, 'databases'));
+const sqlite = await createCoreHostSqlite(join(sqliteRoot, 'databases'));
 const options = {
   // Concurrent VMs with different bindings cannot share agentOS 0.2.19's host
   // callback handler. Retain this pool across recreation of this one tenant.

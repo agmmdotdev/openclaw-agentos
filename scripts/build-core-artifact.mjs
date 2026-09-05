@@ -2,6 +2,7 @@ import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import { resolve } from 'node:path';
 import ts from 'typescript';
+import { sliceCoreArtifact } from './slice-core-artifact.mjs';
 import { prepareCoreProfile } from './core-profile.mjs';
 import { compileAsync, asyncCompiler } from './compile-async.mjs';
 
@@ -16,6 +17,19 @@ if (sha256 !== expected) throw new Error(`Unreviewed worker artifact: ${sha256}`
 const profile = process.env.CORE_PROFILE ?? 'core';
 if (!['core', 'full'].includes(profile)) throw new Error('Unknown CORE_PROFILE');
 const prepared = profile === 'core' ? prepareCoreProfile(source) : { source };
+// Extract the original read-only collector before installing the guest hook.
+// It accepts an already-authorized database handle; it opens no connections.
+const schemaCollector = sliceCoreArtifact(prepared.source, {
+  roots: ['init_sqlite_schema_sql', 'collectSqliteTableContract'], registerRuntime: false,
+  wrapper: '\ninit_sqlite_schema_sql(); export { collectSqliteTableContract };\n',
+});
+if (/^import\s/m.test(schemaCollector.source) || Buffer.byteLength(schemaCollector.source) > 40000) {
+  throw new Error('Schema collector dependency boundary expanded');
+}
+const collectorAnchor = 'function collectSqliteTableContract(Ot,Zt){';
+if (prepared.source.split(collectorAnchor).length !== 2) throw new Error('Schema collector hook boundary changed');
+prepared.source = prepared.source.replace(collectorAnchor, collectorAnchor +
+  'if(typeof Ot.collectOpenClawTableContract===`function`)return Ot.collectOpenClawTableContract(Zt);');
 const ast = ts.createSourceFile('worker.mjs', prepared.source, ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
 const replacements = [];
 const modules = new Map([
@@ -52,6 +66,7 @@ if (intrinsicReferences !== (profile === 'full' ? 3 : 2)) throw new Error('Async
 transformed = 'import { nativeAsyncIteratorPrototype as __agentosAsyncIteratorPrototype } from "./compat/async-intrinsics.mjs";\n' + transformed.replaceAll(intrinsic, '__agentosAsyncIteratorPrototype');
 await mkdir(output, { recursive: true });
 await writeFile(`${output}/native-core.mjs`, prepared.source);
+await writeFile(`${output}/schema-collector.mjs`, schemaCollector.source);
 transformed = await compileAsync(transformed) + (profile === 'full' ? '\nawait workerEntryReady;\n' : '');
 await mkdir(`${output}/compat`, { recursive: true });
 const compatibilityFiles = {};
@@ -62,6 +77,6 @@ for (const name of [...modules.values(), 'sqlite', 'init', 'text-decoder', 'asyn
   await writeFile(`${output}/compat/${file}`, bytes);
 }
 await writeFile(`${output}/worker.mjs`, transformed);
-const manifest = { profile, profileReport: prepared.report, inputBytes: Buffer.byteLength(source), nativeCoreBytes: Buffer.byteLength(prepared.source), outputBytes: Buffer.byteLength(transformed), nativeCoreSha256: createHash('sha256').update(prepared.source).digest('hex'), openclaw: '2026.8.1', agentos: '0.2.19', inputSha256: sha256, outputSha256: createHash('sha256').update(transformed).digest('hex'), asyncCompiler, intrinsicReferences, replacements, compatibilityFiles, addedExports: ['runOpenClawCoreTurn'], invokesUpstreamInitializer: 'init_embedded_agent_runtime' };
+const manifest = { schemaCollector: { sha256: createHash('sha256').update(schemaCollector.source).digest('hex'), bytes: Buffer.byteLength(schemaCollector.source), roots: schemaCollector.report.roots }, profile, profileReport: prepared.report, inputBytes: Buffer.byteLength(source), nativeCoreBytes: Buffer.byteLength(prepared.source), outputBytes: Buffer.byteLength(transformed), nativeCoreSha256: createHash('sha256').update(prepared.source).digest('hex'), openclaw: '2026.8.1', agentos: '0.2.19', inputSha256: sha256, outputSha256: createHash('sha256').update(transformed).digest('hex'), asyncCompiler, intrinsicReferences, replacements, compatibilityFiles, addedExports: ['runOpenClawCoreTurn'], invokesUpstreamInitializer: 'init_embedded_agent_runtime' };
 await writeFile(`${output}/manifest.json`, JSON.stringify(manifest, null, 2) + '\n');
 console.log(JSON.stringify({ output, inputSha256: sha256, replacements: replacements.length }));

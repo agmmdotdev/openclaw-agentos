@@ -5,6 +5,7 @@ function encode(value) {
   if (value === undefined) return ['undefined'];
   if (typeof value === 'bigint') return ['bigint', String(value)];
   if (value instanceof Uint8Array) return ['bytes', Buffer.from(value).toString('base64')];
+  if (value instanceof Map) return ['map', [...value].map(([key, item]) => [encode(key), encode(item)])];
   if (Array.isArray(value)) return ['array', value.map(encode)];
   if (value && typeof value === 'object') return ['object', Object.entries(value).map(([k, v]) => [k, encode(v)])];
   return ['scalar', value];
@@ -13,6 +14,7 @@ function decode([kind, value]) {
   if (kind === 'undefined') return undefined;
   if (kind === 'bigint') return BigInt(value);
   if (kind === 'bytes') return Buffer.from(value, 'base64');
+  if (kind === 'map') return new Map(value.map(([key, item]) => [decode(key), decode(item)]));
   if (kind === 'array') return value.map(decode);
   if (kind === 'object') return Object.fromEntries(value.map(([k, v]) => [k, decode(v)]));
   if (kind === 'scalar') return value;
@@ -33,6 +35,7 @@ export class DatabaseSync {
     this.handle = call({ op: 'open', path: path === ':memory:' ? path : resolve(path), options });
     this.isOpen = true;
   }
+  collectOpenClawTableContract(tableName) { return call({ op: 'openclaw-table-contract', handle: this.handle, tableName }); }
   exec(sql) { return call({ op: 'exec', handle: this.handle, sql }); }
   get isTransaction() { return call({ op: 'state', handle: this.handle }).isTransaction; }
   close() { call({ op: 'close', handle: this.handle }); this.isOpen = false; }

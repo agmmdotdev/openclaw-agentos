@@ -1,7 +1,7 @@
 # Core runtime experiment — compatibility fixes
 
 The newer [runtime benchmark](runtime-benchmark.md) documents the reduced core
-profile, login-shell fix, allocator settings and current Node comparison. Timing
+profile, login-shell fix, allocator settings, schema batching and current Node comparison. Timing
 observations later in this investigation describe the earlier full artifact.
 
 ## Decision and scope
@@ -54,7 +54,8 @@ This remains an artifact patch and a private, pinned implementation boundary.
 | Shell / Node child commands | agentOS process subsystem |
 | Transcript projection and commit/terminal ordering | OpenClaw guest code |
 | Inference responses | Deterministic fixture injected into the real core interface |
-| SQLite SQL execution | Scoped host Node SQLite, invoked through guest binding CLI |
+| SQLite SQL execution and original table-contract collection | Scoped host Node SQLite, invoked through guest binding CLI |
+| Schema comparison, migration decisions and integrity checks | Original OpenClaw guest code |
 | Workspace and transcript durability | Published agentOS native `chunked_local` mounts |
 
 The fixture has no model API credentials and the guest network policy is deny.
@@ -154,7 +155,7 @@ This is a **static compiled-code boundary**, not a general runtime repair:
 - Lowering can affect reflection and scheduling. Three stream ponyfills inspected
   the native async-generator prototype; those exact expressions now use an
   uncompiled intrinsic module. Broader reflection compatibility is unproven.
-- Reduced compiler output is 16,598,563 bytes versus 46,593,544 input bytes
+- Reduced compiler output is 16,598,661 bytes versus 46,593,544 input bytes
   (the previous full compiled artifact was 53,604,203 bytes). This does not
   establish guest memory overhead or a production cost advantage.
 - The tests establish exercised context behavior, not secure concurrent customer
@@ -245,7 +246,7 @@ turns, negative cases and restoration, preserving every result in one report.
 It exits nonzero if any capability or integrated scenario fails. The independent
 async-context probe also exits nonzero on adapted-path or compiled-Node
 divergence; failing raw-runtime controls are diagnostic evidence. The latest
-core gate passes all three generations, 129 capability assertions (100 are
+core gate passes all three generations, 132 capability assertions (100 are
 random-integer bounds), and eight failure/background scenarios. Unit tests and TypeScript
 checks remain separate from the real-runtime compatibility gate.
 

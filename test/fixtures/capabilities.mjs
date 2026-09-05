@@ -51,6 +51,15 @@ check(shellEnv.toString().split('\0').some(entry => entry.startsWith('PATH=') &&
 let shellFailure;
 try { execFileSync('/bin/sh', ['-c', 'exit 7'], { encoding: 'utf8' }); } catch (error) { shellFailure = error.status; }
 check(shellFailure === 7, 'non-probe execFileSync keeps genuine exit status');
+const schemaProbe = new DatabaseSync(':memory:');
+schemaProbe.exec('CREATE TABLE sample(id INTEGER PRIMARY KEY, value TEXT) STRICT');
+const schemaBefore = schemaProbe.collectOpenClawTableContract('sample');
+check(schemaBefore.definition.columns instanceof Map && schemaBefore.definition.columns.has('value') && schemaBefore.strict === 1, 'batched schema transport preserves column Map and strict table options');
+schemaProbe.exec('BEGIN; ALTER TABLE sample ADD COLUMN changed BLOB');
+check(schemaProbe.collectOpenClawTableContract('sample').definition.columns.has('changed'), 'batched schema sees uncommitted DDL on its own handle');
+schemaProbe.exec('ROLLBACK');
+check(!schemaProbe.collectOpenClawTableContract('sample').definition.columns.has('changed'), 'batched schema observes rollback without stale cache');
+schemaProbe.close();
 const db = new DatabaseSync('/state/capabilities.sqlite');
 db.exec('CREATE TABLE IF NOT EXISTS vals(n INTEGER, b BLOB); DELETE FROM vals; BEGIN IMMEDIATE');
 check(db.isTransaction, 'real transaction state');

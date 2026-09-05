@@ -41,6 +41,7 @@ for path in sorted(folder.glob('benchmark-*.json')):
         instances.append(instance)
     rows.append({'file':path.name,'runtime':report.get('runtime','native' if native else 'agentos'),
         'profile':report.get('coreManifest',{}).get('profile','full'),
+        'schemaExecution':'native' if native else 'host-batched' if report.get('coreManifest',{}).get('schemaCollector') and report.get('diagnostics',{}).get('BENCH_SQL_SCHEMA_MODE') != 'individual' else 'guest-individual',
         'allocatorEnvironment':report.get('allocatorEnvironment',{}),
         'diagnostics':report.get('diagnostics',{}),
         'configuredInstances':report['instances'],'passed':report['exitCode']==0,

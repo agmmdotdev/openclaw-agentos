@@ -9,6 +9,7 @@ export function encode(value) {
   if (value === undefined) return ['undefined'];
   if (typeof value === 'bigint') return ['bigint', String(value)];
   if (value instanceof Uint8Array) return ['bytes', Buffer.from(value).toString('base64')];
+  if (value instanceof Map) return ['map', [...value].map(([key, item]) => [encode(key), encode(item)])];
   if (Array.isArray(value)) return ['array', value.map(encode)];
   if (value && typeof value === 'object') return ['object', Object.entries(value).map(([k, v]) => [k, encode(v)])];
   return ['scalar', value];
@@ -17,13 +18,14 @@ export function decode([kind, value]) {
   if (kind === 'undefined') return undefined;
   if (kind === 'bigint') return BigInt(value);
   if (kind === 'bytes') return Buffer.from(value, 'base64');
+  if (kind === 'map') return new Map(value.map(([key, item]) => [decode(key), decode(item)]));
   if (kind === 'array') return value.map(decode);
   if (kind === 'object') return Object.fromEntries(value.map(([k, v]) => [k, decode(v)]));
   if (kind === 'scalar') return value;
   throw new Error('Invalid SQLite wire value');
 }
 
-export function createHostSqlite(root) {
+export function createHostSqlite(root, { collectTableContract } = {}) {
   mkdirSync(root, { recursive: true, mode: 0o700 });
   const databases = new Map();
   const stats = { calls: 0, opens: 0, version: undefined, failures: [] };
@@ -54,7 +56,11 @@ export function createHostSqlite(root) {
         if (request.op === 'close') { db.close(); databases.delete(request.handle); }
         else if (request.op === 'state') value = { isOpen: db.isOpen, isTransaction: db.isTransaction };
         else if (request.op === 'exec') value = db.exec(request.sql);
-        else if (request.op === 'statement') {
+        else if (request.op === 'openclaw-table-contract') {
+          if (!collectTableContract) throw new Error('Schema collector is not configured');
+          if (typeof request.tableName !== 'string' || request.tableName.length > 4096) throw new Error('Invalid table name');
+          value = collectTableContract(db, request.tableName);
+        } else if (request.op === 'statement') {
           if (!['get', 'all', 'run', 'columns'].includes(request.method)) throw new Error('Unsupported SQLite statement operation');
           const statement = db.prepare(request.sql);
           if (request.readBigInts) statement.setReadBigInts(true);
