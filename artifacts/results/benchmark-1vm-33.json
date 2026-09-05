@@ -1,0 +1,761 @@
+{
+  "recordedAt": "2026-09-05T09:53:22Z",
+  "instances": 1,
+  "trial": 33,
+  "sampleIntervalMs": 100.0,
+  "runtime": "agentos",
+  "splitInitializer": false,
+  "allocatorEnvironment": {
+    "MALLOC_ARENA_MAX": "1",
+    "MALLOC_TRIM_THRESHOLD_": "65536",
+    "MALLOC_MMAP_THRESHOLD_": "65536"
+  },
+  "coreManifest": {
+    "schemaCollector": {
+      "sha256": "0e5591afdb8e8497b119f9bad1b57d1c7bb8fc4683a60b3ddb7305878e923b41",
+      "bytes": 12477,
+      "roots": [
+        "init_sqlite_schema_sql",
+        "collectSqliteTableContract"
+      ]
+    },
+    "profile": "core",
+    "profileReport": {
+      "roots": [
+        "init_embedded_agent_runtime",
+        "runWorkerEmbeddedTurn"
+      ],
+      "paths": {
+        "init_bundled_channel_config_metadata_generated": [
+          "init_embedded_agent_runtime",
+          "init_model_registry",
+          "init_model_discovery_context",
+          "init_config$14",
+          "init_validation$4",
+          "init_bundled_channel_config_metadata_generated"
+        ]
+      },
+      "largest": [
+        {
+          "names": [
+            "init_bundled_channel_config_metadata_generated"
+          ],
+          "bytes": 308217
+        },
+        {
+          "names": [
+            "index_incubating_exports"
+          ],
+          "bytes": 170036
+        },
+        {
+          "names": [
+            "require_llhttp_simd_wasm"
+          ],
+          "bytes": 144717
+        },
+        {
+          "names": [
+            "require_llhttp_wasm"
+          ],
+          "bytes": 144208
+        },
+        {
+          "names": [
+            "init_node"
+          ],
+          "bytes": 142909
+        },
+        {
+          "names": [
+            "require_isbl"
+          ],
+          "bytes": 142816
+        },
+        {
+          "names": [
+            "init_acorn"
+          ],
+          "bytes": 126506
+        },
+        {
+          "names": [
+            "require_mathematica"
+          ],
+          "bytes": 109955
+        },
+        {
+          "names": [
+            "require_ponyfill_es2018"
+          ],
+          "bytes": 98456
+        },
+        {
+          "names": [
+            "init_index_min"
+          ],
+          "bytes": 88455
+        },
+        {
+          "names": [
+            "init_experimental_attributes"
+          ],
+          "bytes": 83714
+        },
+        {
+          "names": [
+            "init_openclaw_state_schema"
+          ],
+          "bytes": 83197
+        }
+      ],
+      "inputStatements": 81389,
+      "retainedStatements": 36989,
+      "removedBytes": 31995835,
+      "legalNoticeBytes": 6648,
+      "eagerInitializers": 44,
+      "retainedRegistrations": [
+        "setWorkerDeployRuntime({highlightJs:worker_deploy_highlight_runtime_default,json5:worker_deploy_json5_runtime_default,resolveSecureTempRoot})"
+      ],
+      "excludedBoundaries": [
+        "gateway compaction runtime",
+        "source extension loader"
+      ]
+    },
+    "inputBytes": 46593544,
+    "nativeCoreBytes": 14597452,
+    "outputBytes": 16598661,
+    "nativeCoreSha256": "9e79cdd5113000bff8565e92e1ac0e9eeabc23a8da9afd94a3fd495dfb042a17",
+    "openclaw": "2026.8.1",
+    "agentos": "0.2.19",
+    "inputSha256": "03eca1d346aa24fd5028b2ca8d09385b764bf9dd2c82810ce564043a34356f1c",
+    "outputSha256": "0f72315fafb65082506851b4ae066dcef8129aca23919523ee5c72bbf1a28570",
+    "asyncCompiler": {
+      "name": "esbuild",
+      "version": "0.28.2",
+      "supported": {
+        "async-await": false,
+        "async-generator": false,
+        "for-await": false
+      }
+    },
+    "intrinsicReferences": 2,
+    "replacements": [
+      {
+        "start": 6698,
+        "end": 6711,
+        "from": "node:module",
+        "to": "./compat/module.mjs"
+      },
+      {
+        "start": 6737,
+        "end": 6750,
+        "from": "node:crypto",
+        "to": "./compat/crypto.mjs"
+      },
+      {
+        "start": 6919,
+        "end": 6932,
+        "from": "node:crypto",
+        "to": "./compat/crypto.mjs"
+      },
+      {
+        "start": 6955,
+        "end": 6964,
+        "from": "node:fs",
+        "to": "./compat/fs.mjs"
+      },
+      {
+        "start": 7343,
+        "end": 7352,
+        "from": "node:fs",
+        "to": "./compat/fs.mjs"
+      },
+      {
+        "start": 8113,
+        "end": 8131,
+        "from": "node:async_hooks",
+        "to": "./compat/async-hooks.mjs"
+      },
+      {
+        "start": 8152,
+        "end": 8172,
+        "from": "node:child_process",
+        "to": "./compat/child-process.mjs"
+      },
+      {
+        "start": 8264,
+        "end": 8284,
+        "from": "node:child_process",
+        "to": "./compat/child-process.mjs"
+      },
+      {
+        "start": 8448,
+        "end": 8459,
+        "from": "node:util",
+        "to": "./compat/util.mjs"
+      },
+      {
+        "start": 9125,
+        "end": 9142,
+        "from": "node:perf_hooks",
+        "to": "./compat/perf-hooks.mjs"
+      }
+    ],
+    "compatibilityFiles": {
+      "crypto.mjs": "e73413c8e40c0356177a8b79ea329597714e512bb28e18a9cc73384d549ca00e",
+      "fs.mjs": "9eef1b59ce9191195f33beb9b814bdcec103a9cd718a91f03da66247b6107347",
+      "module.mjs": "0b42e0632916a4922ac9a61537b55502c362c98fc7f2b94aeba1686e9f7d2c5f",
+      "perf-hooks.mjs": "bb1084bd98fb604747b4ce53cebc827a0a2f4c8b4fd7d4e5709e2d7962077d7c",
+      "readline-promises.mjs": "6705c91651cfb9f3a2d81631cb5c041448637f3aa839e76d621aec24f4d7ddc4",
+      "util.mjs": "8fb311c732efcf8f1936ececc0f8f14699442af0b089bb15ceb025428198955a",
+      "async-hooks.mjs": "62f7e3dd394203875115cc73b46c25abc52f484b74eb41ee81ea20f58e3f27df",
+      "child-process.mjs": "a44baff695fba23ddd978f5734d1fef33fb3d05674f1ce7cbe294c479a50259b",
+      "sqlite.mjs": "2c0f26177bc0ff0353fdaae26d8749b7b7e730161d591314e9f69e159719410a",
+      "init.mjs": "f7cecfb8fdfd3197bb3351f259b0c1453411e424d6516f0c6df0e2bee6045571",
+      "text-decoder.mjs": "ba47fd59fa220e984a900afe3e748b2660aa4f18fe5a1d2d1ae94cdc8d2ecaa4",
+      "async-intrinsics.mjs": "7b145fa1054d44ef04ee540e24efdc3c205caaad54da9b3705133dcfbb89179e"
+    },
+    "addedExports": [
+      "runOpenClawCoreTurn"
+    ],
+    "invokesUpstreamInitializer": "init_embedded_agent_runtime"
+  },
+  "diagnostics": {
+    "BENCH_PROFILE_CORE": "0",
+    "BENCH_PROFILE_FS": "0",
+    "BENCH_SQL_SCHEMA_MODE": "0",
+    "BENCH_PROFILE_PROCESS": "0",
+    "BENCH_PROFILE_SQL": "0",
+    "CORE_HEAP_MB": null,
+    "CORE_WASM_HEAP_MB": null,
+    "AGENTOS_V8_WARM_ISOLATES": "0",
+    "AGENTOS_WASM_SNAPSHOT_RUNNER": null
+  },
+  "method": "Linux smaps_rollup RSS/PSS summed across isolated benchmark driver and descendants; compiler runs separately",
+  "environment": {
+    "platform": "Linux-6.18.35-x86_64-with-glibc2.39",
+    "cpuCount": 9,
+    "cpuAffinity": [
+      0,
+      1
+    ],
+    "clockTicksPerSecond": 100,
+    "cpuMax": "800000 100000",
+    "memoryMax": "21474836480"
+  },
+  "exitCode": 0,
+  "wallMs": 17920.762699999614,
+  "driverAndReapedUserSeconds": 7.178491,
+  "driverAndReapedSystemSeconds": 1.828299,
+  "sampledTreeCpuSeconds": 8.85,
+  "peakRssBytes": 606314496,
+  "peakPssBytes": 587056128,
+  "events": [
+    {
+      "label": "baseline",
+      "atMs": 7.9696500000000015,
+      "placement": "one-sidecar-pool-per-vm",
+      "receivedAtMs": 288.5341769979277
+    },
+    {
+      "label": "provision:start",
+      "atMs": 614.89077,
+      "instance": 0,
+      "receivedAtMs": 894.9317009974038
+    },
+    {
+      "label": "provision:end",
+      "atMs": 1216.5140740000002,
+      "instance": 0,
+      "receivedAtMs": 1496.5574540001398
+    },
+    {
+      "label": "empty-vms",
+      "atMs": 1216.6255210000002,
+      "receivedAtMs": 1496.5652159989986
+    },
+    {
+      "label": "stage:start",
+      "atMs": 1816.871766,
+      "instance": 0,
+      "receivedAtMs": 2096.9780499981425
+    },
+    {
+      "label": "stage:end",
+      "atMs": 2321.750177,
+      "instance": 0,
+      "receivedAtMs": 2601.8132179997338
+    },
+    {
+      "label": "staged",
+      "atMs": 2321.873252,
+      "receivedAtMs": 2601.8201489969215
+    },
+    {
+      "label": "launch:start",
+      "atMs": 2923.17993,
+      "receivedAtMs": 3203.281738999067
+    },
+    {
+      "label": "worker-ready",
+      "atMs": 3547.7219649999997,
+      "instance": 0,
+      "sqliteCalls": 0,
+      "hostSqlMilliseconds": 0,
+      "guestSql": {
+        "calls": 0,
+        "milliseconds": 0
+      },
+      "receivedAtMs": 3831.808563998493
+    },
+    {
+      "label": "cold-turn:start",
+      "atMs": 3551.6918579999997,
+      "instance": 0,
+      "sqliteCalls": 0,
+      "hostSqlMilliseconds": 0,
+      "guestSql": {
+        "calls": 0,
+        "milliseconds": 0
+      },
+      "receivedAtMs": 3831.9123399996897
+    },
+    {
+      "label": "cold-turn:end",
+      "atMs": 6750.5921579999995,
+      "instance": 0,
+      "sqliteCalls": 1700,
+      "hostSqlMilliseconds": 219.02525699998114,
+      "durationMs": 3197,
+      "calls": 3,
+      "transcriptMessages": 6,
+      "guestSql": {
+        "calls": 1700,
+        "milliseconds": 1231
+      },
+      "receivedAtMs": 7030.697290996613
+    },
+    {
+      "label": "warm-turn-1:start",
+      "atMs": 6751.34566,
+      "instance": 0,
+      "sqliteCalls": 1700,
+      "hostSqlMilliseconds": 219.02525699998114,
+      "guestSql": {
+        "calls": 1700,
+        "milliseconds": 1231
+      },
+      "receivedAtMs": 7031.2373119995755
+    },
+    {
+      "label": "warm-turn-1:end",
+      "atMs": 7077.746246,
+      "instance": 0,
+      "sqliteCalls": 1722,
+      "hostSqlMilliseconds": 220.1404819999807,
+      "durationMs": 326,
+      "calls": 3,
+      "transcriptMessages": 12,
+      "guestSql": {
+        "calls": 1722,
+        "milliseconds": 1242
+      },
+      "receivedAtMs": 7357.718299997941
+    },
+    {
+      "label": "warm-turn-2:start",
+      "atMs": 7078.4226419999995,
+      "instance": 0,
+      "sqliteCalls": 1722,
+      "hostSqlMilliseconds": 220.1404819999807,
+      "guestSql": {
+        "calls": 1722,
+        "milliseconds": 1242
+      },
+      "receivedAtMs": 7358.301084997947
+    },
+    {
+      "label": "warm-turn-2:end",
+      "atMs": 7431.36,
+      "instance": 0,
+      "sqliteCalls": 1744,
+      "hostSqlMilliseconds": 221.14687099998082,
+      "durationMs": 352,
+      "calls": 3,
+      "transcriptMessages": 18,
+      "guestSql": {
+        "calls": 1744,
+        "milliseconds": 1253
+      },
+      "receivedAtMs": 7711.401296997792
+    },
+    {
+      "label": "warm-turn-3:start",
+      "atMs": 7431.95938,
+      "instance": 0,
+      "sqliteCalls": 1744,
+      "hostSqlMilliseconds": 221.14687099998082,
+      "guestSql": {
+        "calls": 1744,
+        "milliseconds": 1253
+      },
+      "receivedAtMs": 7711.8374519996
+    },
+    {
+      "label": "warm-turn-3:end",
+      "atMs": 7764.305211,
+      "instance": 0,
+      "sqliteCalls": 1766,
+      "hostSqlMilliseconds": 222.1827169999833,
+      "durationMs": 331,
+      "calls": 3,
+      "transcriptMessages": 24,
+      "guestSql": {
+        "calls": 1766,
+        "milliseconds": 1262
+      },
+      "receivedAtMs": 8044.345005997457
+    },
+    {
+      "label": "warm-turn-4:start",
+      "atMs": 7765.002729,
+      "instance": 0,
+      "sqliteCalls": 1766,
+      "hostSqlMilliseconds": 222.1827169999833,
+      "guestSql": {
+        "calls": 1766,
+        "milliseconds": 1262
+      },
+      "receivedAtMs": 8044.883514998219
+    },
+    {
+      "label": "warm-turn-4:end",
+      "atMs": 8140.693520000001,
+      "instance": 0,
+      "sqliteCalls": 1788,
+      "hostSqlMilliseconds": 223.58386499998778,
+      "durationMs": 375,
+      "calls": 3,
+      "transcriptMessages": 30,
+      "guestSql": {
+        "calls": 1788,
+        "milliseconds": 1278
+      },
+      "receivedAtMs": 8420.749012999295
+    },
+    {
+      "label": "warm-turn-5:start",
+      "atMs": 8141.558429000001,
+      "instance": 0,
+      "sqliteCalls": 1788,
+      "hostSqlMilliseconds": 223.58386499998778,
+      "guestSql": {
+        "calls": 1788,
+        "milliseconds": 1278
+      },
+      "receivedAtMs": 8421.451577996777
+    },
+    {
+      "label": "warm-turn-5:end",
+      "atMs": 8477.802916,
+      "instance": 0,
+      "sqliteCalls": 1810,
+      "hostSqlMilliseconds": 224.61328199998934,
+      "durationMs": 335,
+      "calls": 3,
+      "transcriptMessages": 36,
+      "guestSql": {
+        "calls": 1810,
+        "milliseconds": 1291
+      },
+      "receivedAtMs": 8757.847051998397
+    },
+    {
+      "label": "sql-roundtrips:start",
+      "atMs": 8479.226383,
+      "instance": 0,
+      "sqliteCalls": 1811,
+      "hostSqlMilliseconds": 224.86141399998814,
+      "guestSql": {
+        "calls": 1811,
+        "milliseconds": 1292
+      },
+      "receivedAtMs": 8759.159317996819
+    },
+    {
+      "label": "sql-roundtrips:end",
+      "atMs": 8509.298327999999,
+      "instance": 0,
+      "sqliteCalls": 1861,
+      "hostSqlMilliseconds": 226.33215599999312,
+      "durationMs": 30,
+      "roundtrips": 50,
+      "guestSql": {
+        "calls": 1861,
+        "milliseconds": 1322
+      },
+      "receivedAtMs": 8789.279905999138
+    },
+    {
+      "label": "idle:start",
+      "atMs": 8510.278941,
+      "instance": 0,
+      "sqliteCalls": 1862,
+      "hostSqlMilliseconds": 226.37056399999346,
+      "guestSql": {
+        "calls": 1862,
+        "milliseconds": 1323
+      },
+      "receivedAtMs": 8790.16027799662
+    },
+    {
+      "label": "idle:end",
+      "atMs": 10012.899748,
+      "instance": 0,
+      "sqliteCalls": 1862,
+      "hostSqlMilliseconds": 226.37056399999346,
+      "guestSql": {
+        "calls": 1862,
+        "milliseconds": 1323
+      },
+      "receivedAtMs": 10292.922460997943
+    },
+    {
+      "label": "process:end",
+      "atMs": 10025.450257,
+      "instance": 0,
+      "result": {
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": "[sqlite/transaction] slow SQLite transaction hold\n",
+        "stdoutTruncated": false,
+        "stderrTruncated": false,
+        "outcome": "succeeded"
+      },
+      "sqlite": {
+        "calls": 1862,
+        "opens": 8,
+        "version": "3.53.3",
+        "failures": []
+      },
+      "receivedAtMs": 10305.502074999822
+    },
+    {
+      "label": "processes-exited",
+      "atMs": 10025.573132,
+      "receivedAtMs": 10305.509835998237
+    },
+    {
+      "label": "dispose:start",
+      "atMs": 10626.522181,
+      "receivedAtMs": 10906.592616000125
+    },
+    {
+      "label": "disposed",
+      "atMs": 15768.806962999999,
+      "receivedAtMs": 16049.579208000068
+    },
+    {
+      "label": "disposed-host-gc",
+      "atMs": 16407.059838,
+      "receivedAtMs": 16687.149347999366
+    },
+    {
+      "label": "sidecars-dispose:start",
+      "atMs": 17008.402042,
+      "receivedAtMs": 17288.517104996572
+    },
+    {
+      "label": "sidecars-disposed",
+      "atMs": 17021.063679000003,
+      "receivedAtMs": 17301.04065499836
+    },
+    {
+      "label": "done",
+      "atMs": 17625.854385000002,
+      "receivedAtMs": 17905.89567299685
+    }
+  ],
+  "stderr": [],
+  "samples": [
+    {"atMs":2.5194539994117804,"rssBytes":1228800,"pssBytes":816128,"processes":[{"pid":314339,"name":"node","ppid":314334,"ticks":0,"startTicks":2140675,"threads":1,"Rss":1228800,"Pss":816128,"Private_Clean":557056,"Private_Dirty":176128,"Swap":0}]},
+    {"atMs":103.1571849998727,"rssBytes":41570304,"pssBytes":40765440,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":9,"startTicks":2140675,"threads":7,"Rss":41570304,"Pss":40765440,"Private_Clean":22183936,"Private_Dirty":18382848,"Swap":0}]},
+    {"atMs":203.4436049980286,"rssBytes":59056128,"pssBytes":58248192,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":21,"startTicks":2140675,"threads":7,"Rss":59056128,"Pss":58248192,"Private_Clean":26484736,"Private_Dirty":31563776,"Swap":0}]},
+    {"atMs":303.65854199772,"rssBytes":68354048,"pssBytes":67543040,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":31,"startTicks":2140675,"threads":11,"Rss":68354048,"Pss":67543040,"Private_Clean":27287552,"Private_Dirty":40054784,"Swap":0}]},
+    {"atMs":404.7201059984218,"rssBytes":68354048,"pssBytes":67543040,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":31,"startTicks":2140675,"threads":11,"Rss":68354048,"Pss":67543040,"Private_Clean":27287552,"Private_Dirty":40054784,"Swap":0}]},
+    {"atMs":505.09161799709545,"rssBytes":68354048,"pssBytes":67543040,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":31,"startTicks":2140675,"threads":11,"Rss":68354048,"Pss":67543040,"Private_Clean":27287552,"Private_Dirty":40054784,"Swap":0}]},
+    {"atMs":605.3744869968796,"rssBytes":68354048,"pssBytes":67543040,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":31,"startTicks":2140675,"threads":11,"Rss":68354048,"Pss":67543040,"Private_Clean":27287552,"Private_Dirty":40054784,"Swap":0}]},
+    {"atMs":705.6837679992896,"rssBytes":68354048,"pssBytes":67543040,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":31,"startTicks":2140675,"threads":11,"Rss":68354048,"Pss":67543040,"Private_Clean":27287552,"Private_Dirty":40054784,"Swap":0}]},
+    {"atMs":805.8828839966736,"rssBytes":68354048,"pssBytes":67543040,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":31,"startTicks":2140675,"threads":11,"Rss":68354048,"Pss":67543040,"Private_Clean":27287552,"Private_Dirty":40054784,"Swap":0}]},
+    {"atMs":906.045682997501,"rssBytes":68780032,"pssBytes":65780736,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":33,"startTicks":2140675,"threads":11,"Rss":68780032,"Pss":65780736,"Private_Clean":27480064,"Private_Dirty":35930112,"Swap":0}]},
+    {"atMs":1006.8782749985985,"rssBytes":108470272,"pssBytes":106730496,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":35,"startTicks":2140675,"threads":11,"Rss":70041600,"Pss":69151744,"Private_Clean":27594752,"Private_Dirty":41357312,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":7,"startTicks":2140765,"threads":13,"Rss":38428672,"Pss":37578752,"Private_Clean":31350784,"Private_Dirty":6049792,"Swap":0}]},
+    {"atMs":1107.989770000131,"rssBytes":181334016,"pssBytes":169906176,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":35,"startTicks":2140675,"threads":11,"Rss":70049792,"Pss":69130240,"Private_Clean":27594752,"Private_Dirty":41365504,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":11,"startTicks":2140765,"threads":14,"Rss":66383872,"Pss":61099008,"Private_Clean":45363200,"Private_Dirty":11186176,"Swap":0},{"pid":314381,"name":"agentos-sidecar","ppid":314367,"ticks":5,"startTicks":2140779,"threads":6,"Rss":44900352,"Pss":39676928,"Private_Clean":7458816,"Private_Dirty":27684864,"Swap":0}]},
+    {"atMs":1209.066992996668,"rssBytes":177180672,"pssBytes":165573632,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":35,"startTicks":2140675,"threads":11,"Rss":70049792,"Pss":69130240,"Private_Clean":27594752,"Private_Dirty":41365504,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":11,"startTicks":2140765,"threads":14,"Rss":66383872,"Pss":61012992,"Private_Clean":45191168,"Private_Dirty":11186176,"Swap":0},{"pid":314381,"name":"agentos-sidecar","ppid":314367,"ticks":16,"startTicks":2140779,"threads":6,"Rss":40747008,"Pss":35430400,"Private_Clean":8269824,"Private_Dirty":22540288,"Swap":0}]},
+    {"atMs":1309.9932799996168,"rssBytes":194187264,"pssBytes":182580224,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":35,"startTicks":2140675,"threads":11,"Rss":70049792,"Pss":69130240,"Private_Clean":27594752,"Private_Dirty":41365504,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":11,"startTicks":2140765,"threads":14,"Rss":66383872,"Pss":61012992,"Private_Clean":45191168,"Private_Dirty":11186176,"Swap":0},{"pid":314381,"name":"agentos-sidecar","ppid":314367,"ticks":26,"startTicks":2140779,"threads":6,"Rss":57753600,"Pss":52436992,"Private_Clean":8335360,"Private_Dirty":39481344,"Swap":0}]},
+    {"atMs":1410.1798869996856,"rssBytes":146984960,"pssBytes":145221632,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":36,"startTicks":2140675,"threads":11,"Rss":70111232,"Pss":69214208,"Private_Clean":27619328,"Private_Dirty":41390080,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":15,"startTicks":2140765,"threads":13,"Rss":76873728,"Pss":76007424,"Private_Clean":61370368,"Private_Dirty":14450688,"Swap":0}]},
+    {"atMs":1510.6728430000658,"rssBytes":151269376,"pssBytes":149506048,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":37,"startTicks":2140675,"threads":11,"Rss":71086080,"Pss":70189056,"Private_Clean":27631616,"Private_Dirty":42352640,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":23,"startTicks":2140765,"threads":13,"Rss":80183296,"Pss":79316992,"Private_Clean":64450560,"Private_Dirty":14680064,"Swap":0}]},
+    {"atMs":1611.3034159970994,"rssBytes":151269376,"pssBytes":149506048,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":37,"startTicks":2140675,"threads":11,"Rss":71086080,"Pss":70189056,"Private_Clean":27631616,"Private_Dirty":42352640,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":23,"startTicks":2140765,"threads":13,"Rss":80183296,"Pss":79316992,"Private_Clean":64450560,"Private_Dirty":14680064,"Swap":0}]},
+    {"atMs":1711.7952619992138,"rssBytes":151269376,"pssBytes":149506048,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":37,"startTicks":2140675,"threads":11,"Rss":71086080,"Pss":70189056,"Private_Clean":27631616,"Private_Dirty":42352640,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":23,"startTicks":2140765,"threads":13,"Rss":80183296,"Pss":79316992,"Private_Clean":64450560,"Private_Dirty":14680064,"Swap":0}]},
+    {"atMs":1812.4134139980015,"rssBytes":151269376,"pssBytes":149506048,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":37,"startTicks":2140675,"threads":11,"Rss":71086080,"Pss":70189056,"Private_Clean":27631616,"Private_Dirty":42352640,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":23,"startTicks":2140765,"threads":13,"Rss":80183296,"Pss":79316992,"Private_Clean":64450560,"Private_Dirty":14680064,"Swap":0}]},
+    {"atMs":1912.9274529987015,"rssBytes":151269376,"pssBytes":149506048,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":37,"startTicks":2140675,"threads":11,"Rss":71086080,"Pss":70189056,"Private_Clean":27631616,"Private_Dirty":42352640,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":23,"startTicks":2140765,"threads":13,"Rss":80183296,"Pss":79316992,"Private_Clean":64450560,"Private_Dirty":14680064,"Swap":0}]},
+    {"atMs":2013.4802579996176,"rssBytes":151269376,"pssBytes":149500928,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":37,"startTicks":2140675,"threads":11,"Rss":71086080,"Pss":70187008,"Private_Clean":27635712,"Private_Dirty":42352640,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":23,"startTicks":2140765,"threads":13,"Rss":80183296,"Pss":79313920,"Private_Clean":64450560,"Private_Dirty":14680064,"Swap":0}]},
+    {"atMs":2114.107776997116,"rssBytes":180539392,"pssBytes":178770944,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":38,"startTicks":2140675,"threads":11,"Rss":100347904,"Pss":99448832,"Private_Clean":27652096,"Private_Dirty":71598080,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":23,"startTicks":2140765,"threads":13,"Rss":80191488,"Pss":79322112,"Private_Clean":64450560,"Private_Dirty":14688256,"Swap":0}]},
+    {"atMs":2214.735771998676,"rssBytes":216903680,"pssBytes":215135232,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":42,"startTicks":2140675,"threads":11,"Rss":103399424,"Pss":102500352,"Private_Clean":27688960,"Private_Dirty":74612736,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":30,"startTicks":2140765,"threads":13,"Rss":113504256,"Pss":112634880,"Private_Clean":64450560,"Private_Dirty":48001024,"Swap":0}]},
+    {"atMs":2315.885273997992,"rssBytes":252395520,"pssBytes":250627072,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":45,"startTicks":2140675,"threads":11,"Rss":155488256,"Pss":154589184,"Private_Clean":27688960,"Private_Dirty":126701568,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":39,"startTicks":2140765,"threads":13,"Rss":96907264,"Pss":96037888,"Private_Clean":64516096,"Private_Dirty":31338496,"Swap":0}]},
+    {"atMs":2416.673774998344,"rssBytes":237826048,"pssBytes":236057600,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":49,"startTicks":2140675,"threads":11,"Rss":86663168,"Pss":85764096,"Private_Clean":27688960,"Private_Dirty":57876480,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":47,"startTicks":2140765,"threads":14,"Rss":151162880,"Pss":150293504,"Private_Clean":64712704,"Private_Dirty":85397504,"Swap":0}]},
+    {"atMs":2516.9874019993586,"rssBytes":263593984,"pssBytes":261831680,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":49,"startTicks":2140675,"threads":11,"Rss":86663168,"Pss":85770240,"Private_Clean":27688960,"Private_Dirty":57876480,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":56,"startTicks":2140765,"threads":14,"Rss":176930816,"Pss":176061440,"Private_Clean":64843776,"Private_Dirty":111026176,"Swap":0}]},
+    {"atMs":2617.9356219981855,"rssBytes":169521152,"pssBytes":167749632,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":53,"startTicks":2140675,"threads":11,"Rss":70365184,"Pss":69464064,"Private_Clean":27701248,"Private_Dirty":41553920,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":64,"startTicks":2140765,"threads":13,"Rss":99155968,"Pss":98285568,"Private_Clean":64909312,"Private_Dirty":33185792,"Swap":0}]},
+    {"atMs":2718.5770609976316,"rssBytes":169521152,"pssBytes":167749632,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":54,"startTicks":2140675,"threads":11,"Rss":70365184,"Pss":69464064,"Private_Clean":27701248,"Private_Dirty":41553920,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":64,"startTicks":2140765,"threads":13,"Rss":99155968,"Pss":98285568,"Private_Clean":64909312,"Private_Dirty":33185792,"Swap":0}]},
+    {"atMs":2819.2891660000896,"rssBytes":169521152,"pssBytes":167749632,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":54,"startTicks":2140675,"threads":11,"Rss":70365184,"Pss":69464064,"Private_Clean":27701248,"Private_Dirty":41553920,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":64,"startTicks":2140765,"threads":13,"Rss":99155968,"Pss":98285568,"Private_Clean":64909312,"Private_Dirty":33185792,"Swap":0}]},
+    {"atMs":2920.414243999403,"rssBytes":169521152,"pssBytes":167749632,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":54,"startTicks":2140675,"threads":11,"Rss":70365184,"Pss":69464064,"Private_Clean":27701248,"Private_Dirty":41553920,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":64,"startTicks":2140765,"threads":13,"Rss":99155968,"Pss":98285568,"Private_Clean":64909312,"Private_Dirty":33185792,"Swap":0}]},
+    {"atMs":3021.172867000132,"rssBytes":169521152,"pssBytes":167749632,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":54,"startTicks":2140675,"threads":11,"Rss":70365184,"Pss":69464064,"Private_Clean":27701248,"Private_Dirty":41553920,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":64,"startTicks":2140765,"threads":13,"Rss":99155968,"Pss":98285568,"Private_Clean":64909312,"Private_Dirty":33185792,"Swap":0}]},
+    {"atMs":3122.0741879988054,"rssBytes":169521152,"pssBytes":167749632,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":54,"startTicks":2140675,"threads":11,"Rss":70365184,"Pss":69464064,"Private_Clean":27701248,"Private_Dirty":41553920,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":64,"startTicks":2140765,"threads":13,"Rss":99155968,"Pss":98285568,"Private_Clean":64909312,"Private_Dirty":33185792,"Swap":0}]},
+    {"atMs":3222.4415949967806,"rssBytes":199331840,"pssBytes":197560320,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":54,"startTicks":2140675,"threads":11,"Rss":70377472,"Pss":69476352,"Private_Clean":27701248,"Private_Dirty":41566208,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":66,"startTicks":2140765,"threads":14,"Rss":128954368,"Pss":128083968,"Private_Clean":64974848,"Private_Dirty":62918656,"Swap":0}]},
+    {"atMs":3322.7255269994203,"rssBytes":269156352,"pssBytes":267384832,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":54,"startTicks":2140675,"threads":11,"Rss":70377472,"Pss":69476352,"Private_Clean":27701248,"Private_Dirty":41566208,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":75,"startTicks":2140765,"threads":14,"Rss":198778880,"Pss":197908480,"Private_Clean":65040384,"Private_Dirty":132677632,"Swap":0}]},
+    {"atMs":3423.4870569998748,"rssBytes":305950720,"pssBytes":304179200,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":54,"startTicks":2140675,"threads":11,"Rss":70377472,"Pss":69476352,"Private_Clean":27701248,"Private_Dirty":41566208,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":85,"startTicks":2140765,"threads":14,"Rss":235573248,"Pss":234702848,"Private_Clean":65040384,"Private_Dirty":169472000,"Swap":0}]},
+    {"atMs":3524.574245999247,"rssBytes":336625664,"pssBytes":334854144,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":54,"startTicks":2140675,"threads":11,"Rss":70377472,"Pss":69476352,"Private_Clean":27701248,"Private_Dirty":41566208,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":94,"startTicks":2140765,"threads":14,"Rss":266248192,"Pss":265377792,"Private_Clean":65105920,"Private_Dirty":200081408,"Swap":0}]},
+    {"atMs":3624.850926997169,"rssBytes":356052992,"pssBytes":354281472,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":54,"startTicks":2140675,"threads":11,"Rss":70377472,"Pss":69476352,"Private_Clean":27701248,"Private_Dirty":41566208,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":104,"startTicks":2140765,"threads":14,"Rss":285675520,"Pss":284805120,"Private_Clean":65105920,"Private_Dirty":219508736,"Swap":0}]},
+    {"atMs":3725.50864099685,"rssBytes":367337472,"pssBytes":365565952,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":54,"startTicks":2140675,"threads":11,"Rss":70377472,"Pss":69476352,"Private_Clean":27701248,"Private_Dirty":41566208,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":116,"startTicks":2140765,"threads":14,"Rss":296960000,"Pss":296089600,"Private_Clean":67989504,"Private_Dirty":227909632,"Swap":0}]},
+    {"atMs":3826.296614999592,"rssBytes":381976576,"pssBytes":380194816,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":54,"startTicks":2140675,"threads":11,"Rss":70422528,"Pss":69519360,"Private_Clean":27701248,"Private_Dirty":41611264,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":130,"startTicks":2140765,"threads":14,"Rss":311554048,"Pss":310675456,"Private_Clean":74018816,"Private_Dirty":236462080,"Swap":0}]},
+    {"atMs":3927.1365829990827,"rssBytes":398544896,"pssBytes":396763136,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":56,"startTicks":2140675,"threads":11,"Rss":73023488,"Pss":72120320,"Private_Clean":29786112,"Private_Dirty":42127360,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":139,"startTicks":2140765,"threads":14,"Rss":325521408,"Pss":324642816,"Private_Clean":74739712,"Private_Dirty":249708544,"Swap":0}]},
+    {"atMs":4027.480374999868,"rssBytes":412188672,"pssBytes":410406912,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":56,"startTicks":2140675,"threads":11,"Rss":73023488,"Pss":72120320,"Private_Clean":29786112,"Private_Dirty":42127360,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":153,"startTicks":2140765,"threads":14,"Rss":339165184,"Pss":338286592,"Private_Clean":74739712,"Private_Dirty":263352320,"Swap":0}]},
+    {"atMs":4128.024658999493,"rssBytes":419758080,"pssBytes":417976320,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":56,"startTicks":2140675,"threads":11,"Rss":73023488,"Pss":72120320,"Private_Clean":29786112,"Private_Dirty":42127360,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":168,"startTicks":2140765,"threads":14,"Rss":346734592,"Pss":345856000,"Private_Clean":75067392,"Private_Dirty":270594048,"Swap":0}]},
+    {"atMs":4228.970084997854,"rssBytes":426041344,"pssBytes":424259584,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":56,"startTicks":2140675,"threads":11,"Rss":73023488,"Pss":72120320,"Private_Clean":29786112,"Private_Dirty":42127360,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":182,"startTicks":2140765,"threads":14,"Rss":353017856,"Pss":352139264,"Private_Clean":75722752,"Private_Dirty":276221952,"Swap":0}]},
+    {"atMs":4329.975290998846,"rssBytes":413171712,"pssBytes":411363328,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":56,"startTicks":2140675,"threads":11,"Rss":73023488,"Pss":72120320,"Private_Clean":29786112,"Private_Dirty":42127360,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":193,"startTicks":2140765,"threads":14,"Rss":340148224,"Pss":339243008,"Private_Clean":76115968,"Private_Dirty":262926336,"Swap":0}]},
+    {"atMs":4430.995648999669,"rssBytes":414138368,"pssBytes":412325888,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":57,"startTicks":2140675,"threads":11,"Rss":73510912,"Pss":72605696,"Private_Clean":29822976,"Private_Dirty":42573824,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":202,"startTicks":2140765,"threads":14,"Rss":340627456,"Pss":339720192,"Private_Clean":76111872,"Private_Dirty":263405568,"Swap":0}]},
+    {"atMs":4531.452119997994,"rssBytes":418926592,"pssBytes":417092608,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":61,"startTicks":2140675,"threads":11,"Rss":77922304,"Pss":77005824,"Private_Clean":29831168,"Private_Dirty":46977024,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":209,"startTicks":2140765,"threads":14,"Rss":341004288,"Pss":340086784,"Private_Clean":76111872,"Private_Dirty":263782400,"Swap":0}]},
+    {"atMs":4631.796012999985,"rssBytes":424726528,"pssBytes":422892544,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":65,"startTicks":2140675,"threads":11,"Rss":83574784,"Pss":82658304,"Private_Clean":29921280,"Private_Dirty":52539392,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":214,"startTicks":2140765,"threads":14,"Rss":341151744,"Pss":340234240,"Private_Clean":76111872,"Private_Dirty":263929856,"Swap":0}]},
+    {"atMs":4732.75694199765,"rssBytes":425381888,"pssBytes":423547904,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":68,"startTicks":2140675,"threads":11,"Rss":84193280,"Pss":83276800,"Private_Clean":29933568,"Private_Dirty":53145600,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":222,"startTicks":2140765,"threads":14,"Rss":341188608,"Pss":340271104,"Private_Clean":76111872,"Private_Dirty":263966720,"Swap":0}]},
+    {"atMs":4833.678241997404,"rssBytes":427827200,"pssBytes":426014720,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":74,"startTicks":2140675,"threads":11,"Rss":86585344,"Pss":85680128,"Private_Clean":30117888,"Private_Dirty":55353344,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":228,"startTicks":2140765,"threads":14,"Rss":341241856,"Pss":340334592,"Private_Clean":76111872,"Private_Dirty":264019968,"Swap":0}]},
+    {"atMs":4934.549515997787,"rssBytes":428212224,"pssBytes":426399744,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":78,"startTicks":2140675,"threads":11,"Rss":86876160,"Pss":85970944,"Private_Clean":30175232,"Private_Dirty":55586816,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":234,"startTicks":2140765,"threads":14,"Rss":341336064,"Pss":340428800,"Private_Clean":76111872,"Private_Dirty":264114176,"Swap":0}]},
+    {"atMs":5035.583445998782,"rssBytes":428924928,"pssBytes":427112448,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":84,"startTicks":2140675,"threads":11,"Rss":87347200,"Pss":86441984,"Private_Clean":30187520,"Private_Dirty":56045568,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":239,"startTicks":2140765,"threads":14,"Rss":341577728,"Pss":340670464,"Private_Clean":76111872,"Private_Dirty":264355840,"Swap":0}]},
+    {"atMs":5136.5830629983975,"rssBytes":429158400,"pssBytes":427345920,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":88,"startTicks":2140675,"threads":11,"Rss":87375872,"Pss":86470656,"Private_Clean":30191616,"Private_Dirty":56070144,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":246,"startTicks":2140765,"threads":14,"Rss":341782528,"Pss":340875264,"Private_Clean":76111872,"Private_Dirty":264560640,"Swap":0}]},
+    {"atMs":5237.045286998182,"rssBytes":429187072,"pssBytes":427374592,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":90,"startTicks":2140675,"threads":11,"Rss":87384064,"Pss":86478848,"Private_Clean":30191616,"Private_Dirty":56078336,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":255,"startTicks":2140765,"threads":14,"Rss":341803008,"Pss":340895744,"Private_Clean":76111872,"Private_Dirty":264581120,"Swap":0}]},
+    {"atMs":5337.954148999415,"rssBytes":429273088,"pssBytes":427460608,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":94,"startTicks":2140675,"threads":11,"Rss":87408640,"Pss":86503424,"Private_Clean":30191616,"Private_Dirty":56102912,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":261,"startTicks":2140765,"threads":14,"Rss":341864448,"Pss":340957184,"Private_Clean":76111872,"Private_Dirty":264642560,"Swap":0}]},
+    {"atMs":5438.613804999477,"rssBytes":429309952,"pssBytes":427497472,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":97,"startTicks":2140675,"threads":11,"Rss":87441408,"Pss":86536192,"Private_Clean":30203904,"Private_Dirty":56123392,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":269,"startTicks":2140765,"threads":14,"Rss":341868544,"Pss":340961280,"Private_Clean":76111872,"Private_Dirty":264646656,"Swap":0}]},
+    {"atMs":5539.59859999668,"rssBytes":429445120,"pssBytes":427632640,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":100,"startTicks":2140675,"threads":11,"Rss":87457792,"Pss":86552576,"Private_Clean":30216192,"Private_Dirty":56127488,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":276,"startTicks":2140765,"threads":14,"Rss":341987328,"Pss":341080064,"Private_Clean":76111872,"Private_Dirty":264765440,"Swap":0}]},
+    {"atMs":5640.33707499766,"rssBytes":429580288,"pssBytes":427767808,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":104,"startTicks":2140675,"threads":11,"Rss":87519232,"Pss":86614016,"Private_Clean":30216192,"Private_Dirty":56188928,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":283,"startTicks":2140765,"threads":14,"Rss":342061056,"Pss":341153792,"Private_Clean":76111872,"Private_Dirty":264839168,"Swap":0}]},
+    {"atMs":5740.583721999428,"rssBytes":430899200,"pssBytes":429086720,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":104,"startTicks":2140675,"threads":11,"Rss":87535616,"Pss":86630400,"Private_Clean":30232576,"Private_Dirty":56188928,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":299,"startTicks":2140765,"threads":14,"Rss":343363584,"Pss":342456320,"Private_Clean":76902400,"Private_Dirty":265351168,"Swap":0}]},
+    {"atMs":5841.572723998979,"rssBytes":437321728,"pssBytes":435509248,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":104,"startTicks":2140675,"threads":11,"Rss":87539712,"Pss":86634496,"Private_Clean":30236672,"Private_Dirty":56188928,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":313,"startTicks":2140765,"threads":14,"Rss":349782016,"Pss":348874752,"Private_Clean":80506880,"Private_Dirty":268165120,"Swap":0}]},
+    {"atMs":5942.190617999586,"rssBytes":472686592,"pssBytes":457469952,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":105,"startTicks":2140675,"threads":11,"Rss":87547904,"Pss":86621184,"Private_Clean":30236672,"Private_Dirty":56197120,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":331,"startTicks":2140765,"threads":16,"Rss":359919616,"Pss":353272832,"Private_Clean":71647232,"Private_Dirty":275746816,"Swap":0},{"pid":314475,"name":"agentos-sidecar","ppid":314367,"ticks":1,"startTicks":2141263,"threads":1,"Rss":25219072,"Pss":17575936,"Private_Clean":393216,"Private_Dirty":10227712,"Swap":0}]},
+    {"atMs":6042.733388996567,"rssBytes":536506368,"pssBytes":519904256,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":105,"startTicks":2140675,"threads":11,"Rss":87547904,"Pss":86611968,"Private_Clean":30236672,"Private_Dirty":56197120,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":346,"startTicks":2140765,"threads":16,"Rss":405770240,"Pss":397878272,"Private_Clean":69222400,"Private_Dirty":321531904,"Swap":0},{"pid":314475,"name":"agentos-sidecar","ppid":314367,"ticks":6,"startTicks":2141263,"threads":6,"Rss":43188224,"Pss":35414016,"Private_Clean":393216,"Private_Dirty":27934720,"Swap":0}]},
+    {"atMs":6143.611052997585,"rssBytes":606089216,"pssBytes":587056128,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":105,"startTicks":2140675,"threads":11,"Rss":87547904,"Pss":86611968,"Private_Clean":30236672,"Private_Dirty":56197120,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":361,"startTicks":2140765,"threads":16,"Rss":467546112,"Pss":458441728,"Private_Clean":66797568,"Private_Dirty":383307776,"Swap":0},{"pid":314475,"name":"agentos-sidecar","ppid":314367,"ticks":11,"startTicks":2141263,"threads":6,"Rss":50995200,"Pss":42002432,"Private_Clean":393216,"Private_Dirty":33308672,"Swap":0}]},
+    {"atMs":6243.814063996979,"rssBytes":510828544,"pssBytes":491336704,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":105,"startTicks":2140675,"threads":11,"Rss":87547904,"Pss":86611968,"Private_Clean":30236672,"Private_Dirty":56197120,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":374,"startTicks":2140765,"threads":16,"Rss":381603840,"Pss":372270080,"Private_Clean":66338816,"Private_Dirty":297365504,"Swap":0},{"pid":314475,"name":"agentos-sidecar","ppid":314367,"ticks":18,"startTicks":2141263,"threads":6,"Rss":41676800,"Pss":32454656,"Private_Clean":458752,"Private_Dirty":23465984,"Swap":0}]},
+    {"atMs":6344.6660289992,"rssBytes":606314496,"pssBytes":586789888,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":105,"startTicks":2140675,"threads":11,"Rss":87547904,"Pss":86611968,"Private_Clean":30236672,"Private_Dirty":56197120,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":384,"startTicks":2140765,"threads":16,"Rss":464736256,"Pss":455402496,"Private_Clean":66338816,"Private_Dirty":380497920,"Swap":0},{"pid":314475,"name":"agentos-sidecar","ppid":314367,"ticks":27,"startTicks":2141263,"threads":6,"Rss":54030336,"Pss":44775424,"Private_Clean":458752,"Private_Dirty":35753984,"Swap":0}]},
+    {"atMs":6445.0589759981085,"rssBytes":583045120,"pssBytes":563487744,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":105,"startTicks":2140675,"threads":11,"Rss":87547904,"Pss":86611968,"Private_Clean":30236672,"Private_Dirty":56197120,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":397,"startTicks":2140765,"threads":16,"Rss":426348544,"Pss":416982016,"Private_Clean":66863104,"Private_Dirty":341520384,"Swap":0},{"pid":314475,"name":"agentos-sidecar","ppid":314367,"ticks":34,"startTicks":2141263,"threads":6,"Rss":69148672,"Pss":59893760,"Private_Clean":458752,"Private_Dirty":50872320,"Swap":0}]},
+    {"atMs":6545.376590998785,"rssBytes":569708544,"pssBytes":567896064,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":105,"startTicks":2140675,"threads":11,"Rss":87547904,"Pss":86642688,"Private_Clean":30236672,"Private_Dirty":56197120,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":410,"startTicks":2140765,"threads":16,"Rss":482160640,"Pss":481253376,"Private_Clean":83718144,"Private_Dirty":397332480,"Swap":0}]},
+    {"atMs":6646.313883997209,"rssBytes":554598400,"pssBytes":552785920,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":105,"startTicks":2140675,"threads":11,"Rss":87547904,"Pss":86642688,"Private_Clean":30236672,"Private_Dirty":56197120,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":427,"startTicks":2140765,"threads":16,"Rss":467050496,"Pss":466143232,"Private_Clean":83718144,"Private_Dirty":382222336,"Swap":0}]},
+    {"atMs":6746.886854998593,"rssBytes":469843968,"pssBytes":468031488,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":105,"startTicks":2140675,"threads":11,"Rss":87552000,"Pss":86646784,"Private_Clean":30236672,"Private_Dirty":56201216,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":440,"startTicks":2140765,"threads":15,"Rss":382291968,"Pss":381384704,"Private_Clean":83718144,"Private_Dirty":297463808,"Swap":0}]},
+    {"atMs":6847.191312997893,"rssBytes":500932608,"pssBytes":499120128,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":105,"startTicks":2140675,"threads":11,"Rss":87552000,"Pss":86646784,"Private_Clean":30236672,"Private_Dirty":56201216,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":451,"startTicks":2140765,"threads":15,"Rss":413380608,"Pss":412473344,"Private_Clean":84307968,"Private_Dirty":327962624,"Swap":0}]},
+    {"atMs":6947.450746996765,"rssBytes":525414400,"pssBytes":523601920,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":105,"startTicks":2140675,"threads":11,"Rss":87552000,"Pss":86646784,"Private_Clean":30236672,"Private_Dirty":56201216,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":463,"startTicks":2140765,"threads":16,"Rss":437862400,"Pss":436955136,"Private_Clean":84307968,"Private_Dirty":352444416,"Swap":0}]},
+    {"atMs":7048.344756000006,"rssBytes":454746112,"pssBytes":452933632,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":105,"startTicks":2140675,"threads":11,"Rss":87552000,"Pss":86646784,"Private_Clean":30236672,"Private_Dirty":56201216,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":478,"startTicks":2140765,"threads":14,"Rss":367194112,"Pss":366286848,"Private_Clean":84307968,"Private_Dirty":281776128,"Swap":0}]},
+    {"atMs":7148.82816699901,"rssBytes":523628544,"pssBytes":521816064,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":106,"startTicks":2140675,"threads":11,"Rss":87552000,"Pss":86646784,"Private_Clean":30236672,"Private_Dirty":56201216,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":488,"startTicks":2140765,"threads":15,"Rss":436076544,"Pss":435169280,"Private_Clean":84307968,"Private_Dirty":350658560,"Swap":0}]},
+    {"atMs":7249.908519999735,"rssBytes":520863744,"pssBytes":519051264,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":106,"startTicks":2140675,"threads":11,"Rss":87552000,"Pss":86646784,"Private_Clean":30236672,"Private_Dirty":56201216,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":501,"startTicks":2140765,"threads":16,"Rss":433311744,"Pss":432404480,"Private_Clean":84307968,"Private_Dirty":347893760,"Swap":0}]},
+    {"atMs":7350.719878999371,"rssBytes":454922240,"pssBytes":453109760,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":106,"startTicks":2140675,"threads":11,"Rss":87552000,"Pss":86646784,"Private_Clean":30236672,"Private_Dirty":56201216,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":518,"startTicks":2140765,"threads":14,"Rss":367370240,"Pss":366462976,"Private_Clean":84307968,"Private_Dirty":281952256,"Swap":0}]},
+    {"atMs":7451.466679998703,"rssBytes":464859136,"pssBytes":463046656,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":106,"startTicks":2140675,"threads":11,"Rss":87556096,"Pss":86650880,"Private_Clean":30236672,"Private_Dirty":56205312,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":529,"startTicks":2140765,"threads":15,"Rss":377303040,"Pss":376395776,"Private_Clean":84373504,"Private_Dirty":291819520,"Swap":0}]},
+    {"atMs":7552.637328997662,"rssBytes":500985856,"pssBytes":499173376,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":106,"startTicks":2140675,"threads":11,"Rss":87556096,"Pss":86650880,"Private_Clean":30236672,"Private_Dirty":56205312,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":540,"startTicks":2140765,"threads":15,"Rss":413429760,"Pss":412522496,"Private_Clean":84373504,"Private_Dirty":327946240,"Swap":0}]},
+    {"atMs":7653.475567996793,"rssBytes":538959872,"pssBytes":537147392,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":106,"startTicks":2140675,"threads":11,"Rss":87556096,"Pss":86650880,"Private_Clean":30236672,"Private_Dirty":56205312,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":555,"startTicks":2140765,"threads":16,"Rss":451403776,"Pss":450496512,"Private_Clean":84373504,"Private_Dirty":365920256,"Swap":0}]},
+    {"atMs":7753.953776998969,"rssBytes":455548928,"pssBytes":453736448,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":106,"startTicks":2140675,"threads":11,"Rss":87556096,"Pss":86650880,"Private_Clean":30236672,"Private_Dirty":56205312,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":566,"startTicks":2140765,"threads":14,"Rss":367992832,"Pss":367085568,"Private_Clean":84373504,"Private_Dirty":282509312,"Swap":0}]},
+    {"atMs":7854.758084999048,"rssBytes":545828864,"pssBytes":544016384,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":106,"startTicks":2140675,"threads":11,"Rss":87556096,"Pss":86650880,"Private_Clean":30236672,"Private_Dirty":56205312,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":576,"startTicks":2140765,"threads":15,"Rss":458272768,"Pss":457365504,"Private_Clean":84373504,"Private_Dirty":372789248,"Swap":0}]},
+    {"atMs":7955.8560739969835,"rssBytes":526344192,"pssBytes":524531712,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":106,"startTicks":2140675,"threads":11,"Rss":87556096,"Pss":86650880,"Private_Clean":30236672,"Private_Dirty":56205312,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":590,"startTicks":2140765,"threads":16,"Rss":438788096,"Pss":437880832,"Private_Clean":84373504,"Private_Dirty":353304576,"Swap":0}]},
+    {"atMs":8055.976214996917,"rssBytes":455704576,"pssBytes":453892096,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":106,"startTicks":2140675,"threads":11,"Rss":87556096,"Pss":86650880,"Private_Clean":30236672,"Private_Dirty":56205312,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":604,"startTicks":2140765,"threads":14,"Rss":368148480,"Pss":367241216,"Private_Clean":84373504,"Private_Dirty":282664960,"Swap":0}]},
+    {"atMs":8156.757758999447,"rssBytes":477044736,"pssBytes":475232256,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":107,"startTicks":2140675,"threads":11,"Rss":87556096,"Pss":86650880,"Private_Clean":30236672,"Private_Dirty":56205312,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":614,"startTicks":2140765,"threads":15,"Rss":389488640,"Pss":388581376,"Private_Clean":84373504,"Private_Dirty":304005120,"Swap":0}]},
+    {"atMs":8257.413629999064,"rssBytes":502759424,"pssBytes":500946944,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":107,"startTicks":2140675,"threads":11,"Rss":87556096,"Pss":86650880,"Private_Clean":30236672,"Private_Dirty":56205312,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":626,"startTicks":2140765,"threads":15,"Rss":415203328,"Pss":414296064,"Private_Clean":84373504,"Private_Dirty":329719808,"Swap":0}]},
+    {"atMs":8358.013229997596,"rssBytes":544473088,"pssBytes":542660608,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":107,"startTicks":2140675,"threads":11,"Rss":87556096,"Pss":86650880,"Private_Clean":30236672,"Private_Dirty":56205312,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":640,"startTicks":2140765,"threads":16,"Rss":456916992,"Pss":456009728,"Private_Clean":84373504,"Private_Dirty":371433472,"Swap":0}]},
+    {"atMs":8458.578358997329,"rssBytes":456925184,"pssBytes":455112704,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":107,"startTicks":2140675,"threads":11,"Rss":87556096,"Pss":86650880,"Private_Clean":30236672,"Private_Dirty":56205312,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":652,"startTicks":2140765,"threads":14,"Rss":369369088,"Pss":368461824,"Private_Clean":84373504,"Private_Dirty":283885568,"Swap":0}]},
+    {"atMs":8558.86763399758,"rssBytes":525746176,"pssBytes":523933696,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":107,"startTicks":2140675,"threads":11,"Rss":87556096,"Pss":86650880,"Private_Clean":30236672,"Private_Dirty":56205312,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":662,"startTicks":2140765,"threads":15,"Rss":438190080,"Pss":437282816,"Private_Clean":84373504,"Private_Dirty":352706560,"Swap":0}]},
+    {"atMs":8659.72908799813,"rssBytes":512110592,"pssBytes":510298112,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":107,"startTicks":2140675,"threads":11,"Rss":87556096,"Pss":86650880,"Private_Clean":30236672,"Private_Dirty":56205312,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":674,"startTicks":2140765,"threads":16,"Rss":424554496,"Pss":423647232,"Private_Clean":84373504,"Private_Dirty":339070976,"Swap":0}]},
+    {"atMs":8760.246650999761,"rssBytes":457216000,"pssBytes":455403520,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":107,"startTicks":2140675,"threads":11,"Rss":87556096,"Pss":86650880,"Private_Clean":30236672,"Private_Dirty":56205312,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":690,"startTicks":2140765,"threads":14,"Rss":369659904,"Pss":368752640,"Private_Clean":84373504,"Private_Dirty":284176384,"Swap":0}]},
+    {"atMs":8862.309579999419,"rssBytes":457269248,"pssBytes":455456768,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":109,"startTicks":2140675,"threads":11,"Rss":87588864,"Pss":86683648,"Private_Clean":30240768,"Private_Dirty":56233984,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":692,"startTicks":2140765,"threads":14,"Rss":369680384,"Pss":368773120,"Private_Clean":84373504,"Private_Dirty":284196864,"Swap":0}]},
+    {"atMs":8962.733691998437,"rssBytes":457269248,"pssBytes":455456768,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":109,"startTicks":2140675,"threads":11,"Rss":87588864,"Pss":86683648,"Private_Clean":30240768,"Private_Dirty":56233984,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":692,"startTicks":2140765,"threads":14,"Rss":369680384,"Pss":368773120,"Private_Clean":84373504,"Private_Dirty":284196864,"Swap":0}]},
+    {"atMs":9063.005751999299,"rssBytes":457269248,"pssBytes":455456768,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":109,"startTicks":2140675,"threads":11,"Rss":87588864,"Pss":86683648,"Private_Clean":30240768,"Private_Dirty":56233984,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":692,"startTicks":2140765,"threads":14,"Rss":369680384,"Pss":368773120,"Private_Clean":84373504,"Private_Dirty":284196864,"Swap":0}]},
+    {"atMs":9163.715126996976,"rssBytes":457269248,"pssBytes":455456768,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":109,"startTicks":2140675,"threads":11,"Rss":87588864,"Pss":86683648,"Private_Clean":30240768,"Private_Dirty":56233984,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":692,"startTicks":2140765,"threads":14,"Rss":369680384,"Pss":368773120,"Private_Clean":84373504,"Private_Dirty":284196864,"Swap":0}]},
+    {"atMs":9264.268398997956,"rssBytes":457269248,"pssBytes":455456768,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":109,"startTicks":2140675,"threads":11,"Rss":87588864,"Pss":86683648,"Private_Clean":30240768,"Private_Dirty":56233984,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":692,"startTicks":2140765,"threads":14,"Rss":369680384,"Pss":368773120,"Private_Clean":84373504,"Private_Dirty":284196864,"Swap":0}]},
+    {"atMs":9365.189195999847,"rssBytes":457269248,"pssBytes":455456768,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":109,"startTicks":2140675,"threads":11,"Rss":87588864,"Pss":86683648,"Private_Clean":30240768,"Private_Dirty":56233984,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":693,"startTicks":2140765,"threads":14,"Rss":369680384,"Pss":368773120,"Private_Clean":84373504,"Private_Dirty":284196864,"Swap":0}]},
+    {"atMs":9466.226824999467,"rssBytes":457269248,"pssBytes":455456768,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":109,"startTicks":2140675,"threads":11,"Rss":87588864,"Pss":86683648,"Private_Clean":30240768,"Private_Dirty":56233984,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":693,"startTicks":2140765,"threads":14,"Rss":369680384,"Pss":368773120,"Private_Clean":84373504,"Private_Dirty":284196864,"Swap":0}]},
+    {"atMs":9566.447325996705,"rssBytes":457269248,"pssBytes":455456768,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":109,"startTicks":2140675,"threads":11,"Rss":87588864,"Pss":86683648,"Private_Clean":30240768,"Private_Dirty":56233984,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":693,"startTicks":2140765,"threads":14,"Rss":369680384,"Pss":368773120,"Private_Clean":84373504,"Private_Dirty":284196864,"Swap":0}]},
+    {"atMs":9667.627909999283,"rssBytes":457269248,"pssBytes":455456768,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":109,"startTicks":2140675,"threads":11,"Rss":87588864,"Pss":86683648,"Private_Clean":30240768,"Private_Dirty":56233984,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":693,"startTicks":2140765,"threads":14,"Rss":369680384,"Pss":368773120,"Private_Clean":84373504,"Private_Dirty":284196864,"Swap":0}]},
+    {"atMs":9768.610404997162,"rssBytes":457269248,"pssBytes":455456768,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":109,"startTicks":2140675,"threads":11,"Rss":87588864,"Pss":86683648,"Private_Clean":30240768,"Private_Dirty":56233984,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":694,"startTicks":2140765,"threads":14,"Rss":369680384,"Pss":368773120,"Private_Clean":84373504,"Private_Dirty":284196864,"Swap":0}]},
+    {"atMs":9868.904897997709,"rssBytes":457269248,"pssBytes":455456768,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":109,"startTicks":2140675,"threads":11,"Rss":87588864,"Pss":86683648,"Private_Clean":30240768,"Private_Dirty":56233984,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":694,"startTicks":2140765,"threads":14,"Rss":369680384,"Pss":368773120,"Private_Clean":84373504,"Private_Dirty":284196864,"Swap":0}]},
+    {"atMs":9969.350827999733,"rssBytes":457269248,"pssBytes":455456768,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":109,"startTicks":2140675,"threads":11,"Rss":87588864,"Pss":86683648,"Private_Clean":30240768,"Private_Dirty":56233984,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":694,"startTicks":2140765,"threads":14,"Rss":369680384,"Pss":368773120,"Private_Clean":84373504,"Private_Dirty":284196864,"Swap":0}]},
+    {"atMs":10069.638950997614,"rssBytes":457269248,"pssBytes":455456768,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":109,"startTicks":2140675,"threads":11,"Rss":87588864,"Pss":86683648,"Private_Clean":30240768,"Private_Dirty":56233984,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":694,"startTicks":2140765,"threads":14,"Rss":369680384,"Pss":368773120,"Private_Clean":84373504,"Private_Dirty":284196864,"Swap":0}]},
+    {"atMs":10170.213759996841,"rssBytes":457269248,"pssBytes":455456768,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":109,"startTicks":2140675,"threads":11,"Rss":87588864,"Pss":86683648,"Private_Clean":30240768,"Private_Dirty":56233984,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":694,"startTicks":2140765,"threads":14,"Rss":369680384,"Pss":368773120,"Private_Clean":84373504,"Private_Dirty":284196864,"Swap":0}]},
+    {"atMs":10271.051322997664,"rssBytes":457269248,"pssBytes":455456768,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":109,"startTicks":2140675,"threads":11,"Rss":87588864,"Pss":86683648,"Private_Clean":30240768,"Private_Dirty":56233984,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":694,"startTicks":2140765,"threads":14,"Rss":369680384,"Pss":368773120,"Private_Clean":84373504,"Private_Dirty":284196864,"Swap":0}]},
+    {"atMs":10371.683124998526,"rssBytes":291139584,"pssBytes":289327104,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":109,"startTicks":2140675,"threads":11,"Rss":87597056,"Pss":86691840,"Private_Clean":30240768,"Private_Dirty":56242176,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":696,"startTicks":2140765,"threads":13,"Rss":203542528,"Pss":202635264,"Private_Clean":84373504,"Private_Dirty":118059008,"Swap":0}]},
+    {"atMs":10472.263490999467,"rssBytes":291139584,"pssBytes":289327104,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":109,"startTicks":2140675,"threads":11,"Rss":87597056,"Pss":86691840,"Private_Clean":30240768,"Private_Dirty":56242176,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":696,"startTicks":2140765,"threads":13,"Rss":203542528,"Pss":202635264,"Private_Clean":84373504,"Private_Dirty":118059008,"Swap":0}]},
+    {"atMs":10572.934462998091,"rssBytes":291139584,"pssBytes":289327104,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":109,"startTicks":2140675,"threads":11,"Rss":87597056,"Pss":86691840,"Private_Clean":30240768,"Private_Dirty":56242176,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":696,"startTicks":2140765,"threads":13,"Rss":203542528,"Pss":202635264,"Private_Clean":84373504,"Private_Dirty":118059008,"Swap":0}]},
+    {"atMs":10673.74190099872,"rssBytes":291139584,"pssBytes":289327104,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":109,"startTicks":2140675,"threads":11,"Rss":87597056,"Pss":86691840,"Private_Clean":30240768,"Private_Dirty":56242176,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":696,"startTicks":2140765,"threads":13,"Rss":203542528,"Pss":202635264,"Private_Clean":84373504,"Private_Dirty":118059008,"Swap":0}]},
+    {"atMs":10774.827546996676,"rssBytes":291139584,"pssBytes":289327104,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":109,"startTicks":2140675,"threads":11,"Rss":87597056,"Pss":86691840,"Private_Clean":30240768,"Private_Dirty":56242176,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":696,"startTicks":2140765,"threads":13,"Rss":203542528,"Pss":202635264,"Private_Clean":84373504,"Private_Dirty":118059008,"Swap":0}]},
+    {"atMs":10875.534080998477,"rssBytes":291139584,"pssBytes":289327104,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":109,"startTicks":2140675,"threads":11,"Rss":87597056,"Pss":86691840,"Private_Clean":30240768,"Private_Dirty":56242176,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":696,"startTicks":2140765,"threads":13,"Rss":203542528,"Pss":202635264,"Private_Clean":84373504,"Private_Dirty":118059008,"Swap":0}]},
+    {"atMs":10975.78190999775,"rssBytes":337235968,"pssBytes":335423488,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":109,"startTicks":2140675,"threads":11,"Rss":87601152,"Pss":86695936,"Private_Clean":30240768,"Private_Dirty":56246272,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":702,"startTicks":2140765,"threads":13,"Rss":249634816,"Pss":248727552,"Private_Clean":77361152,"Private_Dirty":171163648,"Swap":0}]},
+    {"atMs":11076.002622998203,"rssBytes":308596736,"pssBytes":306784256,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":109,"startTicks":2140675,"threads":11,"Rss":87601152,"Pss":86695936,"Private_Clean":30240768,"Private_Dirty":56246272,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":704,"startTicks":2140765,"threads":13,"Rss":220995584,"Pss":220088320,"Private_Clean":77361152,"Private_Dirty":142524416,"Swap":0}]},
+    {"atMs":11176.800685996568,"rssBytes":308596736,"pssBytes":306784256,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":109,"startTicks":2140675,"threads":11,"Rss":87601152,"Pss":86695936,"Private_Clean":30240768,"Private_Dirty":56246272,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":704,"startTicks":2140765,"threads":13,"Rss":220995584,"Pss":220088320,"Private_Clean":77361152,"Private_Dirty":142524416,"Swap":0}]},
+    {"atMs":11277.789912997832,"rssBytes":308596736,"pssBytes":306784256,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":109,"startTicks":2140675,"threads":11,"Rss":87601152,"Pss":86695936,"Private_Clean":30240768,"Private_Dirty":56246272,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":704,"startTicks":2140765,"threads":13,"Rss":220995584,"Pss":220088320,"Private_Clean":77361152,"Private_Dirty":142524416,"Swap":0}]},
+    {"atMs":11378.479385999526,"rssBytes":308596736,"pssBytes":306784256,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":109,"startTicks":2140675,"threads":11,"Rss":87601152,"Pss":86695936,"Private_Clean":30240768,"Private_Dirty":56246272,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":704,"startTicks":2140765,"threads":13,"Rss":220995584,"Pss":220088320,"Private_Clean":77361152,"Private_Dirty":142524416,"Swap":0}]},
+    {"atMs":11479.204824998305,"rssBytes":308596736,"pssBytes":306784256,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":109,"startTicks":2140675,"threads":11,"Rss":87601152,"Pss":86695936,"Private_Clean":30240768,"Private_Dirty":56246272,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":704,"startTicks":2140765,"threads":13,"Rss":220995584,"Pss":220088320,"Private_Clean":77361152,"Private_Dirty":142524416,"Swap":0}]},
+    {"atMs":11580.093968997971,"rssBytes":308596736,"pssBytes":306784256,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":109,"startTicks":2140675,"threads":11,"Rss":87601152,"Pss":86695936,"Private_Clean":30240768,"Private_Dirty":56246272,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":704,"startTicks":2140765,"threads":13,"Rss":220995584,"Pss":220088320,"Private_Clean":77361152,"Private_Dirty":142524416,"Swap":0}]},
+    {"atMs":11680.771340998035,"rssBytes":308596736,"pssBytes":306784256,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":109,"startTicks":2140675,"threads":11,"Rss":87601152,"Pss":86695936,"Private_Clean":30240768,"Private_Dirty":56246272,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":704,"startTicks":2140765,"threads":13,"Rss":220995584,"Pss":220088320,"Private_Clean":77361152,"Private_Dirty":142524416,"Swap":0}]},
+    {"atMs":11781.443542997295,"rssBytes":308596736,"pssBytes":306784256,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":109,"startTicks":2140675,"threads":11,"Rss":87601152,"Pss":86695936,"Private_Clean":30240768,"Private_Dirty":56246272,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":704,"startTicks":2140765,"threads":13,"Rss":220995584,"Pss":220088320,"Private_Clean":77361152,"Private_Dirty":142524416,"Swap":0}]},
+    {"atMs":11882.187619998149,"rssBytes":308596736,"pssBytes":306784256,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":109,"startTicks":2140675,"threads":11,"Rss":87601152,"Pss":86695936,"Private_Clean":30240768,"Private_Dirty":56246272,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":704,"startTicks":2140765,"threads":13,"Rss":220995584,"Pss":220088320,"Private_Clean":77361152,"Private_Dirty":142524416,"Swap":0}]},
+    {"atMs":11982.976762999897,"rssBytes":308596736,"pssBytes":306784256,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":109,"startTicks":2140675,"threads":11,"Rss":87601152,"Pss":86695936,"Private_Clean":30240768,"Private_Dirty":56246272,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":704,"startTicks":2140765,"threads":13,"Rss":220995584,"Pss":220088320,"Private_Clean":77361152,"Private_Dirty":142524416,"Swap":0}]},
+    {"atMs":12083.665614998608,"rssBytes":308596736,"pssBytes":306784256,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":109,"startTicks":2140675,"threads":11,"Rss":87601152,"Pss":86695936,"Private_Clean":30240768,"Private_Dirty":56246272,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":704,"startTicks":2140765,"threads":13,"Rss":220995584,"Pss":220088320,"Private_Clean":77361152,"Private_Dirty":142524416,"Swap":0}]},
+    {"atMs":12184.308985997632,"rssBytes":308596736,"pssBytes":306784256,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":109,"startTicks":2140675,"threads":11,"Rss":87601152,"Pss":86695936,"Private_Clean":30240768,"Private_Dirty":56246272,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":704,"startTicks":2140765,"threads":13,"Rss":220995584,"Pss":220088320,"Private_Clean":77361152,"Private_Dirty":142524416,"Swap":0}]},
+    {"atMs":12284.96262799672,"rssBytes":308596736,"pssBytes":306784256,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":109,"startTicks":2140675,"threads":11,"Rss":87601152,"Pss":86695936,"Private_Clean":30240768,"Private_Dirty":56246272,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":704,"startTicks":2140765,"threads":13,"Rss":220995584,"Pss":220088320,"Private_Clean":77361152,"Private_Dirty":142524416,"Swap":0}]},
+    {"atMs":12385.643781999534,"rssBytes":308596736,"pssBytes":306784256,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":109,"startTicks":2140675,"threads":11,"Rss":87601152,"Pss":86695936,"Private_Clean":30240768,"Private_Dirty":56246272,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":704,"startTicks":2140765,"threads":13,"Rss":220995584,"Pss":220088320,"Private_Clean":77361152,"Private_Dirty":142524416,"Swap":0}]},
+    {"atMs":12486.185966998164,"rssBytes":308596736,"pssBytes":306784256,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":109,"startTicks":2140675,"threads":11,"Rss":87601152,"Pss":86695936,"Private_Clean":30240768,"Private_Dirty":56246272,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":704,"startTicks":2140765,"threads":13,"Rss":220995584,"Pss":220088320,"Private_Clean":77361152,"Private_Dirty":142524416,"Swap":0}]},
+    {"atMs":12586.834005000128,"rssBytes":308596736,"pssBytes":306784256,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":109,"startTicks":2140675,"threads":11,"Rss":87601152,"Pss":86695936,"Private_Clean":30240768,"Private_Dirty":56246272,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":704,"startTicks":2140765,"threads":13,"Rss":220995584,"Pss":220088320,"Private_Clean":77361152,"Private_Dirty":142524416,"Swap":0}]},
+    {"atMs":12687.50291499964,"rssBytes":308596736,"pssBytes":306784256,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":109,"startTicks":2140675,"threads":11,"Rss":87601152,"Pss":86695936,"Private_Clean":30240768,"Private_Dirty":56246272,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":704,"startTicks":2140765,"threads":13,"Rss":220995584,"Pss":220088320,"Private_Clean":77361152,"Private_Dirty":142524416,"Swap":0}]},
+    {"atMs":12788.25157099709,"rssBytes":308596736,"pssBytes":306784256,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":109,"startTicks":2140675,"threads":11,"Rss":87601152,"Pss":86695936,"Private_Clean":30240768,"Private_Dirty":56246272,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":704,"startTicks":2140765,"threads":13,"Rss":220995584,"Pss":220088320,"Private_Clean":77361152,"Private_Dirty":142524416,"Swap":0}]},
+    {"atMs":12889.065041999856,"rssBytes":308596736,"pssBytes":306784256,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":109,"startTicks":2140675,"threads":11,"Rss":87601152,"Pss":86695936,"Private_Clean":30240768,"Private_Dirty":56246272,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":704,"startTicks":2140765,"threads":13,"Rss":220995584,"Pss":220088320,"Private_Clean":77361152,"Private_Dirty":142524416,"Swap":0}]},
+    {"atMs":12989.676329998474,"rssBytes":308596736,"pssBytes":306784256,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":109,"startTicks":2140675,"threads":11,"Rss":87601152,"Pss":86695936,"Private_Clean":30240768,"Private_Dirty":56246272,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":704,"startTicks":2140765,"threads":13,"Rss":220995584,"Pss":220088320,"Private_Clean":77361152,"Private_Dirty":142524416,"Swap":0}]},
+    {"atMs":13096.194419998938,"rssBytes":308596736,"pssBytes":306784256,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":109,"startTicks":2140675,"threads":11,"Rss":87601152,"Pss":86695936,"Private_Clean":30240768,"Private_Dirty":56246272,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":704,"startTicks":2140765,"threads":13,"Rss":220995584,"Pss":220088320,"Private_Clean":77361152,"Private_Dirty":142524416,"Swap":0}]},
+    {"atMs":13196.946889998799,"rssBytes":308596736,"pssBytes":306784256,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":109,"startTicks":2140675,"threads":11,"Rss":87601152,"Pss":86695936,"Private_Clean":30240768,"Private_Dirty":56246272,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":704,"startTicks":2140765,"threads":13,"Rss":220995584,"Pss":220088320,"Private_Clean":77361152,"Private_Dirty":142524416,"Swap":0}]},
+    {"atMs":13297.683250999398,"rssBytes":308596736,"pssBytes":306784256,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":109,"startTicks":2140675,"threads":11,"Rss":87601152,"Pss":86695936,"Private_Clean":30240768,"Private_Dirty":56246272,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":704,"startTicks":2140765,"threads":13,"Rss":220995584,"Pss":220088320,"Private_Clean":77361152,"Private_Dirty":142524416,"Swap":0}]},
+    {"atMs":13398.336933998507,"rssBytes":308596736,"pssBytes":306784256,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":109,"startTicks":2140675,"threads":11,"Rss":87601152,"Pss":86695936,"Private_Clean":30240768,"Private_Dirty":56246272,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":704,"startTicks":2140765,"threads":13,"Rss":220995584,"Pss":220088320,"Private_Clean":77361152,"Private_Dirty":142524416,"Swap":0}]},
+    {"atMs":13499.289853996743,"rssBytes":308596736,"pssBytes":306784256,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":109,"startTicks":2140675,"threads":11,"Rss":87601152,"Pss":86695936,"Private_Clean":30240768,"Private_Dirty":56246272,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":704,"startTicks":2140765,"threads":13,"Rss":220995584,"Pss":220088320,"Private_Clean":77361152,"Private_Dirty":142524416,"Swap":0}]},
+    {"atMs":13599.759428998368,"rssBytes":308596736,"pssBytes":306784256,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":109,"startTicks":2140675,"threads":11,"Rss":87601152,"Pss":86695936,"Private_Clean":30240768,"Private_Dirty":56246272,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":704,"startTicks":2140765,"threads":13,"Rss":220995584,"Pss":220088320,"Private_Clean":77361152,"Private_Dirty":142524416,"Swap":0}]},
+    {"atMs":13700.403150996863,"rssBytes":308596736,"pssBytes":306784256,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":109,"startTicks":2140675,"threads":11,"Rss":87601152,"Pss":86695936,"Private_Clean":30240768,"Private_Dirty":56246272,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":704,"startTicks":2140765,"threads":13,"Rss":220995584,"Pss":220088320,"Private_Clean":77361152,"Private_Dirty":142524416,"Swap":0}]},
+    {"atMs":13801.104019999912,"rssBytes":308596736,"pssBytes":306784256,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":109,"startTicks":2140675,"threads":11,"Rss":87601152,"Pss":86695936,"Private_Clean":30240768,"Private_Dirty":56246272,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":704,"startTicks":2140765,"threads":13,"Rss":220995584,"Pss":220088320,"Private_Clean":77361152,"Private_Dirty":142524416,"Swap":0}]},
+    {"atMs":13901.712954997492,"rssBytes":308596736,"pssBytes":306784256,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":109,"startTicks":2140675,"threads":11,"Rss":87601152,"Pss":86695936,"Private_Clean":30240768,"Private_Dirty":56246272,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":704,"startTicks":2140765,"threads":13,"Rss":220995584,"Pss":220088320,"Private_Clean":77361152,"Private_Dirty":142524416,"Swap":0}]},
+    {"atMs":14002.426969997032,"rssBytes":308596736,"pssBytes":306784256,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":110,"startTicks":2140675,"threads":11,"Rss":87601152,"Pss":86695936,"Private_Clean":30240768,"Private_Dirty":56246272,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":704,"startTicks":2140765,"threads":13,"Rss":220995584,"Pss":220088320,"Private_Clean":77361152,"Private_Dirty":142524416,"Swap":0}]},
+    {"atMs":14103.071214998636,"rssBytes":308596736,"pssBytes":306784256,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":110,"startTicks":2140675,"threads":11,"Rss":87601152,"Pss":86695936,"Private_Clean":30240768,"Private_Dirty":56246272,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":704,"startTicks":2140765,"threads":13,"Rss":220995584,"Pss":220088320,"Private_Clean":77361152,"Private_Dirty":142524416,"Swap":0}]},
+    {"atMs":14203.697936998651,"rssBytes":308596736,"pssBytes":306784256,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":110,"startTicks":2140675,"threads":11,"Rss":87601152,"Pss":86695936,"Private_Clean":30240768,"Private_Dirty":56246272,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":704,"startTicks":2140765,"threads":13,"Rss":220995584,"Pss":220088320,"Private_Clean":77361152,"Private_Dirty":142524416,"Swap":0}]},
+    {"atMs":14304.38685199988,"rssBytes":308596736,"pssBytes":306784256,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":110,"startTicks":2140675,"threads":11,"Rss":87601152,"Pss":86695936,"Private_Clean":30240768,"Private_Dirty":56246272,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":704,"startTicks":2140765,"threads":13,"Rss":220995584,"Pss":220088320,"Private_Clean":77361152,"Private_Dirty":142524416,"Swap":0}]},
+    {"atMs":14405.038109998713,"rssBytes":308596736,"pssBytes":306784256,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":110,"startTicks":2140675,"threads":11,"Rss":87601152,"Pss":86695936,"Private_Clean":30240768,"Private_Dirty":56246272,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":704,"startTicks":2140765,"threads":13,"Rss":220995584,"Pss":220088320,"Private_Clean":77361152,"Private_Dirty":142524416,"Swap":0}]},
+    {"atMs":14505.935025998042,"rssBytes":308596736,"pssBytes":306784256,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":110,"startTicks":2140675,"threads":11,"Rss":87601152,"Pss":86695936,"Private_Clean":30240768,"Private_Dirty":56246272,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":704,"startTicks":2140765,"threads":13,"Rss":220995584,"Pss":220088320,"Private_Clean":77361152,"Private_Dirty":142524416,"Swap":0}]},
+    {"atMs":14606.770127997152,"rssBytes":308596736,"pssBytes":306784256,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":110,"startTicks":2140675,"threads":11,"Rss":87601152,"Pss":86695936,"Private_Clean":30240768,"Private_Dirty":56246272,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":704,"startTicks":2140765,"threads":13,"Rss":220995584,"Pss":220088320,"Private_Clean":77361152,"Private_Dirty":142524416,"Swap":0}]},
+    {"atMs":14706.968497997877,"rssBytes":308596736,"pssBytes":306784256,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":110,"startTicks":2140675,"threads":11,"Rss":87601152,"Pss":86695936,"Private_Clean":30240768,"Private_Dirty":56246272,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":704,"startTicks":2140765,"threads":13,"Rss":220995584,"Pss":220088320,"Private_Clean":77361152,"Private_Dirty":142524416,"Swap":0}]},
+    {"atMs":14808.022105997225,"rssBytes":308596736,"pssBytes":306784256,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":110,"startTicks":2140675,"threads":11,"Rss":87601152,"Pss":86695936,"Private_Clean":30240768,"Private_Dirty":56246272,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":704,"startTicks":2140765,"threads":13,"Rss":220995584,"Pss":220088320,"Private_Clean":77361152,"Private_Dirty":142524416,"Swap":0}]},
+    {"atMs":14909.062473998347,"rssBytes":308596736,"pssBytes":306784256,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":110,"startTicks":2140675,"threads":11,"Rss":87601152,"Pss":86695936,"Private_Clean":30240768,"Private_Dirty":56246272,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":704,"startTicks":2140765,"threads":13,"Rss":220995584,"Pss":220088320,"Private_Clean":77361152,"Private_Dirty":142524416,"Swap":0}]},
+    {"atMs":15010.08146699678,"rssBytes":308596736,"pssBytes":306784256,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":110,"startTicks":2140675,"threads":11,"Rss":87601152,"Pss":86695936,"Private_Clean":30240768,"Private_Dirty":56246272,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":704,"startTicks":2140765,"threads":13,"Rss":220995584,"Pss":220088320,"Private_Clean":77361152,"Private_Dirty":142524416,"Swap":0}]},
+    {"atMs":15111.02914499861,"rssBytes":308596736,"pssBytes":306784256,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":110,"startTicks":2140675,"threads":11,"Rss":87601152,"Pss":86695936,"Private_Clean":30240768,"Private_Dirty":56246272,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":704,"startTicks":2140765,"threads":13,"Rss":220995584,"Pss":220088320,"Private_Clean":77361152,"Private_Dirty":142524416,"Swap":0}]},
+    {"atMs":15211.991804997524,"rssBytes":308596736,"pssBytes":306784256,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":110,"startTicks":2140675,"threads":11,"Rss":87601152,"Pss":86695936,"Private_Clean":30240768,"Private_Dirty":56246272,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":704,"startTicks":2140765,"threads":13,"Rss":220995584,"Pss":220088320,"Private_Clean":77361152,"Private_Dirty":142524416,"Swap":0}]},
+    {"atMs":15312.922516997787,"rssBytes":308596736,"pssBytes":306784256,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":110,"startTicks":2140675,"threads":11,"Rss":87601152,"Pss":86695936,"Private_Clean":30240768,"Private_Dirty":56246272,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":704,"startTicks":2140765,"threads":13,"Rss":220995584,"Pss":220088320,"Private_Clean":77361152,"Private_Dirty":142524416,"Swap":0}]},
+    {"atMs":15413.542983998923,"rssBytes":308596736,"pssBytes":306784256,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":110,"startTicks":2140675,"threads":11,"Rss":87601152,"Pss":86695936,"Private_Clean":30240768,"Private_Dirty":56246272,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":704,"startTicks":2140765,"threads":13,"Rss":220995584,"Pss":220088320,"Private_Clean":77361152,"Private_Dirty":142524416,"Swap":0}]},
+    {"atMs":15514.502748999803,"rssBytes":308596736,"pssBytes":306784256,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":110,"startTicks":2140675,"threads":11,"Rss":87601152,"Pss":86695936,"Private_Clean":30240768,"Private_Dirty":56246272,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":704,"startTicks":2140765,"threads":13,"Rss":220995584,"Pss":220088320,"Private_Clean":77361152,"Private_Dirty":142524416,"Swap":0}]},
+    {"atMs":15615.13297899728,"rssBytes":308596736,"pssBytes":306784256,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":110,"startTicks":2140675,"threads":11,"Rss":87601152,"Pss":86695936,"Private_Clean":30240768,"Private_Dirty":56246272,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":704,"startTicks":2140765,"threads":13,"Rss":220995584,"Pss":220088320,"Private_Clean":77361152,"Private_Dirty":142524416,"Swap":0}]},
+    {"atMs":15716.059345999383,"rssBytes":308596736,"pssBytes":306784256,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":110,"startTicks":2140675,"threads":11,"Rss":87601152,"Pss":86695936,"Private_Clean":30240768,"Private_Dirty":56246272,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":704,"startTicks":2140765,"threads":13,"Rss":220995584,"Pss":220088320,"Private_Clean":77361152,"Private_Dirty":142524416,"Swap":0}]},
+    {"atMs":15817.098479998094,"rssBytes":308596736,"pssBytes":306784256,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":110,"startTicks":2140675,"threads":11,"Rss":87601152,"Pss":86695936,"Private_Clean":30240768,"Private_Dirty":56246272,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":704,"startTicks":2140765,"threads":13,"Rss":220995584,"Pss":220088320,"Private_Clean":77361152,"Private_Dirty":142524416,"Swap":0}]},
+    {"atMs":15918.096492998302,"rssBytes":308596736,"pssBytes":306784256,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":110,"startTicks":2140675,"threads":11,"Rss":87601152,"Pss":86695936,"Private_Clean":30240768,"Private_Dirty":56246272,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":704,"startTicks":2140765,"threads":13,"Rss":220995584,"Pss":220088320,"Private_Clean":77361152,"Private_Dirty":142524416,"Swap":0}]},
+    {"atMs":16018.967274998431,"rssBytes":290422784,"pssBytes":288610304,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":110,"startTicks":2140675,"threads":11,"Rss":87601152,"Pss":86695936,"Private_Clean":30240768,"Private_Dirty":56246272,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":707,"startTicks":2140765,"threads":13,"Rss":202821632,"Pss":201914368,"Private_Clean":77361152,"Private_Dirty":124350464,"Swap":0}]},
+    {"atMs":16119.750475998444,"rssBytes":290353152,"pssBytes":288540672,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":111,"startTicks":2140675,"threads":11,"Rss":87531520,"Pss":86626304,"Private_Clean":30253056,"Private_Dirty":56164352,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":708,"startTicks":2140765,"threads":13,"Rss":202821632,"Pss":201914368,"Private_Clean":77361152,"Private_Dirty":124350464,"Swap":0}]},
+    {"atMs":16220.416540996666,"rssBytes":290353152,"pssBytes":288540672,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":111,"startTicks":2140675,"threads":11,"Rss":87531520,"Pss":86626304,"Private_Clean":30253056,"Private_Dirty":56164352,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":708,"startTicks":2140765,"threads":13,"Rss":202821632,"Pss":201914368,"Private_Clean":77361152,"Private_Dirty":124350464,"Swap":0}]},
+    {"atMs":16320.98028299879,"rssBytes":290353152,"pssBytes":288540672,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":111,"startTicks":2140675,"threads":11,"Rss":87531520,"Pss":86626304,"Private_Clean":30253056,"Private_Dirty":56164352,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":708,"startTicks":2140765,"threads":13,"Rss":202821632,"Pss":201914368,"Private_Clean":77361152,"Private_Dirty":124350464,"Swap":0}]},
+    {"atMs":16421.81365399665,"rssBytes":290353152,"pssBytes":288540672,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":111,"startTicks":2140675,"threads":11,"Rss":87531520,"Pss":86626304,"Private_Clean":30253056,"Private_Dirty":56164352,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":708,"startTicks":2140765,"threads":13,"Rss":202821632,"Pss":201914368,"Private_Clean":77361152,"Private_Dirty":124350464,"Swap":0}]},
+    {"atMs":16522.435652997956,"rssBytes":290353152,"pssBytes":288540672,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":111,"startTicks":2140675,"threads":11,"Rss":87531520,"Pss":86626304,"Private_Clean":30253056,"Private_Dirty":56164352,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":708,"startTicks":2140765,"threads":13,"Rss":202821632,"Pss":201914368,"Private_Clean":77361152,"Private_Dirty":124350464,"Swap":0}]},
+    {"atMs":16623.00182299805,"rssBytes":290353152,"pssBytes":288540672,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":111,"startTicks":2140675,"threads":11,"Rss":87531520,"Pss":86626304,"Private_Clean":30253056,"Private_Dirty":56164352,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":708,"startTicks":2140765,"threads":13,"Rss":202821632,"Pss":201914368,"Private_Clean":77361152,"Private_Dirty":124350464,"Swap":0}]},
+    {"atMs":16724.326271996688,"rssBytes":290377728,"pssBytes":288565248,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":117,"startTicks":2140675,"threads":11,"Rss":87556096,"Pss":86650880,"Private_Clean":30277632,"Private_Dirty":56164352,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":708,"startTicks":2140765,"threads":13,"Rss":202821632,"Pss":201914368,"Private_Clean":77361152,"Private_Dirty":124350464,"Swap":0}]},
+    {"atMs":16824.87401799881,"rssBytes":290377728,"pssBytes":288565248,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":117,"startTicks":2140675,"threads":11,"Rss":87556096,"Pss":86650880,"Private_Clean":30277632,"Private_Dirty":56164352,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":708,"startTicks":2140765,"threads":13,"Rss":202821632,"Pss":201914368,"Private_Clean":77361152,"Private_Dirty":124350464,"Swap":0}]},
+    {"atMs":16925.51028699745,"rssBytes":290377728,"pssBytes":288565248,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":117,"startTicks":2140675,"threads":11,"Rss":87556096,"Pss":86650880,"Private_Clean":30277632,"Private_Dirty":56164352,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":708,"startTicks":2140765,"threads":13,"Rss":202821632,"Pss":201914368,"Private_Clean":77361152,"Private_Dirty":124350464,"Swap":0}]},
+    {"atMs":17026.152096997976,"rssBytes":290377728,"pssBytes":288565248,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":117,"startTicks":2140675,"threads":11,"Rss":87556096,"Pss":86650880,"Private_Clean":30277632,"Private_Dirty":56164352,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":708,"startTicks":2140765,"threads":13,"Rss":202821632,"Pss":201914368,"Private_Clean":77361152,"Private_Dirty":124350464,"Swap":0}]},
+    {"atMs":17126.92928799879,"rssBytes":290377728,"pssBytes":288565248,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":117,"startTicks":2140675,"threads":11,"Rss":87556096,"Pss":86650880,"Private_Clean":30277632,"Private_Dirty":56164352,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":708,"startTicks":2140765,"threads":13,"Rss":202821632,"Pss":201914368,"Private_Clean":77361152,"Private_Dirty":124350464,"Swap":0}]},
+    {"atMs":17227.62018999856,"rssBytes":290377728,"pssBytes":288565248,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":117,"startTicks":2140675,"threads":11,"Rss":87556096,"Pss":86650880,"Private_Clean":30277632,"Private_Dirty":56164352,"Swap":0},{"pid":314367,"name":"agentos-sidecar","ppid":314339,"ticks":708,"startTicks":2140765,"threads":13,"Rss":202821632,"Pss":201914368,"Private_Clean":77361152,"Private_Dirty":124350464,"Swap":0}]},
+    {"atMs":17328.163444999518,"rssBytes":87560192,"pssBytes":86736896,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":117,"startTicks":2140675,"threads":11,"Rss":87560192,"Pss":86736896,"Private_Clean":30367744,"Private_Dirty":56168448,"Swap":0}]},
+    {"atMs":17429.259304997686,"rssBytes":87560192,"pssBytes":86736896,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":117,"startTicks":2140675,"threads":11,"Rss":87560192,"Pss":86736896,"Private_Clean":30367744,"Private_Dirty":56168448,"Swap":0}]},
+    {"atMs":17530.449301997578,"rssBytes":87560192,"pssBytes":86736896,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":117,"startTicks":2140675,"threads":11,"Rss":87560192,"Pss":86736896,"Private_Clean":30367744,"Private_Dirty":56168448,"Swap":0}]},
+    {"atMs":17631.424769999285,"rssBytes":87560192,"pssBytes":86736896,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":117,"startTicks":2140675,"threads":11,"Rss":87560192,"Pss":86736896,"Private_Clean":30367744,"Private_Dirty":56168448,"Swap":0}]},
+    {"atMs":17732.54089999682,"rssBytes":87560192,"pssBytes":86736896,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":117,"startTicks":2140675,"threads":11,"Rss":87560192,"Pss":86736896,"Private_Clean":30367744,"Private_Dirty":56168448,"Swap":0}]},
+    {"atMs":17832.822248998127,"rssBytes":87560192,"pssBytes":86736896,"processes":[{"pid":314339,"name":"MainThread","ppid":314334,"ticks":117,"startTicks":2140675,"threads":11,"Rss":87560192,"Pss":86736896,"Private_Clean":30367744,"Private_Dirty":56168448,"Swap":0}]}
+  ]
+}

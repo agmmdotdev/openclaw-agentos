@@ -18,6 +18,7 @@ await copyFile('artifacts/core/manifest.json', 'artifacts/results/core-build.jso
 await writeFile('artifacts/results/summary.json', JSON.stringify({
   recordedAt: core.recordedAt,
   versions: { node: core.node, openclaw: core.openclaw, agentos: core.agentos, sqlite: core.sqlite.version },
+  runtimeEnvironment: core.runtimeEnvironment,
   compatibilityGate: passing ? 'passed' : 'failed',
   asyncContext: { adaptedMatchesNode: asyncContext.adaptedMatchesNode, compiledNodeMatchesNative: asyncContext.compiledNodeMatchesNative, rawRuntimeStillUnsupported: true },
   scenarios,

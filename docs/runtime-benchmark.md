@@ -1,11 +1,16 @@
 # OpenClaw / agentOS: current measured boundary
 
-The reduced guest core remains **16.6 MB**, compared with the original compiled
-53.6 MB. This pass further reduces cold-start transport by running the existing
-OpenClaw table-metadata collector beside host SQLite. It improves typical cold
-latency without a material warm-latency or memory gain.
+The latest [memory and CPU pass](runtime-memory-cpu.md) adds an opt-in economy
+profile. Across two 51-turn runs per mode, idle process-tree memory falls from
+568 to 468 MiB (18%) and sampled peak from 661 to 562 MiB (15%). Complete
+lifecycle CPU falls only about 3%; steady-state CPU improvement is not
+established. The same reduced core on direct Node measures 324 MiB idle and
+3.38 CPU-seconds for the full workload, versus about 30.16 CPU-seconds on agentOS.
 
-## Latest controlled comparison
+The reduced guest core remains **16.6 MB**, compared with the original compiled
+53.6 MB. The preceding schema-batching measurements are preserved below.
+
+## Schema-batching comparison
 
 The two agentOS configurations below use the same built artifact, allocator
 settings and workload. The individual control disables only the new metadata
@@ -131,10 +136,10 @@ npm run test:core:compact
 npm run test:host-sqlite
 npm run core:report
 npm run bench:build
-npm run bench:core -- --instances 1 --allocator compact --trial 30
-BENCH_SQL_SCHEMA_MODE=individual npm run bench:core -- --instances 1 --allocator compact --trial 31
-npm run bench:core -- --instances 2 --allocator compact --trial 30
-npm run bench:core -- --native --core --allocator compact --trial 30
+npm run bench:core -- --instances 1 --allocator compact --trial 60
+BENCH_SQL_SCHEMA_MODE=individual npm run bench:core -- --instances 1 --allocator compact --trial 61
+npm run bench:core -- --instances 2 --allocator compact --trial 60
+npm run bench:core -- --native --core --allocator compact --trial 60
 npm run bench:report
 ```
 

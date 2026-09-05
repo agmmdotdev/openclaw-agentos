@@ -10,6 +10,11 @@ import { OPENCLAW_AGENTOS_NODE_BUILTINS } from '../../dist/src/compatibility.js'
 import { decode as decodeSqlRequest } from '../../src/host-sqlite.mjs';
 import { createCoreHostSqlite } from '../../src/core-host-sqlite.mjs';
 
+const warmTurns = Number(process.env.BENCH_WARM_TURNS ?? 5);
+if (!Number.isSafeInteger(warmTurns) || warmTurns < 1 || warmTurns > 100) throw new Error('BENCH_WARM_TURNS must be between 1 and 100');
+const heapMb = Number(process.env.CORE_HEAP_MB ?? 256);
+const wasmHeapMb = process.env.CORE_WASM_HEAP_MB ? Number(process.env.CORE_WASM_HEAP_MB) : undefined;
+for (const value of [heapMb, wasmHeapMb].filter(value => value !== undefined)) if (!Number.isSafeInteger(value) || value <= 0) throw new Error('Heap limits must be positive integers');
 const instances = Number(process.argv[2] ?? 1);
 if (![1, 2, 4].includes(instances)) throw new Error('Expected 1, 2 or 4 instances');
 const start = performance.now(), resources = [];
@@ -43,7 +48,7 @@ try {
       bindings: [sqlite.collection, { name: 'bench', description: 'Benchmark checkpoints', bindings: { mark: { description: 'Record a checkpoint', inputSchema: z.object({ label: z.string(), data: z.string() }), execute({ label, data }) { mark(label, { instance: index, sqliteCalls: sqlite.stats.calls, hostSqlMilliseconds, ...JSON.parse(data) }); return 'ok'; } } } }],
       allowedNodeBuiltins: [...OPENCLAW_AGENTOS_NODE_BUILTINS, 'querystring', 'console', 'sqlite', 'stream/web', 'constants', 'inspector'],
       permissions: { fs: 'allow', process: 'allow', childProcess: 'allow', env: 'allow', network: 'deny', binding: { default: 'deny', rules: [{ patterns: ['core-sqlite:call', 'bench:mark'], mode: 'allow' }] } },
-      limits: { resources: { maxProcesses: 32, maxOpenFds: 256, maxFilesystemBytes: 512 * 1024 * 1024 }, process: { pendingStdinBytes: 64 * 1024 * 1024, pendingEventBytes: 64 * 1024 * 1024, pendingEventCount: 10000 }, jsRuntime: { v8HeapLimitMb: 256, cpuTimeLimitMs: 120000, wallClockLimitMs: 180000 } },
+      limits: { ...(wasmHeapMb ? { wasm: { runnerHeapLimitMb: wasmHeapMb } } : {}), resources: { maxProcesses: 32, maxOpenFds: 256, maxFilesystemBytes: 512 * 1024 * 1024 }, process: { pendingStdinBytes: 64 * 1024 * 1024, pendingEventBytes: 64 * 1024 * 1024, pendingEventCount: 10000 }, jsRuntime: { v8HeapLimitMb: heapMb, cpuTimeLimitMs: 120000, wallClockLimitMs: 180000 } },
     };
     mark('provision:start', { instance: index });
     const setup = await AgentOs.create({ ...options, user: { uid: 0, gid: 0 } });
@@ -125,7 +130,7 @@ globalThis.__benchmarkFsTiming = () => benchmarkFsTiming;
   mark('staged'); await settle();
   mark('launch:start');
   const results = await Promise.all(resources.map(async ({ vm, index, sqlite }) => {
-    const result = await vm.process.execFile('node', ['/core/benchmark.mjs', '--internal-worker-prewarm'], { env: { OPENCLAW_STATE_DIR: '/state/openclaw', OPENCLAW_CHILD_OOM_SCORE_ADJ: '0', BENCH_WARM_TURNS: '5', BENCH_SPLIT_INIT: process.env.BENCH_SPLIT_INIT ?? '0', BENCH_PROFILE_CORE: process.env.BENCH_PROFILE_CORE ?? '0' }, timeoutMs: 180000, output: { capture: 'all' } });
+    const result = await vm.process.execFile('node', ['/core/benchmark.mjs', '--internal-worker-prewarm'], { env: { OPENCLAW_STATE_DIR: '/state/openclaw', OPENCLAW_CHILD_OOM_SCORE_ADJ: '0', BENCH_WARM_TURNS: String(warmTurns), BENCH_SPLIT_INIT: process.env.BENCH_SPLIT_INIT ?? '0', BENCH_PROFILE_CORE: process.env.BENCH_PROFILE_CORE ?? '0' }, timeoutMs: 180000, output: { capture: 'all' } });
     mark('process:end', { instance: index, result, sqlite: sqlite.stats });
     return result;
   }));

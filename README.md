@@ -98,24 +98,28 @@ listener-table representation. See the report for these compatibility limits.
 
 ## Performance and placement
 
-The [runtime benchmark](docs/runtime-benchmark.md) now measures a **16.6 MB
-compiled core**, down from 53.6 MB. With the tested glibc allocator settings,
-the latest batching pass measures **3.50 seconds median to the first result**,
-versus **4.46 seconds** with individual SQL calls. The five batched runs span
-3.40–6.14 seconds; the slow outlier is retained. Idle memory remains about
-520–547 MiB and warm turns about 0.3 seconds. Direct Node still measures around
-1.17 seconds cold, 27 ms warm and 272 MiB idle. These are small local samples
-with deterministic inference, not production cost or Cloudflare evidence.
-See [schema batching](docs/schema-batching.md) for the code boundary and
-in-guest drift/rollback comparisons. The guest bundle remains 16.6 MB; the
-extracted host collector adds 12.5 KB.
+The [runtime benchmark](docs/runtime-benchmark.md) measures a **16.6 MB compiled
+core**, down from 53.6 MB. The new [memory and CPU pass](docs/runtime-memory-cpu.md)
+reduces idle process-tree memory from **568 to 468 MiB** across repeated 51-turn
+workloads, with sampled peak falling from **661 to 562 MiB**. Full-workload CPU
+is about 3% lower; there is no established steady-state CPU gain. Warm turns
+remain about 0.3 seconds. Direct Node on the same workload measures 324 MiB idle,
+26 ms warm turns and much less CPU. These are local deterministic-inference
+measurements, not production or Cloudflare cost evidence.
 
-Use `npm run test:core:compact` to exercise the tuned Linux configuration, or
-`npm run bench:core -- --allocator compact --trial 30` to measure it. The
-allocator profile sets `MALLOC_ARENA_MAX=1`, `MALLOC_TRIM_THRESHOLD_=65536`, and
-`MALLOC_MMAP_THRESHOLD_=65536` before starting the host and sidecars. The ordinary
-`test:core` command leaves allocator defaults intact. Settings need validation
-for a future high-concurrency service.
+Use `npm run test:core:economy` for the current opt-in profile, or
+`node scripts/run-core-economy.mjs your-core-host.mjs` to launch a core host.
+It disables spare V8 isolates through `AGENTOS_V8_WARM_ISOLATES=0` and retains the
+existing compact glibc allocator settings. The launcher checks the agentOS
+version because that environment switch is internal to the published runtime.
+The guest heap remains 256 MiB; all default software and shell tools remain.
+`test:core:compact` retains the previous allocator-only control and `test:core`
+retains defaults. See the report for measurements and rejected experiments.
+
+[Schema batching](docs/schema-batching.md) still reduces cold binding calls
+from 3,306 to 1,700 while retaining the original metadata collector, drift
+checks and rollback behavior. The host collector adds 12.5 KB; the guest bundle
+remains 16.6 MB.
 
 A new multi-instance probe also found that agentOS 0.2.19 replaces host binding
 handlers/policies when VMs share a sidecar. The core harness now requests its

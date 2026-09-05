@@ -83,6 +83,6 @@ try {
   }
 } finally {
   await mkdir('artifacts/results', { recursive: true });
-  await writeFile('artifacts/results/core-probe.json', JSON.stringify({ recordedAt: new Date().toISOString(), node: process.version, openclaw: '2026.8.1', agentos: '0.2.19', sqlite: sqlite.stats, reports }, null, 2) + '\n');
+  await writeFile('artifacts/results/core-probe.json', JSON.stringify({ recordedAt: new Date().toISOString(), node: process.version, openclaw: '2026.8.1', agentos: '0.2.19', runtimeEnvironment: Object.fromEntries(['MALLOC_ARENA_MAX', 'MALLOC_TRIM_THRESHOLD_', 'MALLOC_MMAP_THRESHOLD_', 'AGENTOS_V8_WARM_ISOLATES'].map(key => [key, process.env[key] ?? null])), sqlite: sqlite.stats, reports }, null, 2) + '\n');
   await vm?.dispose(); sqlite.dispose(); await vm?.sidecar.dispose(); await rm(sqliteRoot, { recursive: true, force: true });
 }
