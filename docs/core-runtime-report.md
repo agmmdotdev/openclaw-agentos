@@ -1,12 +1,13 @@
-# Core runtime experiment — 2026-09-05
+# Core runtime experiment — failure fixes
 
 ## Decision and scope
 
-Continue the published-runtime, out-of-tree approach as a **bounded prototype**.
-The core flow is executable, but runtime fidelity has reached a concrete wall:
-agentOS's AsyncLocalStorage does not isolate overlapping async contexts and
-retains a store after a completed async scope. A successful sequential demo is
-not sufficient evidence for a secure, concurrent runtime.
+The two previously failing cases now pass within a compiled compatibility
+boundary. A JavaScript child-process adapter fixes completion cleanup. An
+AsyncLocalStorage adapter plus async-syntax lowering fixes the exercised context
+propagation paths. Keep the published-runtime, out-of-tree approach as a
+**bounded prototype**. Raw agentOS still has the original context defects; this
+work does not make arbitrary Node code context-safe.
 
 No upstream repository or published package was modified. No containers or
 Rust builds were used. No Gateway server, channel integration or deployment
@@ -22,14 +23,22 @@ was implemented. The older provider driver is unchanged.
 - Host used for these tests: Node 24.19.0, SQLite 3.53.3, Linux x64.
 - Latest agentOS version returned by the registry during this work: 0.2.19.
 
-The builder fails closed on a different worker digest. It parses only the
-bundle's import preamble with TypeScript, rewrites module specifiers, and adds
+The builder fails closed on a different worker digest. It parses the
+bundle's import preamble with TypeScript, rewrites eleven import specifiers, and adds
 `runOpenClawCoreTurn(params)`. That wrapper calls the upstream generated
 `init_embedded_agent_runtime()` before `runWorkerEmbeddedTurn(params)`.
 Failing to invoke that initializer leaves module-local constants unset; simply
 exporting the function is not sufficient.
 
-The build manifest records input/output hashes and individual adapter hashes.
+The builder then lowers async functions, async generators and for-await loops
+with esbuild 0.28.2. It preserves function names and modern non-async syntax.
+Three exact native async-iterator prototype expressions are replaced with an
+imported intrinsic that remains native. The worker entry retains module-level
+waiting, with its operation moved into a lowered function. These matches are
+count-checked against the pinned input.
+
+The build manifest records input/output hashes, compiler version/settings,
+intrinsic-reference count and individual adapter hashes.
 This remains an artifact patch and a private, pinned implementation boundary.
 
 ## What executes where
@@ -62,7 +71,9 @@ reasoning or an external provider's HTTP/SSE transport.
 | Missing promise-readline module | Wrapper; interactive usage has not been exercised |
 | Missing process memory-constraint method | Returns Node's documented unknown value, 0; not a RAM estimate |
 | Missing Latin-1 TextDecoder | Windows-1252 decoding for supported WHATWG labels, UTF-8 delegated to native |
-| Missing AsyncLocalStorage static bind/snapshot | Capture known adapter instances for callback binding; does **not** fix async propagation |
+| Missing AsyncLocalStorage static bind/snapshot | Capture known adapter instances for callback binding |
+| Incorrect async store lifetime and native-await propagation | Restore stores synchronously; lower async syntax to captured promise continuations |
+| Child-process cleanup throws on missing `removeAllListeners` | Add event-scoped/all listener removal to the pinned child-process prototype |
 | Unlisted dynamic builtins | Explicit allow-list additions, discovered during execution |
 | SQLite 3.46.0 rejected for WAL safety | Host SQLite adapter, preserving OpenClaw's version check |
 | Worker exceeds dependency import response cap | Launch one combined entry artifact using bounded chunked transfer |
@@ -77,8 +88,10 @@ behavioral compatibility.
 
 The primary turn performs write → read → edit → shell exec → apply_patch →
 final assistant response. Each tool result returns to the next inference call.
-The harness checks actual final file contents and that transcript settlement
-precedes the finishing event.
+The harness checks actual final file contents, foreground exec status/exit code,
+and that transcript settlement precedes the finishing event. The earlier suite
+checked `isError` and file contents, which missed failed process completion in
+`details.status`; that assertion gap is now closed.
 
 A second turn in the same guest process consumes the earlier transcript and
 reads both an edited file and shell output. The host then disposes the VM,
@@ -96,46 +109,71 @@ Negative cases verify:
   absent write tool cannot create the target file.
 - A missing-file tool result returns to the model interface and the loop can
   produce a final response.
+- Three background commands are polled through completion and preserve exit
+  codes 0, 7 and 127 plus stdout. OpenClaw labels ordinary exit 7 completed and
+  shell-failure exit 127 failed; the harness checks that upstream behavior.
 
 The host SQLite test checks commit/rollback, actual transaction state, blobs,
 64-bit integers, reopening data and separate tenant namespaces. ATTACH and
 VACUUM INTO cannot create a file outside the database namespace. Closed or
 foreign handles are rejected.
 
-## Remaining failures
+## Async-context fix and its boundary
 
-### Async context: independently reproduced in unmodified agentOS
+The raw runtime's `AsyncLocalStorage.run()` keeps a mutable store until the
+returned promise settles. Native `await` bypasses its patched `.then()` capture.
+`async_hooks.createHook()` is a no-op, `v8.promiseHooks` has no working hooks,
+and `globalThis.AsyncContext` is absent in the inspected runtime.
 
-Run `npm run probe:async-context`. It runs identical code on real Node and
-published agentOS with no OpenClaw artifact and no compatibility modules.
+The adapter calls native `run()` with a synchronous wrapper that captures the
+callback's result without returning it to native `run()`. This restores the
+caller immediately and returns the original result/promise unchanged. The
+compiler converts async operations into generator steps driven by `.then()`,
+which agentOS already captures. Neither part alone is sufficient.
 
-| Scenario | Node | agentOS |
-| --- | --- | --- |
-| One async scope finishes | Store cleared afterward | Store remains afterward |
-| Two scopes, first finishes first | context-0, context-1 | context-1, context-1 |
-| Two scopes, second finishes first | context-0, context-1 | context-1, context-1 |
+`npm run probe:async-context` compares native host Node, compiled host Node,
+raw agentOS, the adapter without compilation, and the compiled adapter path.
+The last path matches Node across 13 deterministic scenario records: overlap
+in both completion orders, immediate/post-await restoration, nested stores,
+rejection/finally, timers, microtasks, promise callbacks returning promises,
+async generators, bind/snapshot/AsyncResource, promise identity, thrown callback
+cleanup, externally resolved promises and `exit()` restoration. Raw and
+uncompiled controls remain visibly incorrect in the saved report.
 
-This can affect ambient execution identity, tracing and other context-dependent
-behavior. Keeping one customer per VM is necessary isolation work, but does not
-repair overlapping internal operations or scope cleanup within that VM.
-The narrow static bind adapter does not claim to solve this.
+This is a **static compiled-code boundary**, not a general runtime repair:
 
-The reliable fixes are upstream runtime async-context support or an explicit
-context design in the application paths that currently depend on it. The latter
-could justify an OpenClaw fork, but it is more substantial than an import patch.
-No such fork was started in this task.
+- Injected context-sensitive callbacks must also be compiled. The harness does
+  this for inference, transcript and live-event fixtures.
+- Dynamically loaded plugins, eval/Function-generated code and arbitrary native
+  async callbacks are not certified. Uncompiled native await loses context.
+- Lowering can affect reflection and scheduling. Three stream ponyfills inspected
+  the native async-generator prototype; those exact expressions now use an
+  uncompiled intrinsic module. Broader reflection compatibility is unproven.
+- Compiler output is 53,604,203 bytes versus 46,593,544 input bytes. This does not
+  establish guest memory overhead or a production cost advantage.
+- The tests establish exercised context behavior, not secure concurrent customer
+  isolation or support for simultaneous OpenClaw turns in one VM.
 
-### Background process completion
+## Process-completion fix
 
-The full OpenClaw `exec(background:true)` → `process.poll` scenario starts a
-child, returns a session ID, and captures `background-ok`. It then reports a
-failed process with an unknown exit code. The assertion remains failing.
+Temporary instrumentation of `buildExecRuntimeErrorOutcome` revealed
+`TypeError: child.removeAllListeners is not a function` during the supervisor's
+ownership cleanup. The command had exited normally; cleanup converted its
+outcome to a runtime failure with no exit code. This also affected foreground
+commands, even when their filesystem side effects succeeded.
 
-Separate direct agentOS child-process probes delivered exit and close codes 0
-and 7 correctly. Disabling the unsupported OOM-score wrapper removes `/proc`
-noise but does not repair the OpenClaw background case. The exact cause in the
-integrated process-management path has not been established; it must not be
-papered over by assuming exit code 0.
+The new adapter supplies `ChildProcess.prototype.removeAllListeners`, clearing
+persistent and one-shot registrations. It handles a selected event or all
+events, including symbols, and returns the child. It checks agentOS 0.2.19's
+listener-table representation before operating. These internal tables are a
+pinned dependency, not a portable EventEmitter API; this does not certify all
+Node event-emitter semantics. It preserves child process execution and actual
+exit codes. No completion is fabricated, and diagnostic instrumentation is not
+part of the shipped artifact.
+
+Capability checks verify scoped removal, one-shot removal, retained listeners,
+symbol events and real child close/exit codes 0 and 7. Integrated tests verify
+foreground completion and background exit codes 0, 7 and 127 through OpenClaw.
 
 ## Persistence findings
 
@@ -172,7 +210,8 @@ These limits are recorded rather than hidden behind passing core assertions.
 Observed runs before final packaging were approximately:
 
 - First five-tool turn: 17–18 seconds after loading; about 20–22 seconds for the
-  process including initialization.
+  process including initialization (the final combined initial run including
+  eight additional scenarios took about 23 seconds).
 - Warm two-tool continuation in the same process: 0.35–0.55 seconds.
 - Restored two-tool continuation in a new process: roughly 20 seconds including
   initialization.
@@ -189,7 +228,10 @@ made from bundle size or the 256 MiB configured heap cap.
 Use the README commands. `npm run test:core` runs capability assertions, core
 turns, negative cases and restoration, preserving every result in one report.
 It exits nonzero if any capability or integrated scenario fails. The independent
-async-context probe also exits nonzero on divergence. Unit tests and TypeScript
+async-context probe also exits nonzero on adapted-path or compiled-Node
+divergence; failing raw-runtime controls are diagnostic evidence. The latest
+core gate passes all three generations, 125 capability assertions (100 are
+random-integer bounds), and eight failure/background scenarios. Unit tests and TypeScript
 checks remain separate from the real-runtime compatibility gate.
 
 The source archive includes the integration repository, generated small result

@@ -4,6 +4,7 @@ import { TextDecoder } from './compat/text-decoder.mjs';
 import { AsyncLocalStorage } from './compat/async-hooks.mjs';
 import { DatabaseSync } from './compat/sqlite.mjs';
 import { monitorEventLoopDelay } from './compat/perf-hooks.mjs';
+import { spawn } from './compat/child-process.mjs';
 let count = 0;
 const failures = [];
 const check = (value, description) => { if (!value) failures.push(description); count++; };
@@ -23,6 +24,22 @@ check(JSON.stringify(a.run('other', () => captured.call({ id: 7 }, 8))) === '["a
 check(a.getStore() === undefined && b.getStore() === undefined, 'bound contexts restore caller');
 const parallel = await Promise.all(['first', 'second'].map(label => a.run(label, async () => { await new Promise(resolve => setTimeout(resolve, label === 'first' ? 20 : 5)); return a.getStore(); })));
 check(JSON.stringify(parallel) === '["first","second"]', 'async local contexts remain isolated across await');
+check(a.getStore() === undefined, 'async contexts restore caller after await');
+for (const code of [0, 7]) {
+  const child = spawn('node', ['-e', `setTimeout(() => process.exit(${code}), 5)`]);
+  let removedCalls = 0, retainedCalls = 0;
+  const symbol = Symbol('child-event');
+  child.on('fixture', () => removedCalls++);
+  child.once('fixture', () => removedCalls++);
+  child.on(symbol, () => retainedCalls++);
+  check(child.removeAllListeners('fixture') === child, 'removeAllListeners returns child');
+  child.emit('fixture'); child.emit(symbol);
+  check(removedCalls === 0 && retainedCalls === 1, 'event-scoped removal clears persistent and once listeners only');
+  const exit = await new Promise((resolve, reject) => { child.once('error', reject); child.once('close', (code, signal) => resolve({ code, signal })); });
+  check(exit.code === code && exit.signal === null && child.exitCode === code, 'real child exit code survives cleanup boundary');
+  child.removeAllListeners(); child.emit(symbol);
+  check(retainedCalls === 1, 'removeAllListeners clears symbol events');
+}
 const db = new DatabaseSync('/state/capabilities.sqlite');
 db.exec('CREATE TABLE IF NOT EXISTS vals(n INTEGER, b BLOB); DELETE FROM vals; BEGIN IMMEDIATE');
 check(db.isTransaction, 'real transaction state');

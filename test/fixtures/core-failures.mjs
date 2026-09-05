@@ -56,20 +56,26 @@ await scenario('missing-file', { inference: { stream(request) {
   assert(!error, `tool failure recovery: ${error?.message}`);
   assert(transcript.some(m => m.role === 'assistant' && m.stopReason === 'stop'), 'agent continues after tool failure');
 });
-let backgroundCalls = 0, backgroundSession;
-await scenario('background-process', { inference: { stream(request) {
-  if (backgroundCalls++ === 0) return answer([{ type: 'toolCall', id: 'bg-start', name: 'exec', arguments: { command: 'node -e "setTimeout(() => console.log(\'background-ok\'), 50)"', background: true, workdir: '/workspace' } }], 'toolUse');
-  const result = request.context.messages.findLast(m => m.role === 'toolResult');
-  if (backgroundCalls === 2) {
-    backgroundSession = result?.details?.sessionId;
-    assert(typeof backgroundSession === 'string', `background exec returns a session: ${JSON.stringify(result)}`);
-  } else if (result?.details?.status === 'completed') {
-    assert(result.content.some(p => p.text?.includes('background-ok')), 'background stdout returned through process tool');
-    return textAnswer();
-  }
-  assert(backgroundCalls < 8, `background process must settle: ${JSON.stringify(result)}`);
-  return answer([{ type: 'toolCall', id: `bg-poll-${backgroundCalls}`, name: 'process', arguments: { action: 'poll', sessionId: backgroundSession, timeout: 1000 } }], 'toolUse');
-} } }, ({ error }) => { assert(!error, `background process: ${error?.message}`); });
+for (const exitCode of [0, 7, 127]) {
+  let backgroundCalls = 0, backgroundSession, observedOutput = '';
+  const marker = `background-${exitCode}-ok`;
+  await scenario(`background-process-${exitCode}`, { inference: { stream(request) {
+    if (backgroundCalls++ === 0) return answer([{ type: 'toolCall', id: 'bg-start', name: 'exec', arguments: { command: `node -e "setTimeout(() => { console.log('${marker}'); process.exit(${exitCode}); }, 50)"`, background: true, workdir: '/workspace' } }], 'toolUse');
+    const result = request.context.messages.findLast(m => m.role === 'toolResult');
+    observedOutput += result?.content?.map(p => p.text ?? '').join('') ?? '';
+    if (backgroundCalls === 2) {
+      backgroundSession = result?.details?.sessionId;
+      assert(typeof backgroundSession === 'string', `background exec returns a session: ${JSON.stringify(result)}`);
+    } else if (['completed', 'failed'].includes(result?.details?.status)) {
+      assert(result.details.status === (exitCode === 127 ? 'failed' : 'completed'), `background status: ${JSON.stringify(result)}`);
+      assert(result.details.exitCode === exitCode, `background exit code is preserved: ${JSON.stringify(result)}`);
+      assert(observedOutput.includes(marker), 'background stdout returned through process tool');
+      return textAnswer();
+    }
+    assert(backgroundCalls < 8, `background process must settle: ${JSON.stringify(result)}`);
+    return answer([{ type: 'toolCall', id: `bg-poll-${backgroundCalls}`, name: 'process', arguments: { action: 'poll', sessionId: backgroundSession, timeout: 1000 } }], 'toolUse');
+  } } }, ({ error }) => { assert(!error, `background process: ${error?.message}`); });
+}
 console.log('FAILURE_CASES_RESULT=' + JSON.stringify({ completed, failures }));
 
 if (failures.length) process.exitCode = 1;

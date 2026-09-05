@@ -1,14 +1,43 @@
 {
+  "recordedAt": "2026-09-05T07:16:34.456Z",
   "node": "v24.19.0",
   "agentos": "0.2.19",
-  "nodeOutput": "{\"delays\":[5],\"results\":[\"context-0\"]}\n{\"delays\":[5,20],\"results\":[\"context-0\",\"context-1\"]}\n{\"delays\":[20,5],\"results\":[\"context-0\",\"context-1\"]}\n",
-  "agentosResult": {
-    "exitCode": 0,
-    "stdout": "{\"delays\":[5],\"results\":[\"context-0\"],\"after\":\"context-0\"}\n{\"delays\":[5,20],\"results\":[\"context-1\",\"context-1\"],\"after\":\"context-1\"}\n{\"delays\":[20,5],\"results\":[\"context-1\",\"context-1\"],\"after\":\"context-1\"}\n",
-    "stderr": "",
-    "stdoutTruncated": false,
-    "stderrTruncated": false,
-    "outcome": "succeeded"
+  "asyncCompiler": {
+    "name": "esbuild",
+    "version": "0.28.2",
+    "supported": {
+      "async-await": false,
+      "async-generator": false,
+      "for-await": false
+    }
   },
-  "matchesNode": false
+  "nodeOutput": "ASYNC_CONTEXT_RESULT=[{\"test\":\"overlap\",\"delays\":[5],\"results\":[\"context-0\"]},{\"test\":\"overlap\",\"delays\":[5,20],\"results\":[\"context-0\",\"context-1\"]},{\"test\":\"overlap\",\"delays\":[20,5],\"results\":[\"context-0\",\"context-1\"]},{\"test\":\"nested\",\"result\":[\"inner\",\"outer\",[\"outer\",\"second-store\"]]},{\"test\":\"rejection\",\"results\":[[\"left\",\"left\",\"left\"],[\"right\",\"right\",\"right\"]]},{\"test\":\"callbacks\",\"results\":[[\"left\",\"left\",\"left\",\"left\"],[\"right\",\"right\",\"right\",\"right\"]]},{\"test\":\"async-then-callback\",\"results\":[[\"left\",\"left\"],[\"right\",\"right\"]]},{\"test\":\"async-generator\",\"results\":[[\"left\",\"left\"],[\"right\",\"right\"]]},{\"test\":\"capture\",\"bound\":[\"captured\",\"other\",7,8],\"snapshot\":[\"captured\",\"other\"],\"resource\":[\"captured\",\"other\"]},{\"test\":\"promise-identity\",\"same\":true},{\"test\":\"throw-cleanup\",\"thrown\":\"expected\"},{\"test\":\"external-resolution\",\"result\":\"waiter\"},{\"test\":\"exit\",\"result\":[null,\"outer\"]}]\n",
+  "compiledNodeMatchesNative": true,
+  "results": {
+    "native": {
+      "exitCode": 0,
+      "stdout": "ASYNC_CONTEXT_RESULT=[{\"test\":\"overlap\",\"delays\":[5],\"immediate\":\"context-0\",\"results\":[\"context-0\"],\"after\":\"context-0\"},{\"test\":\"overlap\",\"delays\":[5,20],\"immediate\":\"context-1\",\"results\":[\"context-1\",\"context-1\"],\"after\":\"context-1\"},{\"test\":\"overlap\",\"delays\":[20,5],\"immediate\":\"context-1\",\"results\":[\"context-1\",\"context-1\"],\"after\":\"context-1\"},{\"test\":\"nested\",\"result\":[\"inner\",\"inner\",[\"inner\",\"second-store\"]],\"after\":\"inner\"},{\"test\":\"rejection\",\"results\":[[\"left\",\"right\",\"right\"],[\"right\",\"right\",\"right\"]],\"after\":\"right\"},{\"test\":\"callbacks\",\"results\":[[\"left\",\"left\",\"left\",\"left\"],[\"right\",\"right\",\"right\",\"right\"]],\"after\":\"right\"},{\"test\":\"async-then-callback\",\"results\":[[\"right\",\"left\"],[\"right\",\"right\"]],\"after\":\"right\"},{\"test\":\"async-generator\",\"results\":[[\"left\",\"right\"],[\"right\",\"right\"]],\"after\":\"right\"},{\"test\":\"capture\",\"unsupported\":\"static bind/snapshot\"},{\"test\":\"promise-identity\",\"same\":false,\"after\":\"identity\"},{\"test\":\"throw-cleanup\",\"thrown\":\"expected\",\"after\":\"identity\"},{\"test\":\"external-resolution\",\"result\":\"waiter\",\"after\":\"waiter\"},{\"test\":\"exit\",\"result\":[null,null]}]\n",
+      "stderr": "",
+      "stdoutTruncated": false,
+      "stderrTruncated": false,
+      "outcome": "succeeded"
+    },
+    "adapterWithoutLowering": {
+      "exitCode": 0,
+      "stdout": "ASYNC_CONTEXT_RESULT=[{\"test\":\"overlap\",\"delays\":[5],\"results\":[null]},{\"test\":\"overlap\",\"delays\":[5,20],\"results\":[null,null]},{\"test\":\"overlap\",\"delays\":[20,5],\"results\":[null,null]},{\"test\":\"nested\",\"result\":[null,null,[null,null]]},{\"test\":\"rejection\",\"results\":[[\"left\",null,null],[\"right\",null,null]]},{\"test\":\"callbacks\",\"results\":[[\"left\",\"left\",\"left\",\"left\"],[\"right\",\"right\",\"right\",\"right\"]]},{\"test\":\"async-then-callback\",\"results\":[[null,\"left\"],[null,\"right\"]]},{\"test\":\"async-generator\",\"results\":[[\"left\",null],[\"right\",null]]},{\"test\":\"capture\",\"bound\":[\"captured\",\"other\",7,8],\"snapshot\":[\"captured\",\"other\"],\"resource\":[\"captured\",\"other\"]},{\"test\":\"promise-identity\",\"same\":true},{\"test\":\"throw-cleanup\",\"thrown\":\"expected\"},{\"test\":\"external-resolution\"},{\"test\":\"exit\",\"result\":[null,null]}]\n",
+      "stderr": "",
+      "stdoutTruncated": false,
+      "stderrTruncated": false,
+      "outcome": "succeeded"
+    },
+    "adapted": {
+      "exitCode": 0,
+      "stdout": "ASYNC_CONTEXT_RESULT=[{\"test\":\"overlap\",\"delays\":[5],\"results\":[\"context-0\"]},{\"test\":\"overlap\",\"delays\":[5,20],\"results\":[\"context-0\",\"context-1\"]},{\"test\":\"overlap\",\"delays\":[20,5],\"results\":[\"context-0\",\"context-1\"]},{\"test\":\"nested\",\"result\":[\"inner\",\"outer\",[\"outer\",\"second-store\"]]},{\"test\":\"rejection\",\"results\":[[\"left\",\"left\",\"left\"],[\"right\",\"right\",\"right\"]]},{\"test\":\"callbacks\",\"results\":[[\"left\",\"left\",\"left\",\"left\"],[\"right\",\"right\",\"right\",\"right\"]]},{\"test\":\"async-then-callback\",\"results\":[[\"left\",\"left\"],[\"right\",\"right\"]]},{\"test\":\"async-generator\",\"results\":[[\"left\",\"left\"],[\"right\",\"right\"]]},{\"test\":\"capture\",\"bound\":[\"captured\",\"other\",7,8],\"snapshot\":[\"captured\",\"other\"],\"resource\":[\"captured\",\"other\"]},{\"test\":\"promise-identity\",\"same\":true},{\"test\":\"throw-cleanup\",\"thrown\":\"expected\"},{\"test\":\"external-resolution\",\"result\":\"waiter\"},{\"test\":\"exit\",\"result\":[null,\"outer\"]}]\n",
+      "stderr": "",
+      "stdoutTruncated": false,
+      "stderrTruncated": false,
+      "outcome": "succeeded"
+    }
+  },
+  "adaptedMatchesNode": true
 }

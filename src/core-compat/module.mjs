@@ -1,6 +1,7 @@
 import module from 'node:module';
 import * as sqlite from './sqlite.mjs';
 import hooks from './async-hooks.mjs';
+import './child-process.mjs';
 export * from 'node:module';
 export default module;
 export function createRequire(url) {

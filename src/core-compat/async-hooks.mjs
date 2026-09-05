@@ -9,6 +9,15 @@ export class AsyncLocalStorage extends hooks.AsyncLocalStorage {
     instances.add(ref);
     registry.register(this, ref);
   }
+  run(store, callback, ...args) {
+    // Native agentOS run() holds a mutable store until a returned promise
+    // settles. Restore synchronously instead. The artifact compiler lowers
+    // awaits to .then() continuations, which agentOS already captures.
+    let result;
+    super.run(store, () => { result = Reflect.apply(callback, undefined, args); });
+    return result;
+  }
+  exit(callback, ...args) { return this.run(undefined, callback, ...args); }
   static snapshot() {
     const stores = [...instances].map(ref => ref.deref()).filter(Boolean).map(storage => [storage, storage.getStore()]);
     return (fn, ...args) => {

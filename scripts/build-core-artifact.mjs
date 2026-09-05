@@ -2,8 +2,9 @@ import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import { resolve } from 'node:path';
 import ts from 'typescript';
+import { compileAsync, asyncCompiler } from './compile-async.mjs';
 
-// Transform only module specifiers in the pinned bundle's import preamble.
+// Rewrite imports, then lower async syntax for agentOS promise context capture.
 // OpenClaw source and agentOS packages stay untouched. This is an artifact patch.
 const input = resolve(process.env.OPENCLAW_WORKER ?? 'node_modules/openclaw/dist/worker/worker.mjs');
 const output = resolve('artifacts/core');
@@ -20,6 +21,7 @@ const modules = new Map([
   ['node:perf_hooks', 'perf-hooks'], ['node:readline/promises', 'readline-promises'],
   ['node:util', 'util'],
   ['node:async_hooks', 'async-hooks'],
+  ['node:child_process', 'child-process'],
 ]);
 for (const statement of ast.statements) {
   if (!ts.isImportDeclaration(statement) || !ts.isStringLiteral(statement.moduleSpecifier)) continue;
@@ -35,15 +37,27 @@ if (!source.includes('async function runWorkerEmbeddedTurn(') || !source.include
 // Export the existing implementation; retain prewarm/worker entry behavior.
 transformed += '\nexport async function runOpenClawCoreTurn(params) { init_embedded_agent_runtime(); return runWorkerEmbeddedTurn(params); }\n';
 transformed = 'import "./compat/init.mjs";\n' + transformed;
+// Preserve module evaluation waiting for the upstream command, while moving its
+// sole top-level await into a compilable async function. Match the pinned text.
+const entry = 'internalWorkerPrewarm?flushCompileCache():await runWorkerProcess({internalWorkerIpc,managed,browserRuntime:worker_deploy_browser_runtime_default});';
+if (transformed.split(entry).length !== 2) throw new Error('Worker entry boundary changed');
+transformed = transformed.replace(entry, `const workerEntryReady=(async()=>{${entry}})();`);
+// Lowered generators are functions returning iterators, so their function
+// prototype cannot stand in for the native async iterator intrinsic.
+const intrinsic = 'Object.getPrototypeOf(Object.getPrototypeOf(async function*(){}).prototype)';
+const intrinsicReferences = transformed.split(intrinsic).length - 1;
+if (intrinsicReferences !== 3) throw new Error('Async iterator intrinsic references changed');
+transformed = 'import { nativeAsyncIteratorPrototype as __agentosAsyncIteratorPrototype } from "./compat/async-intrinsics.mjs";\n' + transformed.replaceAll(intrinsic, '__agentosAsyncIteratorPrototype');
+transformed = await compileAsync(transformed) + '\nawait workerEntryReady;\n';
 await mkdir(`${output}/compat`, { recursive: true });
 const compatibilityFiles = {};
-for (const name of [...modules.values(), 'sqlite', 'init', 'text-decoder']) {
+for (const name of [...modules.values(), 'sqlite', 'init', 'text-decoder', 'async-intrinsics']) {
   const file = `${name}.mjs`;
   const bytes = await readFile(`src/core-compat/${file}`);
   compatibilityFiles[file] = createHash('sha256').update(bytes).digest('hex');
   await writeFile(`${output}/compat/${file}`, bytes);
 }
 await writeFile(`${output}/worker.mjs`, transformed);
-const manifest = { openclaw: '2026.8.1', agentos: '0.2.19', inputSha256: sha256, outputSha256: createHash('sha256').update(transformed).digest('hex'), replacements, compatibilityFiles, addedExports: ['runOpenClawCoreTurn'], invokesUpstreamInitializer: 'init_embedded_agent_runtime' };
+const manifest = { openclaw: '2026.8.1', agentos: '0.2.19', inputSha256: sha256, outputSha256: createHash('sha256').update(transformed).digest('hex'), asyncCompiler, intrinsicReferences, replacements, compatibilityFiles, addedExports: ['runOpenClawCoreTurn'], invokesUpstreamInitializer: 'init_embedded_agent_runtime' };
 await writeFile(`${output}/manifest.json`, JSON.stringify(manifest, null, 2) + '\n');
 console.log(JSON.stringify({ output, inputSha256: sha256, replacements: replacements.length }));

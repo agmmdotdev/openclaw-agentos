@@ -7,6 +7,7 @@ import { mkdtemp, rm, realpath } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join, dirname } from 'node:path';
 import { createRequire } from 'node:module';
+import { compileFixture } from './compile-async.mjs';
 
 const sqliteRoot = await mkdtemp(join(tmpdir(), 'openclaw-agentos-sqlite-'));
 await mkdir(join(sqliteRoot, 'databases'));
@@ -38,8 +39,9 @@ try {
   const fixture = await readFile('test/fixtures/core-turn.mjs', 'utf8');
   const failures = await readFile('test/fixtures/core-failures.mjs', 'utf8');
   // A single entry file uses the runtime's streamed launch path; importing the
-  // 46 MB bundle as a dependency exceeds agentOS 0.2.19's bridge response cap.
-  await writeLargeFile(vm, '/core/probe.mjs', Buffer.from(worker + '\nfor (const coreProbePhase of (process.env.CORE_PHASES ?? \'tools\').split(\',\')) { await (async () => {\n' + fixture + '\n})(); }\nif (process.env.CORE_FAILURES === \'1\') { await (async () => {\n' + failures + '\n})(); }\n'));
+  // compiled bundle as a dependency exceeds agentOS 0.2.19's bridge response cap.
+  const runner = await compileFixture('\nfor (const coreProbePhase of (process.env.CORE_PHASES ?? \'tools\').split(\',\')) { await (async () => {\n' + fixture + '\n})(); }\nif (process.env.CORE_FAILURES === \'1\') { await (async () => {\n' + failures + '\n})(); }\n');
+  await writeLargeFile(vm, '/core/probe.mjs', Buffer.from(worker + '\n' + runner));
   await vm.filesystem.mkdir('/core/compat', { recursive: true });
   for (const name of await readdir('artifacts/core/compat')) await vm.filesystem.writeFile(`/core/compat/${name}`, await readFile(`artifacts/core/compat/${name}`));
   const packageRequire = createRequire(await realpath('node_modules/openclaw/package.json'));
@@ -49,7 +51,7 @@ try {
   await vm.filesystem.writeFile('/core/node_modules/tree-sitter-bash/tree-sitter-bash.wasm', await readFile(packageRequire.resolve('tree-sitter-bash/tree-sitter-bash.wasm')));
   }
   await stage();
-  await vm.filesystem.writeFile('/core/capabilities.mjs', await readFile('test/fixtures/capabilities.mjs'));
+  await vm.filesystem.writeFile('/core/capabilities.mjs', await compileFixture(await readFile('test/fixtures/capabilities.mjs', 'utf8')));
   const capabilities = await vm.process.execFile('node', ['/core/capabilities.mjs'], { timeoutMs: 30000, output: { capture: 'all' } });
   reports.push({ generation: 'capabilities', result: capabilities });
   console.log(JSON.stringify({ generation: 'capabilities', result: capabilities }, null, 2));

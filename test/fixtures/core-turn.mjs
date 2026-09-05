@@ -25,6 +25,9 @@ const inference = { stream(request) {
     const result = request.context.messages.findLast(m => m.role === 'toolResult');
     assert(result && !result.isError, `tool ${plan[calls - 1].name}: ${JSON.stringify(result)}`);
     assert(result.toolName === plan[calls - 1].name, 'tool result must return to the inference context');
+    if (result.toolName === 'exec') {
+      assert(result.details?.status === 'completed' && result.details.exitCode === 0, `foreground exec exit status: ${JSON.stringify(result)}`);
+    }
     observedResults.push(result);
   }
   if (phase === 'resume' && calls === 0) {

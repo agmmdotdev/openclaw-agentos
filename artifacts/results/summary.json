@@ -1,24 +1,29 @@
 {
+  "recordedAt": "2026-09-05T07:16:32.776Z",
   "versions": {
     "node": "v24.19.0",
     "openclaw": "2026.8.1",
     "agentos": "0.2.19",
     "sqlite": "3.53.3"
   },
-  "compatibilityGate": "failed",
+  "compatibilityGate": "passed",
+  "asyncContext": {
+    "adaptedMatchesNode": true,
+    "compiledNodeMatchesNative": true,
+    "rawRuntimeStillUnsupported": true
+  },
   "scenarios": [
     {
       "generation": "capabilities",
-      "processOutcome": "failed",
+      "processOutcome": "succeeded",
+      "exitCode": 0,
       "checks": [
         {
           "kind": "CAPABILITIES_RESULT",
-          "assertions": 116,
-          "failures": [
-            "async local contexts remain isolated across await"
-          ],
+          "assertions": 125,
+          "failures": [],
           "parallel": [
-            "second",
+            "first",
             "second"
           ],
           "sqlite": "host-backed",
@@ -31,14 +36,15 @@
     },
     {
       "generation": "initial",
-      "processOutcome": "failed",
-      "durationMs": 21368,
-      "sqliteCalls": 3386,
+      "processOutcome": "succeeded",
+      "exitCode": 0,
+      "durationMs": 23075,
+      "sqliteCalls": 3482,
       "checks": [
         {
           "kind": "CORE_RESULT",
           "phase": "tools",
-          "durationMs": 17693,
+          "durationMs": 18379,
           "calls": 6,
           "tools": [
             "write",
@@ -121,7 +127,7 @@
         {
           "kind": "CORE_RESULT",
           "phase": "resume",
-          "durationMs": 330,
+          "durationMs": 374,
           "calls": 3,
           "tools": [
             "read",
@@ -179,27 +185,26 @@
             "inference-error",
             "transcript-error",
             "read-only",
-            "missing-file"
+            "missing-file",
+            "background-process-0",
+            "background-process-7",
+            "background-process-127"
           ],
-          "failures": [
-            {
-              "name": "background-process",
-              "message": "ASSERTION: background process: ASSERTION: background process must settle: {\"role\":\"toolResult\",\"toolCallId\":\"bg-poll-7\",\"toolName\":\"process\",\"content\":[{\"type\":\"text\",\"text\":\"(no new output)\\n\\nProcess exited with unknown exit code.\"}],\"details\":{\"status\":\"failed\",\"sessionId\":\"dawn-glade\",\"name\":\"node setTimeout(() => conso...('background-ok'), 50)\",\"aggregated\":\"background-ok\\n\"},\"isError\":false,\"timestamp\":1788590463586}"
-            }
-          ]
+          "failures": []
         }
       ]
     },
     {
       "generation": "restored",
       "processOutcome": "succeeded",
-      "durationMs": 19876,
+      "exitCode": 0,
+      "durationMs": 19845,
       "sqliteCalls": 3422,
       "checks": [
         {
           "kind": "CORE_RESULT",
           "phase": "resume",
-          "durationMs": 17722,
+          "durationMs": 17607,
           "calls": 3,
           "tools": [
             "read",
