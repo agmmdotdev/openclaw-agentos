@@ -98,6 +98,12 @@ listener-table representation. See the report for these compatibility limits.
 
 ## Performance and placement
 
+The [workload decomposition](docs/runtime-bottlenecks.md) finds near-Node speed
+for the tested JS computation, but high filesystem and shell costs. Warm core
+turns measure 25 ms without tools, 41 ms with read and 338 ms with read plus
+shell exec, versus 4/9/27 ms on Node. These are different diagnostic workloads,
+not reductions in the normal runtime capabilities.
+
 The [runtime benchmark](docs/runtime-benchmark.md) measures a **16.6 MB compiled
 core**, down from 53.6 MB. The new [memory and CPU pass](docs/runtime-memory-cpu.md)
 reduces idle process-tree memory from **568 to 468 MiB** across repeated 51-turn

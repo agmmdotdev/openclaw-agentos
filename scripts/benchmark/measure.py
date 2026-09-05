@@ -34,7 +34,7 @@ def proc_info(pid):
     end = raw.rfind(')')
     fields = raw[end + 2:].split()
     return {'pid': pid, 'name': raw[raw.index('(')+1:end], 'ppid': int(fields[1]),
-            'ticks': int(fields[11]) + int(fields[12]), 'startTicks': int(fields[19]), 'threads': int(fields[17])}
+            'ticks': int(fields[11]) + int(fields[12]), 'reapedChildTicks': int(fields[13]) + int(fields[14]), 'startTicks': int(fields[19]), 'threads': int(fields[17])}
 
 def sample(pid):
     all_processes = {}
@@ -59,7 +59,8 @@ def sample(pid):
                     memory[key] = int(value.split()[0]) * 1024
             processes.append({**all_processes[child], **memory})
         except (OSError, ValueError): pass
-    return {'rssBytes': sum(p.get('Rss', 0) for p in processes),
+    return {'accountedTreeTicks': sum(p['ticks'] + p['reapedChildTicks'] for p in processes),
+            'rssBytes': sum(p.get('Rss', 0) for p in processes),
             'pssBytes': sum(p.get('Pss', 0) for p in processes), 'processes': processes}
 
 def read_optional(path):
@@ -129,8 +130,8 @@ try:
                     event = json.loads(text[len('BENCH_EVENT='):])
                     event['receivedAtMs'] = (time.monotonic() - started) * 1000
                     events.append(event)
-                    if event['label'] == f"warm-turn-{env.get('BENCH_WARM_TURNS', '5')}:end" or event['label'] in ('worker-ready', 'cold-turn:end', 'warm-turn-5:end', 'error'):
-                        print(json.dumps(event), flush=True)
+                    if event['label'].startswith('boundary:') and event['label'].endswith(':end') or event['label'] == f"warm-turn-{env.get('BENCH_WARM_TURNS', '5')}:end" or event['label'] in ('worker-ready', 'cold-turn:end', 'warm-turn-5:end', 'error'):
+                        print(json.dumps({k:v for k,v in event.items() if k != 'times'}), flush=True)
                 else: stderr.append(text)
     exit_code = process.wait()
 finally:
@@ -147,20 +148,27 @@ for item in samples:
     for member in item['processes']:
         key = (member['pid'], member['startTicks'])
         cpu_ticks[key] = max(cpu_ticks.get(key, 0), member['ticks'])
+required_labels = {'worker-ready', 'idle:end'}
+if env.get('BENCH_WORKLOAD') == 'boundaries':
+    required_labels.update(f'boundary:{name}:warm:end' for name in ['js-cpu', 'fs-read', 'fs-read-root', 'direct-cat', 'shell-cat', 'shell-builtin', 'child-node'])
+else:
+    required_labels.update(['cold-turn:end', f'warm-turn-{warm_turns}:end'])
+missing_labels = sorted(required_labels - {e['label'] for e in events})
 report = {
     'recordedAt': time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime()),
     'instances': args.instances, 'trial': args.trial, 'sampleIntervalMs': args.interval * 1000,
     'runtime': native_label if args.native else 'agentos', 'splitInitializer': env.get('BENCH_SPLIT_INIT') == '1',
     'allocatorEnvironment': {k: env.get(k) for k in ['MALLOC_ARENA_MAX', 'MALLOC_TRIM_THRESHOLD_', 'MALLOC_MMAP_THRESHOLD_']},
     'coreManifest': json.loads((root / 'artifacts/core/manifest.json').read_text()),
-    'diagnostics': {k: env.get(k, '0') for k in ['BENCH_PROFILE_CORE', 'BENCH_PROFILE_FS', 'BENCH_SQL_SCHEMA_MODE', 'BENCH_PROFILE_PROCESS', 'BENCH_PROFILE_SQL']} | {k: env.get(k) for k in ['CORE_HEAP_MB', 'CORE_WASM_HEAP_MB', 'AGENTOS_V8_WARM_ISOLATES', 'AGENTOS_WASM_SNAPSHOT_RUNNER', 'BENCH_WARM_TURNS']},
+    'diagnostics': {k: env.get(k, '0') for k in ['BENCH_PROFILE_CORE', 'BENCH_PROFILE_FS', 'BENCH_SQL_SCHEMA_MODE', 'BENCH_PROFILE_PROCESS', 'BENCH_PROFILE_SQL']} | {k: env.get(k) for k in ['CORE_HEAP_MB', 'CORE_WASM_HEAP_MB', 'AGENTOS_V8_WARM_ISOLATES', 'AGENTOS_WASM_SNAPSHOT_RUNNER', 'BENCH_WARM_TURNS', 'BENCH_WORKLOAD', 'BENCH_REVERSE']},
     'method': 'Linux smaps_rollup RSS/PSS summed across isolated benchmark driver and descendants; compiler runs separately',
     'environment': {'platform': platform.platform(), 'cpuCount': os.cpu_count(), 'cpuAffinity': selected_cpus, 'clockTicksPerSecond': os.sysconf('SC_CLK_TCK'),
         'cpuMax': read_optional('/sys/fs/cgroup/cpu.max'), 'memoryMax': read_optional('/sys/fs/cgroup/memory.max')},
-    'exitCode': exit_code, 'wallMs': (time.monotonic() - started) * 1000,
+    'exitCode': exit_code, 'measurementValid': not missing_labels, 'missingCheckpoints': missing_labels, 'wallMs': (time.monotonic() - started) * 1000,
     'driverAndReapedUserSeconds': after.ru_utime - before.ru_utime,
     'driverAndReapedSystemSeconds': after.ru_stime - before.ru_stime,
     'sampledTreeCpuSeconds': sum(cpu_ticks.values()) / os.sysconf('SC_CLK_TCK'),
+    'accountedTreeCpuSeconds': max(s['accountedTreeTicks'] for s in samples) / os.sysconf('SC_CLK_TCK'),
     'peakRssBytes': max((s['rssBytes'] for s in samples), default=0),
     'peakPssBytes': max((s['pssBytes'] for s in samples), default=0),
     'events': events, 'samples': samples, 'stderr': stderr,
@@ -170,4 +178,4 @@ output.parent.mkdir(parents=True, exist_ok=True)
 header = json.dumps({k: v for k, v in report.items() if k != 'samples'}, indent=2)
 output.write_text(header[:-2] + ',\n  "samples": [\n' + ',\n'.join('    ' + json.dumps(s, separators=(',', ':')) for s in samples) + '\n  ]\n}\n')
 print(json.dumps({'output': str(output), 'exitCode': exit_code, 'peakRssMiB': report['peakRssBytes']/2**20, 'peakPssMiB': report['peakPssBytes']/2**20}), flush=True)
-raise SystemExit(exit_code)
+raise SystemExit(exit_code or (1 if missing_labels else 0))

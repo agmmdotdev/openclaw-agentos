@@ -13,6 +13,7 @@ console.log('Benchmark entry built outside the measured process.');
 const upstream = await readFile('node_modules/openclaw/dist/worker/worker.mjs', 'utf8');
 if (createHash('sha256').update(upstream).digest('hex') !== manifest.inputSha256) throw new Error('Native baseline input differs from the verified worker');
 let nativeFixture = await readFile('test/fixtures/core-benchmark.mjs', 'utf8');
+nativeFixture = nativeFixture.replace("import benchChildProcess from './compat/child-process.mjs';", "const benchChildProcess = await import('node:child_process');");
 nativeFixture = nativeFixture.replace("import { spawnSync as benchSpawnSync } from 'node:child_process';", '');
 nativeFixture = nativeFixture.replace("import { DatabaseSync as BenchDatabase, getBenchmarkSqlTiming } from './compat/sqlite.mjs';", "const { DatabaseSync: BenchDatabase } = await import('node:sqlite');");
 const markerStart = nativeFixture.indexOf('function mark('), markerEnd = nativeFixture.indexOf("mark('worker-ready');", markerStart);
@@ -22,6 +23,7 @@ const benchStart = performance.now();
 const benchWorkspace = process.env.BENCH_ROOT + "/workspace", benchState = process.env.BENCH_ROOT + "/state";
 function mark(label, data = {}) { console.log('BENCH_EVENT=' + JSON.stringify({ label, atMs: performance.now() - benchStart, instance: 0, ...data })); }
 ` + nativeFixture.slice(markerEnd);
+nativeFixture = nativeFixture.replaceAll("'/tmp/boundary-seed.txt'", "process.env.BENCH_ROOT + '/boundary-seed.txt'");
 nativeFixture = nativeFixture.replaceAll("'/workspace/seed.txt'", "benchWorkspace + '/seed.txt'").replaceAll("'/workspace'", 'benchWorkspace').replaceAll("'/state/transcript.json'", "benchState + '/transcript.json'").replaceAll("'/state'", 'benchState').replaceAll("'cat /workspace/seed.txt'", "'cat ' + benchWorkspace + '/seed.txt'");
 await writeFile('artifacts/core/native-benchmark.mjs', upstream + '\nasync function runOpenClawCoreTurn(params) { init_embedded_agent_runtime(); return runWorkerEmbeddedTurn(params); }\nawait (async()=>{\n' + nativeFixture + '\n})();\n');
 const nativeCore = await readFile('artifacts/core/native-core.mjs', 'utf8');

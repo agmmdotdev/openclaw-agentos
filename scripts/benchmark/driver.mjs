@@ -130,7 +130,7 @@ globalThis.__benchmarkFsTiming = () => benchmarkFsTiming;
   mark('staged'); await settle();
   mark('launch:start');
   const results = await Promise.all(resources.map(async ({ vm, index, sqlite }) => {
-    const result = await vm.process.execFile('node', ['/core/benchmark.mjs', '--internal-worker-prewarm'], { env: { OPENCLAW_STATE_DIR: '/state/openclaw', OPENCLAW_CHILD_OOM_SCORE_ADJ: '0', BENCH_WARM_TURNS: String(warmTurns), BENCH_SPLIT_INIT: process.env.BENCH_SPLIT_INIT ?? '0', BENCH_PROFILE_CORE: process.env.BENCH_PROFILE_CORE ?? '0' }, timeoutMs: 180000, output: { capture: 'all' } });
+    const result = await vm.process.execFile('node', ['/core/benchmark.mjs', '--internal-worker-prewarm'], { env: { OPENCLAW_STATE_DIR: '/state/openclaw', OPENCLAW_CHILD_OOM_SCORE_ADJ: '0', BENCH_WORKLOAD: process.env.BENCH_WORKLOAD ?? 'core-shell', BENCH_REVERSE: process.env.BENCH_REVERSE ?? '0', BENCH_WARM_TURNS: String(warmTurns), BENCH_SPLIT_INIT: process.env.BENCH_SPLIT_INIT ?? '0', BENCH_PROFILE_CORE: process.env.BENCH_PROFILE_CORE ?? '0' }, timeoutMs: 180000, output: { capture: 'all' } });
     mark('process:end', { instance: index, result, sqlite: sqlite.stats });
     return result;
   }));

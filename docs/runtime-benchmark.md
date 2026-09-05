@@ -1,5 +1,8 @@
 # OpenClaw / agentOS: current measured boundary
 
+See the latest [workload decomposition](runtime-bottlenecks.md) for isolated JS,
+filesystem and process measurements and corrected child-process CPU accounting.
+
 The latest [memory and CPU pass](runtime-memory-cpu.md) adds an opt-in economy
 profile. Across two 51-turn runs per mode, idle process-tree memory falls from
 568 to 468 MiB (18%) and sampled peak from 661 to 562 MiB (15%). Complete

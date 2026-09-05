@@ -5,7 +5,7 @@ root = Path(__file__).resolve().parents[2]
 folder = root / 'artifacts/results'
 rows = []
 for path in sorted(folder.glob('benchmark-*.json')):
-    if path.name == 'benchmark-summary.json': continue
+    if path.name in ('benchmark-summary.json', 'benchmark-bottlenecks.json'): continue
     report = json.loads(path.read_text())
     events, samples = report['events'], report['samples']
     def event(label, instance=None):
@@ -18,20 +18,24 @@ for path in sorted(folder.glob('benchmark-*.json')):
         return median_memory(events[index]['receivedAtMs'], events[index+1]['receivedAtMs']) if index is not None and index+1<len(events) else None
     idle_starts = [e['receivedAtMs'] for e in events if e['label'] == 'idle:start']
     idle_ends = [e['receivedAtMs'] for e in events if e['label'] == 'idle:end']
+    clock_offset = min((e['receivedAtMs'] - e['atMs'] for e in events), default=0)
     ticks = {}
+    inclusive = all('accountedTreeTicks' in s for s in samples)
+    high = 0
     cumulative_cpu = []
     clock_ticks = report.get('environment', {}).get('clockTicksPerSecond', os.sysconf('SC_CLK_TCK'))
     for sample in samples:
         for process in sample['processes']:
             key=(process['pid'], process['startTicks'])
             ticks[key]=max(ticks.get(key,0),process['ticks'])
-        cumulative_cpu.append((sample['atMs'], sum(ticks.values()) / clock_ticks))
+        high = max(high, sample.get('accountedTreeTicks', sum(ticks.values())))
+        cumulative_cpu.append((sample['atMs'], high / clock_ticks))
     def cpu_at(at_ms):
         return min(cumulative_cpu, key=lambda item: abs(item[0] - at_ms))[1] if cumulative_cpu else 0
     def phase_cpu(start, end):
         if report['instances'] != 1: return None  # overlapping multi-VM intervals are not additive
         begin, finish = event(start), event(end)
-        return max(0, cpu_at(finish['receivedAtMs']) - cpu_at(begin['receivedAtMs'])) if begin and finish else None
+        return max(0, cpu_at(finish['atMs'] + clock_offset) - cpu_at(begin['atMs'] + clock_offset)) if begin and finish else None
     native = 'native' in path.name
     instances=[]
     for index in range(report['instances']):
@@ -51,15 +55,18 @@ for path in sorted(folder.glob('benchmark-*.json')):
     warm_ends = [e for e in events if e['label'].startswith('warm-turn-') and e['label'].endswith(':end')]
     last_warm = warm_ends[-1]['label'] if warm_ends else 'warm-turn-5:end'
     rows.append({'file':path.name,'runtime':report.get('runtime','native' if native else 'agentos'),
+        'workload':report.get('diagnostics',{}).get('BENCH_WORKLOAD') or 'core-shell',
         'profile':report.get('coreManifest',{}).get('profile','full'),
         'schemaExecution':'native' if native else 'host-batched' if report.get('coreManifest',{}).get('schemaCollector') and report.get('diagnostics',{}).get('BENCH_SQL_SCHEMA_MODE') != 'individual' else 'guest-individual',
         'allocatorEnvironment':report.get('allocatorEnvironment',{}),
         'diagnostics':report.get('diagnostics',{}),
         'experimentNotes':report.get('experimentNotes',[]),
-        'configuredInstances':report['instances'],'passed':report['exitCode']==0,
+        'configuredInstances':report['instances'],'passed':report['exitCode']==0 and report.get('measurementValid', True),
         'placement':event('baseline').get('placement','shared-default') if event('baseline') else 'native-process',
         'splitInitializer':report.get('splitInitializer',False),'instances':instances,
         'sampledTreeCpuSeconds':sum(ticks.values())/clock_ticks,
+        'accountedTreeCpuSeconds':report.get('accountedTreeCpuSeconds'),
+        'phaseCpuIncludesReapedChildren':inclusive,
         'cpuAffinity':report.get('environment',{}).get('cpuAffinity'),
         'phaseCpuSeconds':{
             'provision':phase_cpu('provision:start','empty-vms'),
@@ -75,7 +82,7 @@ for path in sorted(folder.glob('benchmark-*.json')):
         'stagedPssMiB':checkpoint_memory('staged'),'disposedVmsPssMiB':checkpoint_memory('disposed-host-gc'),
         'disposedSidecarsPssMiB':checkpoint_memory('sidecars-disposed')})
 result={'method':{'memory':'MiB; sampled process-tree PSS includes Node driver and native sidecars; RSS also retained',
-    'cpu':'Sum of maximum sampled CPU ticks per PID/start-time identity; phases use nearest 100 ms samples and are emitted only for one VM. Approximate, may miss CPU between the last sample and exit',
+    'cpu':'Sum of maximum sampled CPU ticks per PID/start-time identity; phases align event clocks, include reaped children where indicated, and use nearest 100 ms samples and are emitted only for one VM. Approximate, may miss CPU between the last sample and exit',
     'latency':'Same read + shell exec turn, synthetic inference, six turns per guest by default (BENCH_WARM_TURNS extends the run); cold means fresh process/storage with warm host file cache',
     'scope':'Small local experiment, not production capacity or cloud billing'},'runs':rows}
 (folder/'benchmark-summary.json').write_text(json.dumps(result,indent=2)+'\n')

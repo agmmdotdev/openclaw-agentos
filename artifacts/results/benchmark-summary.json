@@ -1,7 +1,7 @@
 {
   "method": {
     "memory": "MiB; sampled process-tree PSS includes Node driver and native sidecars; RSS also retained",
-    "cpu": "Sum of maximum sampled CPU ticks per PID/start-time identity; phases use nearest 100 ms samples and are emitted only for one VM. Approximate, may miss CPU between the last sample and exit",
+    "cpu": "Sum of maximum sampled CPU ticks per PID/start-time identity; phases align event clocks, include reaped children where indicated, and use nearest 100 ms samples and are emitted only for one VM. Approximate, may miss CPU between the last sample and exit",
     "latency": "Same read + shell exec turn, synthetic inference, six turns per guest by default (BENCH_WARM_TURNS extends the run); cold means fresh process/storage with warm host file cache",
     "scope": "Small local experiment, not production capacity or cloud billing"
   },
@@ -9,6 +9,7 @@
     {
       "file": "benchmark-1vm-1.json",
       "runtime": "agentos",
+      "workload": "core-shell",
       "profile": "full",
       "schemaExecution": "guest-individual",
       "allocatorEnvironment": {},
@@ -36,6 +37,8 @@
         }
       ],
       "sampledTreeCpuSeconds": 31.16,
+      "accountedTreeCpuSeconds": null,
+      "phaseCpuIncludesReapedChildren": false,
       "cpuAffinity": null,
       "phaseCpuSeconds": {
         "provision": 0.75,
@@ -57,6 +60,7 @@
     {
       "file": "benchmark-1vm-10.json",
       "runtime": "agentos",
+      "workload": "core-shell",
       "profile": "full",
       "schemaExecution": "guest-individual",
       "allocatorEnvironment": {},
@@ -85,6 +89,8 @@
         }
       ],
       "sampledTreeCpuSeconds": 30.97,
+      "accountedTreeCpuSeconds": null,
+      "phaseCpuIncludesReapedChildren": false,
       "cpuAffinity": null,
       "phaseCpuSeconds": {
         "provision": 0.7899999999999999,
@@ -106,6 +112,7 @@
     {
       "file": "benchmark-1vm-11.json",
       "runtime": "agentos",
+      "workload": "core-shell",
       "profile": "full",
       "schemaExecution": "guest-individual",
       "allocatorEnvironment": {},
@@ -134,6 +141,8 @@
         }
       ],
       "sampledTreeCpuSeconds": 30.35,
+      "accountedTreeCpuSeconds": null,
+      "phaseCpuIncludesReapedChildren": false,
       "cpuAffinity": null,
       "phaseCpuSeconds": {
         "provision": 0.61,
@@ -155,6 +164,7 @@
     {
       "file": "benchmark-1vm-12.json",
       "runtime": "agentos",
+      "workload": "core-shell",
       "profile": "full",
       "schemaExecution": "guest-individual",
       "allocatorEnvironment": {},
@@ -183,6 +193,8 @@
         }
       ],
       "sampledTreeCpuSeconds": 14.38,
+      "accountedTreeCpuSeconds": null,
+      "phaseCpuIncludesReapedChildren": false,
       "cpuAffinity": null,
       "phaseCpuSeconds": {
         "provision": 0.63,
@@ -204,6 +216,7 @@
     {
       "file": "benchmark-1vm-13.json",
       "runtime": "agentos",
+      "workload": "core-shell",
       "profile": "core",
       "schemaExecution": "guest-individual",
       "allocatorEnvironment": {},
@@ -235,6 +248,8 @@
         }
       ],
       "sampledTreeCpuSeconds": 10.6,
+      "accountedTreeCpuSeconds": null,
+      "phaseCpuIncludesReapedChildren": false,
       "cpuAffinity": null,
       "phaseCpuSeconds": {
         "provision": 0.73,
@@ -256,6 +271,7 @@
     {
       "file": "benchmark-1vm-14.json",
       "runtime": "agentos",
+      "workload": "core-shell",
       "profile": "core",
       "schemaExecution": "guest-individual",
       "allocatorEnvironment": {},
@@ -287,11 +303,13 @@
         }
       ],
       "sampledTreeCpuSeconds": 10.72,
+      "accountedTreeCpuSeconds": null,
+      "phaseCpuIncludesReapedChildren": false,
       "cpuAffinity": null,
       "phaseCpuSeconds": {
         "provision": 0.7699999999999999,
         "stage": 0.48,
-        "cold": 5.8500000000000005,
+        "cold": 5.7299999999999995,
         "warmFive": 2.1799999999999997,
         "warmAll": 2.1799999999999997,
         "idle": 0.02999999999999936
@@ -308,6 +326,7 @@
     {
       "file": "benchmark-1vm-15.json",
       "runtime": "agentos",
+      "workload": "core-shell",
       "profile": "core",
       "schemaExecution": "guest-individual",
       "allocatorEnvironment": {
@@ -343,6 +362,8 @@
         }
       ],
       "sampledTreeCpuSeconds": 10.17,
+      "accountedTreeCpuSeconds": null,
+      "phaseCpuIncludesReapedChildren": false,
       "cpuAffinity": null,
       "phaseCpuSeconds": {
         "provision": 0.67,
@@ -364,6 +385,7 @@
     {
       "file": "benchmark-1vm-16.json",
       "runtime": "agentos",
+      "workload": "core-shell",
       "profile": "core",
       "schemaExecution": "guest-individual",
       "allocatorEnvironment": {
@@ -399,6 +421,8 @@
         }
       ],
       "sampledTreeCpuSeconds": 10.58,
+      "accountedTreeCpuSeconds": null,
+      "phaseCpuIncludesReapedChildren": false,
       "cpuAffinity": null,
       "phaseCpuSeconds": {
         "provision": 0.71,
@@ -420,6 +444,7 @@
     {
       "file": "benchmark-1vm-17.json",
       "runtime": "agentos",
+      "workload": "core-shell",
       "profile": "core",
       "schemaExecution": "guest-individual",
       "allocatorEnvironment": {
@@ -455,6 +480,8 @@
         }
       ],
       "sampledTreeCpuSeconds": 11.55,
+      "accountedTreeCpuSeconds": null,
+      "phaseCpuIncludesReapedChildren": false,
       "cpuAffinity": null,
       "phaseCpuSeconds": {
         "provision": 0.6199999999999999,
@@ -476,6 +503,7 @@
     {
       "file": "benchmark-1vm-18.json",
       "runtime": "agentos",
+      "workload": "core-shell",
       "profile": "core",
       "schemaExecution": "guest-individual",
       "allocatorEnvironment": {
@@ -511,6 +539,8 @@
         }
       ],
       "sampledTreeCpuSeconds": 10.64,
+      "accountedTreeCpuSeconds": null,
+      "phaseCpuIncludesReapedChildren": false,
       "cpuAffinity": null,
       "phaseCpuSeconds": {
         "provision": 0.73,
@@ -532,6 +562,7 @@
     {
       "file": "benchmark-1vm-19.json",
       "runtime": "agentos",
+      "workload": "core-shell",
       "profile": "core",
       "schemaExecution": "host-batched",
       "allocatorEnvironment": {
@@ -569,6 +600,8 @@
         }
       ],
       "sampledTreeCpuSeconds": 10.24,
+      "accountedTreeCpuSeconds": null,
+      "phaseCpuIncludesReapedChildren": false,
       "cpuAffinity": null,
       "phaseCpuSeconds": {
         "provision": 0.8099999999999999,
@@ -590,6 +623,7 @@
     {
       "file": "benchmark-1vm-2.json",
       "runtime": "agentos",
+      "workload": "core-shell",
       "profile": "full",
       "schemaExecution": "guest-individual",
       "allocatorEnvironment": {},
@@ -617,11 +651,13 @@
         }
       ],
       "sampledTreeCpuSeconds": 30.14,
+      "accountedTreeCpuSeconds": null,
+      "phaseCpuIncludesReapedChildren": false,
       "cpuAffinity": null,
       "phaseCpuSeconds": {
         "provision": 0.71,
         "stage": 0.9899999999999998,
-        "cold": 21.28,
+        "cold": 21.56,
         "warmFive": 2.7600000000000016,
         "warmAll": 2.7600000000000016,
         "idle": 0.0799999999999983
@@ -638,6 +674,7 @@
     {
       "file": "benchmark-1vm-20.json",
       "runtime": "agentos",
+      "workload": "core-shell",
       "profile": "core",
       "schemaExecution": "guest-individual",
       "allocatorEnvironment": {
@@ -675,6 +712,8 @@
         }
       ],
       "sampledTreeCpuSeconds": 10.97,
+      "accountedTreeCpuSeconds": null,
+      "phaseCpuIncludesReapedChildren": false,
       "cpuAffinity": null,
       "phaseCpuSeconds": {
         "provision": 0.7299999999999999,
@@ -696,6 +735,7 @@
     {
       "file": "benchmark-1vm-21.json",
       "runtime": "agentos",
+      "workload": "core-shell",
       "profile": "core",
       "schemaExecution": "host-batched",
       "allocatorEnvironment": {
@@ -733,6 +773,8 @@
         }
       ],
       "sampledTreeCpuSeconds": 9.93,
+      "accountedTreeCpuSeconds": null,
+      "phaseCpuIncludesReapedChildren": false,
       "cpuAffinity": null,
       "phaseCpuSeconds": {
         "provision": 0.8200000000000001,
@@ -754,6 +796,7 @@
     {
       "file": "benchmark-1vm-22.json",
       "runtime": "agentos",
+      "workload": "core-shell",
       "profile": "core",
       "schemaExecution": "host-batched",
       "allocatorEnvironment": {
@@ -792,6 +835,8 @@
         }
       ],
       "sampledTreeCpuSeconds": 11.92,
+      "accountedTreeCpuSeconds": null,
+      "phaseCpuIncludesReapedChildren": false,
       "cpuAffinity": null,
       "phaseCpuSeconds": {
         "provision": 0.64,
@@ -813,6 +858,7 @@
     {
       "file": "benchmark-1vm-23.json",
       "runtime": "agentos",
+      "workload": "core-shell",
       "profile": "core",
       "schemaExecution": "host-batched",
       "allocatorEnvironment": {
@@ -851,6 +897,8 @@
         }
       ],
       "sampledTreeCpuSeconds": 10.09,
+      "accountedTreeCpuSeconds": null,
+      "phaseCpuIncludesReapedChildren": false,
       "cpuAffinity": null,
       "phaseCpuSeconds": {
         "provision": 0.7100000000000001,
@@ -872,6 +920,7 @@
     {
       "file": "benchmark-1vm-24.json",
       "runtime": "agentos",
+      "workload": "core-shell",
       "profile": "core",
       "schemaExecution": "host-batched",
       "allocatorEnvironment": {
@@ -910,6 +959,8 @@
         }
       ],
       "sampledTreeCpuSeconds": 13.13,
+      "accountedTreeCpuSeconds": null,
+      "phaseCpuIncludesReapedChildren": false,
       "cpuAffinity": null,
       "phaseCpuSeconds": {
         "provision": 0.74,
@@ -931,6 +982,7 @@
     {
       "file": "benchmark-1vm-25.json",
       "runtime": "agentos",
+      "workload": "core-shell",
       "profile": "core",
       "schemaExecution": "host-batched",
       "allocatorEnvironment": {
@@ -969,6 +1021,8 @@
         }
       ],
       "sampledTreeCpuSeconds": 9.78,
+      "accountedTreeCpuSeconds": null,
+      "phaseCpuIncludesReapedChildren": false,
       "cpuAffinity": null,
       "phaseCpuSeconds": {
         "provision": 0.65,
@@ -990,6 +1044,7 @@
     {
       "file": "benchmark-1vm-26.json",
       "runtime": "agentos",
+      "workload": "core-shell",
       "profile": "core",
       "schemaExecution": "guest-individual",
       "allocatorEnvironment": {
@@ -1028,6 +1083,8 @@
         }
       ],
       "sampledTreeCpuSeconds": 11.36,
+      "accountedTreeCpuSeconds": null,
+      "phaseCpuIncludesReapedChildren": false,
       "cpuAffinity": null,
       "phaseCpuSeconds": {
         "provision": 0.7200000000000001,
@@ -1049,6 +1106,7 @@
     {
       "file": "benchmark-1vm-27.json",
       "runtime": "agentos",
+      "workload": "core-shell",
       "profile": "core",
       "schemaExecution": "host-batched",
       "allocatorEnvironment": {
@@ -1087,6 +1145,8 @@
         }
       ],
       "sampledTreeCpuSeconds": 10.64,
+      "accountedTreeCpuSeconds": null,
+      "phaseCpuIncludesReapedChildren": false,
       "cpuAffinity": null,
       "phaseCpuSeconds": {
         "provision": 0.69,
@@ -1108,6 +1168,7 @@
     {
       "file": "benchmark-1vm-28.json",
       "runtime": "agentos",
+      "workload": "core-shell",
       "profile": "core",
       "schemaExecution": "guest-individual",
       "allocatorEnvironment": {
@@ -1146,6 +1207,8 @@
         }
       ],
       "sampledTreeCpuSeconds": 11.04,
+      "accountedTreeCpuSeconds": null,
+      "phaseCpuIncludesReapedChildren": false,
       "cpuAffinity": null,
       "phaseCpuSeconds": {
         "provision": 0.6400000000000001,
@@ -1167,6 +1230,7 @@
     {
       "file": "benchmark-1vm-29.json",
       "runtime": "agentos",
+      "workload": "core-shell",
       "profile": "core",
       "schemaExecution": "host-batched",
       "allocatorEnvironment": {
@@ -1207,9 +1271,11 @@
         }
       ],
       "sampledTreeCpuSeconds": 10.09,
+      "accountedTreeCpuSeconds": null,
+      "phaseCpuIncludesReapedChildren": false,
       "cpuAffinity": null,
       "phaseCpuSeconds": {
-        "provision": 0.83,
+        "provision": 0.8899999999999999,
         "stage": 0.56,
         "cold": 5.07,
         "warmFive": 2.2800000000000002,
@@ -1228,6 +1294,7 @@
     {
       "file": "benchmark-1vm-3.json",
       "runtime": "agentos",
+      "workload": "core-shell",
       "profile": "full",
       "schemaExecution": "guest-individual",
       "allocatorEnvironment": {},
@@ -1255,6 +1322,8 @@
         }
       ],
       "sampledTreeCpuSeconds": 38.34,
+      "accountedTreeCpuSeconds": null,
+      "phaseCpuIncludesReapedChildren": false,
       "cpuAffinity": null,
       "phaseCpuSeconds": {
         "provision": 0.75,
@@ -1276,6 +1345,7 @@
     {
       "file": "benchmark-1vm-30.json",
       "runtime": "agentos",
+      "workload": "core-shell",
       "profile": "core",
       "schemaExecution": "host-batched",
       "allocatorEnvironment": {
@@ -1299,6 +1369,8 @@
       "splitInitializer": false,
       "instances": [],
       "sampledTreeCpuSeconds": 2.42,
+      "accountedTreeCpuSeconds": null,
+      "phaseCpuIncludesReapedChildren": false,
       "cpuAffinity": null,
       "phaseCpuSeconds": {
         "provision": 0.6900000000000001,
@@ -1320,6 +1392,7 @@
     {
       "file": "benchmark-1vm-31.json",
       "runtime": "agentos",
+      "workload": "core-shell",
       "profile": "core",
       "schemaExecution": "host-batched",
       "allocatorEnvironment": {
@@ -1362,6 +1435,8 @@
         }
       ],
       "sampledTreeCpuSeconds": 10.72,
+      "accountedTreeCpuSeconds": null,
+      "phaseCpuIncludesReapedChildren": false,
       "cpuAffinity": null,
       "phaseCpuSeconds": {
         "provision": 0.6900000000000001,
@@ -1383,6 +1458,7 @@
     {
       "file": "benchmark-1vm-32.json",
       "runtime": "agentos",
+      "workload": "core-shell",
       "profile": "core",
       "schemaExecution": "host-batched",
       "allocatorEnvironment": {
@@ -1425,6 +1501,8 @@
         }
       ],
       "sampledTreeCpuSeconds": 9.09,
+      "accountedTreeCpuSeconds": null,
+      "phaseCpuIncludesReapedChildren": false,
       "cpuAffinity": null,
       "phaseCpuSeconds": {
         "provision": 0.5700000000000001,
@@ -1446,6 +1524,7 @@
     {
       "file": "benchmark-1vm-33.json",
       "runtime": "agentos",
+      "workload": "core-shell",
       "profile": "core",
       "schemaExecution": "host-batched",
       "allocatorEnvironment": {
@@ -1488,6 +1567,8 @@
         }
       ],
       "sampledTreeCpuSeconds": 8.85,
+      "accountedTreeCpuSeconds": null,
+      "phaseCpuIncludesReapedChildren": false,
       "cpuAffinity": [
         0,
         1
@@ -1512,6 +1593,7 @@
     {
       "file": "benchmark-1vm-34.json",
       "runtime": "agentos",
+      "workload": "core-shell",
       "profile": "core",
       "schemaExecution": "host-batched",
       "allocatorEnvironment": {
@@ -1554,6 +1636,8 @@
         }
       ],
       "sampledTreeCpuSeconds": 8.94,
+      "accountedTreeCpuSeconds": null,
+      "phaseCpuIncludesReapedChildren": false,
       "cpuAffinity": [
         0,
         1,
@@ -1585,6 +1669,7 @@
     {
       "file": "benchmark-1vm-35.json",
       "runtime": "agentos",
+      "workload": "core-shell",
       "profile": "core",
       "schemaExecution": "host-batched",
       "allocatorEnvironment": {
@@ -1627,6 +1712,8 @@
         }
       ],
       "sampledTreeCpuSeconds": 9.01,
+      "accountedTreeCpuSeconds": null,
+      "phaseCpuIncludesReapedChildren": false,
       "cpuAffinity": [
         0,
         1,
@@ -1658,6 +1745,7 @@
     {
       "file": "benchmark-1vm-36.json",
       "runtime": "agentos",
+      "workload": "core-shell",
       "profile": "core",
       "schemaExecution": "host-batched",
       "allocatorEnvironment": {
@@ -1700,6 +1788,8 @@
         }
       ],
       "sampledTreeCpuSeconds": 9.38,
+      "accountedTreeCpuSeconds": null,
+      "phaseCpuIncludesReapedChildren": false,
       "cpuAffinity": [
         0,
         1,
@@ -1731,6 +1821,7 @@
     {
       "file": "benchmark-1vm-37.json",
       "runtime": "agentos",
+      "workload": "core-shell",
       "profile": "core",
       "schemaExecution": "host-batched",
       "allocatorEnvironment": {
@@ -1819,6 +1910,8 @@
         }
       ],
       "sampledTreeCpuSeconds": 31.04,
+      "accountedTreeCpuSeconds": null,
+      "phaseCpuIncludesReapedChildren": false,
       "cpuAffinity": [
         0,
         1,
@@ -1850,6 +1943,7 @@
     {
       "file": "benchmark-1vm-38.json",
       "runtime": "agentos",
+      "workload": "core-shell",
       "profile": "core",
       "schemaExecution": "host-batched",
       "allocatorEnvironment": {
@@ -1940,6 +2034,8 @@
         }
       ],
       "sampledTreeCpuSeconds": 30.7,
+      "accountedTreeCpuSeconds": null,
+      "phaseCpuIncludesReapedChildren": false,
       "cpuAffinity": [
         0,
         1,
@@ -1971,6 +2067,7 @@
     {
       "file": "benchmark-1vm-39.json",
       "runtime": "agentos",
+      "workload": "core-shell",
       "profile": "core",
       "schemaExecution": "host-batched",
       "allocatorEnvironment": {
@@ -2059,6 +2156,8 @@
         }
       ],
       "sampledTreeCpuSeconds": 30.28,
+      "accountedTreeCpuSeconds": null,
+      "phaseCpuIncludesReapedChildren": false,
       "cpuAffinity": [
         0,
         1,
@@ -2090,6 +2189,7 @@
     {
       "file": "benchmark-1vm-4.json",
       "runtime": "agentos",
+      "workload": "core-shell",
       "profile": "full",
       "schemaExecution": "guest-individual",
       "allocatorEnvironment": {},
@@ -2118,6 +2218,8 @@
         }
       ],
       "sampledTreeCpuSeconds": 31.99,
+      "accountedTreeCpuSeconds": null,
+      "phaseCpuIncludesReapedChildren": false,
       "cpuAffinity": null,
       "phaseCpuSeconds": {
         "provision": 0.8499999999999999,
@@ -2139,6 +2241,7 @@
     {
       "file": "benchmark-1vm-40.json",
       "runtime": "agentos",
+      "workload": "core-shell",
       "profile": "core",
       "schemaExecution": "host-batched",
       "allocatorEnvironment": {
@@ -2227,6 +2330,8 @@
         }
       ],
       "sampledTreeCpuSeconds": 29.78,
+      "accountedTreeCpuSeconds": null,
+      "phaseCpuIncludesReapedChildren": false,
       "cpuAffinity": [
         0
       ],
@@ -2250,6 +2355,7 @@
     {
       "file": "benchmark-1vm-41.json",
       "runtime": "agentos",
+      "workload": "core-shell",
       "profile": "core",
       "schemaExecution": "host-batched",
       "allocatorEnvironment": {
@@ -2278,6 +2384,8 @@
       "splitInitializer": false,
       "instances": [],
       "sampledTreeCpuSeconds": 0.98,
+      "accountedTreeCpuSeconds": null,
+      "phaseCpuIncludesReapedChildren": false,
       "cpuAffinity": [
         0,
         1,
@@ -2309,6 +2417,7 @@
     {
       "file": "benchmark-1vm-42.json",
       "runtime": "agentos",
+      "workload": "core-shell",
       "profile": "core",
       "schemaExecution": "host-batched",
       "allocatorEnvironment": {
@@ -2397,6 +2506,8 @@
         }
       ],
       "sampledTreeCpuSeconds": 31.13,
+      "accountedTreeCpuSeconds": null,
+      "phaseCpuIncludesReapedChildren": false,
       "cpuAffinity": [
         0,
         1,
@@ -2428,6 +2539,7 @@
     {
       "file": "benchmark-1vm-43.json",
       "runtime": "agentos",
+      "workload": "core-shell",
       "profile": "core",
       "schemaExecution": "host-batched",
       "allocatorEnvironment": {
@@ -2516,6 +2628,8 @@
         }
       ],
       "sampledTreeCpuSeconds": 30.03,
+      "accountedTreeCpuSeconds": null,
+      "phaseCpuIncludesReapedChildren": false,
       "cpuAffinity": [
         0,
         1,
@@ -2547,6 +2661,7 @@
     {
       "file": "benchmark-1vm-44.json",
       "runtime": "agentos",
+      "workload": "core-shell",
       "profile": "core",
       "schemaExecution": "host-batched",
       "allocatorEnvironment": {
@@ -2590,6 +2705,8 @@
         }
       ],
       "sampledTreeCpuSeconds": 10.07,
+      "accountedTreeCpuSeconds": null,
+      "phaseCpuIncludesReapedChildren": false,
       "cpuAffinity": [
         0,
         1,
@@ -2619,8 +2736,505 @@
       "disposedSidecarsPssMiB": 84.2080078125
     },
     {
+      "file": "benchmark-1vm-45.json",
+      "runtime": "agentos",
+      "workload": "boundaries",
+      "profile": "core",
+      "schemaExecution": "host-batched",
+      "allocatorEnvironment": {
+        "MALLOC_ARENA_MAX": "1",
+        "MALLOC_TRIM_THRESHOLD_": "65536",
+        "MALLOC_MMAP_THRESHOLD_": "65536"
+      },
+      "diagnostics": {
+        "BENCH_PROFILE_CORE": "0",
+        "BENCH_PROFILE_FS": "0",
+        "BENCH_SQL_SCHEMA_MODE": "0",
+        "BENCH_PROFILE_PROCESS": "0",
+        "BENCH_PROFILE_SQL": "0",
+        "CORE_HEAP_MB": null,
+        "CORE_WASM_HEAP_MB": null,
+        "AGENTOS_V8_WARM_ISOLATES": "0",
+        "AGENTOS_WASM_SNAPSHOT_RUNNER": null,
+        "BENCH_WARM_TURNS": null,
+        "BENCH_WORKLOAD": "boundaries",
+        "BENCH_REVERSE": null
+      },
+      "experimentNotes": [],
+      "configuredInstances": 1,
+      "passed": true,
+      "placement": "one-sidecar-pool-per-vm",
+      "splitInitializer": false,
+      "instances": [],
+      "sampledTreeCpuSeconds": 27.33,
+      "accountedTreeCpuSeconds": null,
+      "phaseCpuIncludesReapedChildren": false,
+      "cpuAffinity": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "phaseCpuSeconds": {
+        "provision": 0.7000000000000001,
+        "stage": 0.54,
+        "cold": null,
+        "warmFive": null,
+        "warmAll": null,
+        "idle": 0.04999999999999716
+      },
+      "peakPssMiB": 448.6259765625,
+      "peakRssMiB": 450.328125,
+      "allIdlePssMiB": 355.5517578125,
+      "baselinePssMiB": 64.1953125,
+      "emptyVmsPssMiB": 142.115234375,
+      "stagedPssMiB": 159.669921875,
+      "disposedVmsPssMiB": 245.8564453125,
+      "disposedSidecarsPssMiB": 68.41796875
+    },
+    {
+      "file": "benchmark-1vm-46.json",
+      "runtime": "agentos",
+      "workload": "core-read",
+      "profile": "core",
+      "schemaExecution": "host-batched",
+      "allocatorEnvironment": {
+        "MALLOC_ARENA_MAX": "1",
+        "MALLOC_TRIM_THRESHOLD_": "65536",
+        "MALLOC_MMAP_THRESHOLD_": "65536"
+      },
+      "diagnostics": {
+        "BENCH_PROFILE_CORE": "0",
+        "BENCH_PROFILE_FS": "0",
+        "BENCH_SQL_SCHEMA_MODE": "0",
+        "BENCH_PROFILE_PROCESS": "0",
+        "BENCH_PROFILE_SQL": "0",
+        "CORE_HEAP_MB": null,
+        "CORE_WASM_HEAP_MB": null,
+        "AGENTOS_V8_WARM_ISOLATES": "0",
+        "AGENTOS_WASM_SNAPSHOT_RUNNER": null,
+        "BENCH_WARM_TURNS": "50",
+        "BENCH_WORKLOAD": "core-read",
+        "BENCH_REVERSE": null
+      },
+      "experimentNotes": [],
+      "configuredInstances": 1,
+      "passed": true,
+      "placement": "one-sidecar-pool-per-vm",
+      "splitInitializer": false,
+      "instances": [
+        {
+          "index": 0,
+          "coldTurnMs": 425,
+          "launchToFirstResultMs": 1049.041674,
+          "launchToReadyMs": 613.241716,
+          "warmTurnMs": [
+            34,
+            33,
+            29,
+            32,
+            69,
+            32,
+            30,
+            78,
+            30,
+            32,
+            39,
+            40,
+            40,
+            35,
+            33,
+            30,
+            34,
+            36,
+            35,
+            35,
+            40,
+            44,
+            46,
+            36,
+            34,
+            35,
+            75,
+            35,
+            33,
+            36,
+            37,
+            36,
+            46,
+            40,
+            44,
+            44,
+            40,
+            40,
+            45,
+            45,
+            42,
+            41,
+            44,
+            40,
+            43,
+            49,
+            43,
+            71,
+            45,
+            45
+          ],
+          "coldSqliteCalls": 8,
+          "coldHostSqlMs": 10.475430999999844,
+          "coldGuestSqlMs": 17
+        }
+      ],
+      "sampledTreeCpuSeconds": 5.71,
+      "accountedTreeCpuSeconds": 5.72,
+      "phaseCpuIncludesReapedChildren": true,
+      "cpuAffinity": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "phaseCpuSeconds": {
+        "provision": 0.64,
+        "stage": 0.44999999999999996,
+        "cold": 0.75,
+        "warmFive": 0.21999999999999975,
+        "warmAll": 2.6300000000000003,
+        "idle": 0.05999999999999961
+      },
+      "peakPssMiB": 431.0791015625,
+      "peakRssMiB": 432.8203125,
+      "allIdlePssMiB": 431.0791015625,
+      "baselinePssMiB": 64.84375,
+      "emptyVmsPssMiB": 144.2451171875,
+      "stagedPssMiB": 160.3447265625,
+      "disposedVmsPssMiB": 248.1494140625,
+      "disposedSidecarsPssMiB": 72.5908203125
+    },
+    {
+      "file": "benchmark-1vm-47.json",
+      "runtime": "agentos",
+      "workload": "core-none",
+      "profile": "core",
+      "schemaExecution": "host-batched",
+      "allocatorEnvironment": {
+        "MALLOC_ARENA_MAX": "1",
+        "MALLOC_TRIM_THRESHOLD_": "65536",
+        "MALLOC_MMAP_THRESHOLD_": "65536"
+      },
+      "diagnostics": {
+        "BENCH_PROFILE_CORE": "0",
+        "BENCH_PROFILE_FS": "0",
+        "BENCH_SQL_SCHEMA_MODE": "0",
+        "BENCH_PROFILE_PROCESS": "0",
+        "BENCH_PROFILE_SQL": "0",
+        "CORE_HEAP_MB": null,
+        "CORE_WASM_HEAP_MB": null,
+        "AGENTOS_V8_WARM_ISOLATES": "0",
+        "AGENTOS_WASM_SNAPSHOT_RUNNER": null,
+        "BENCH_WARM_TURNS": "50",
+        "BENCH_WORKLOAD": "core-none",
+        "BENCH_REVERSE": null
+      },
+      "experimentNotes": [],
+      "configuredInstances": 1,
+      "passed": true,
+      "placement": "one-sidecar-pool-per-vm",
+      "splitInitializer": false,
+      "instances": [
+        {
+          "index": 0,
+          "coldTurnMs": 434,
+          "launchToFirstResultMs": 1066.507024000001,
+          "launchToReadyMs": 626.1602160000002,
+          "warmTurnMs": [
+            29,
+            30,
+            19,
+            22,
+            21,
+            20,
+            22,
+            28,
+            24,
+            23,
+            25,
+            21,
+            23,
+            21,
+            23,
+            26,
+            51,
+            32,
+            62,
+            27,
+            24,
+            26,
+            28,
+            26,
+            29,
+            29,
+            26,
+            23,
+            20,
+            31,
+            25,
+            26,
+            25,
+            27,
+            23,
+            28,
+            30,
+            30,
+            22,
+            22,
+            23,
+            23,
+            24,
+            22,
+            27,
+            24,
+            25,
+            22,
+            23,
+            27
+          ],
+          "coldSqliteCalls": 8,
+          "coldHostSqlMs": 9.720029999999952,
+          "coldGuestSqlMs": 18
+        }
+      ],
+      "sampledTreeCpuSeconds": 4.76,
+      "accountedTreeCpuSeconds": 4.84,
+      "phaseCpuIncludesReapedChildren": true,
+      "cpuAffinity": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "phaseCpuSeconds": {
+        "provision": 0.5800000000000001,
+        "stage": 0.7599999999999999,
+        "cold": 0.6099999999999999,
+        "warmFive": 0.2400000000000002,
+        "warmAll": 1.6300000000000003,
+        "idle": 0.03000000000000025
+      },
+      "peakPssMiB": 422.0712890625,
+      "peakRssMiB": 423.8125,
+      "allIdlePssMiB": 422.0712890625,
+      "baselinePssMiB": 64.658203125,
+      "emptyVmsPssMiB": 142.37890625,
+      "stagedPssMiB": 159.3330078125,
+      "disposedVmsPssMiB": 247.6533203125,
+      "disposedSidecarsPssMiB": 72.2939453125
+    },
+    {
+      "file": "benchmark-1vm-48.json",
+      "runtime": "agentos",
+      "workload": "core-shell",
+      "profile": "core",
+      "schemaExecution": "host-batched",
+      "allocatorEnvironment": {
+        "MALLOC_ARENA_MAX": "1",
+        "MALLOC_TRIM_THRESHOLD_": "65536",
+        "MALLOC_MMAP_THRESHOLD_": "65536"
+      },
+      "diagnostics": {
+        "BENCH_PROFILE_CORE": "0",
+        "BENCH_PROFILE_FS": "0",
+        "BENCH_SQL_SCHEMA_MODE": "0",
+        "BENCH_PROFILE_PROCESS": "0",
+        "BENCH_PROFILE_SQL": "0",
+        "CORE_HEAP_MB": null,
+        "CORE_WASM_HEAP_MB": null,
+        "AGENTOS_V8_WARM_ISOLATES": "0",
+        "AGENTOS_WASM_SNAPSHOT_RUNNER": null,
+        "BENCH_WARM_TURNS": "50",
+        "BENCH_WORKLOAD": "core-shell",
+        "BENCH_REVERSE": null
+      },
+      "experimentNotes": [],
+      "configuredInstances": 1,
+      "passed": true,
+      "placement": "one-sidecar-pool-per-vm",
+      "splitInitializer": false,
+      "instances": [
+        {
+          "index": 0,
+          "coldTurnMs": 3000,
+          "launchToFirstResultMs": 3657.708521,
+          "launchToReadyMs": 650.5534210000001,
+          "warmTurnMs": [
+            360,
+            283,
+            299,
+            361,
+            338,
+            307,
+            333,
+            327,
+            289,
+            328,
+            386,
+            344,
+            320,
+            327,
+            295,
+            331,
+            323,
+            323,
+            345,
+            376,
+            336,
+            334,
+            350,
+            339,
+            358,
+            337,
+            320,
+            332,
+            341,
+            363,
+            319,
+            343,
+            325,
+            347,
+            354,
+            358,
+            393,
+            346,
+            395,
+            354,
+            371,
+            338,
+            382,
+            333,
+            351,
+            380,
+            378,
+            331,
+            331,
+            323
+          ],
+          "coldSqliteCalls": 1700,
+          "coldHostSqlMs": 210.53936600000725,
+          "coldGuestSqlMs": 1347
+        }
+      ],
+      "sampledTreeCpuSeconds": 32.1,
+      "accountedTreeCpuSeconds": 32.18,
+      "phaseCpuIncludesReapedChildren": true,
+      "cpuAffinity": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "phaseCpuSeconds": {
+        "provision": 0.5900000000000001,
+        "stage": 0.53,
+        "cold": 4.89,
+        "warmFive": 2.330000000000001,
+        "warmAll": 24.75,
+        "idle": 0.05999999999999872
+      },
+      "peakPssMiB": 555.51953125,
+      "peakRssMiB": 573.890625,
+      "allIdlePssMiB": 455.9267578125,
+      "baselinePssMiB": 64.91015625,
+      "emptyVmsPssMiB": 143.16650390625,
+      "stagedPssMiB": 159.505859375,
+      "disposedVmsPssMiB": 281.9775390625,
+      "disposedSidecarsPssMiB": 82.8134765625
+    },
+    {
+      "file": "benchmark-1vm-49.json",
+      "runtime": "agentos",
+      "workload": "boundaries",
+      "profile": "core",
+      "schemaExecution": "host-batched",
+      "allocatorEnvironment": {
+        "MALLOC_ARENA_MAX": "1",
+        "MALLOC_TRIM_THRESHOLD_": "65536",
+        "MALLOC_MMAP_THRESHOLD_": "65536"
+      },
+      "diagnostics": {
+        "BENCH_PROFILE_CORE": "0",
+        "BENCH_PROFILE_FS": "0",
+        "BENCH_SQL_SCHEMA_MODE": "0",
+        "BENCH_PROFILE_PROCESS": "0",
+        "BENCH_PROFILE_SQL": "0",
+        "CORE_HEAP_MB": null,
+        "CORE_WASM_HEAP_MB": null,
+        "AGENTOS_V8_WARM_ISOLATES": "0",
+        "AGENTOS_WASM_SNAPSHOT_RUNNER": null,
+        "BENCH_WARM_TURNS": null,
+        "BENCH_WORKLOAD": "boundaries",
+        "BENCH_REVERSE": null
+      },
+      "experimentNotes": [],
+      "configuredInstances": 1,
+      "passed": true,
+      "placement": "one-sidecar-pool-per-vm",
+      "splitInitializer": false,
+      "instances": [],
+      "sampledTreeCpuSeconds": 29.2,
+      "accountedTreeCpuSeconds": 29.38,
+      "phaseCpuIncludesReapedChildren": true,
+      "cpuAffinity": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "phaseCpuSeconds": {
+        "provision": 0.6699999999999999,
+        "stage": 0.5900000000000001,
+        "cold": null,
+        "warmFive": null,
+        "warmAll": null,
+        "idle": 0.060000000000002274
+      },
+      "peakPssMiB": 452.0673828125,
+      "peakRssMiB": 453.78515625,
+      "allIdlePssMiB": 360.0908203125,
+      "baselinePssMiB": 64.701171875,
+      "emptyVmsPssMiB": 144.0419921875,
+      "stagedPssMiB": 161.7275390625,
+      "disposedVmsPssMiB": 249.3134765625,
+      "disposedSidecarsPssMiB": 68.9619140625
+    },
+    {
       "file": "benchmark-1vm-5.json",
       "runtime": "agentos",
+      "workload": "core-shell",
       "profile": "full",
       "schemaExecution": "guest-individual",
       "allocatorEnvironment": {},
@@ -2649,6 +3263,8 @@
         }
       ],
       "sampledTreeCpuSeconds": 29.66,
+      "accountedTreeCpuSeconds": null,
+      "phaseCpuIncludesReapedChildren": false,
       "cpuAffinity": null,
       "phaseCpuSeconds": {
         "provision": 0.63,
@@ -2668,8 +3284,336 @@
       "disposedSidecarsPssMiB": 84.4228515625
     },
     {
+      "file": "benchmark-1vm-50.json",
+      "runtime": "agentos",
+      "workload": "boundaries",
+      "profile": "core",
+      "schemaExecution": "host-batched",
+      "allocatorEnvironment": {
+        "MALLOC_ARENA_MAX": "1",
+        "MALLOC_TRIM_THRESHOLD_": "65536",
+        "MALLOC_MMAP_THRESHOLD_": "65536"
+      },
+      "diagnostics": {
+        "BENCH_PROFILE_CORE": "0",
+        "BENCH_PROFILE_FS": "0",
+        "BENCH_SQL_SCHEMA_MODE": "0",
+        "BENCH_PROFILE_PROCESS": "0",
+        "BENCH_PROFILE_SQL": "0",
+        "CORE_HEAP_MB": null,
+        "CORE_WASM_HEAP_MB": null,
+        "AGENTOS_V8_WARM_ISOLATES": "0",
+        "AGENTOS_WASM_SNAPSHOT_RUNNER": null,
+        "BENCH_WARM_TURNS": null,
+        "BENCH_WORKLOAD": "boundaries",
+        "BENCH_REVERSE": "1"
+      },
+      "experimentNotes": [],
+      "configuredInstances": 1,
+      "passed": true,
+      "placement": "one-sidecar-pool-per-vm",
+      "splitInitializer": false,
+      "instances": [],
+      "sampledTreeCpuSeconds": 28.77,
+      "accountedTreeCpuSeconds": 28.92,
+      "phaseCpuIncludesReapedChildren": true,
+      "cpuAffinity": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "phaseCpuSeconds": {
+        "provision": 0.7,
+        "stage": 0.56,
+        "cold": null,
+        "warmFive": null,
+        "warmAll": null,
+        "idle": 0.030000000000001137
+      },
+      "peakPssMiB": 478.06640625,
+      "peakRssMiB": 495.98828125,
+      "allIdlePssMiB": 357.9697265625,
+      "baselinePssMiB": 64.466796875,
+      "emptyVmsPssMiB": 143.0380859375,
+      "stagedPssMiB": 159.2548828125,
+      "disposedVmsPssMiB": 247.8994140625,
+      "disposedSidecarsPssMiB": 68.3837890625
+    },
+    {
+      "file": "benchmark-1vm-51.json",
+      "runtime": "agentos",
+      "workload": "core-read-ready",
+      "profile": "core",
+      "schemaExecution": "host-batched",
+      "allocatorEnvironment": {
+        "MALLOC_ARENA_MAX": "1",
+        "MALLOC_TRIM_THRESHOLD_": "65536",
+        "MALLOC_MMAP_THRESHOLD_": "65536"
+      },
+      "diagnostics": {
+        "BENCH_PROFILE_CORE": "0",
+        "BENCH_PROFILE_FS": "0",
+        "BENCH_SQL_SCHEMA_MODE": "0",
+        "BENCH_PROFILE_PROCESS": "0",
+        "BENCH_PROFILE_SQL": "0",
+        "CORE_HEAP_MB": null,
+        "CORE_WASM_HEAP_MB": null,
+        "AGENTOS_V8_WARM_ISOLATES": "0",
+        "AGENTOS_WASM_SNAPSHOT_RUNNER": null,
+        "BENCH_WARM_TURNS": "50",
+        "BENCH_WORKLOAD": "core-read-ready",
+        "BENCH_REVERSE": null
+      },
+      "experimentNotes": [],
+      "configuredInstances": 1,
+      "passed": true,
+      "placement": "one-sidecar-pool-per-vm",
+      "splitInitializer": false,
+      "instances": [
+        {
+          "index": 0,
+          "coldTurnMs": 452,
+          "launchToFirstResultMs": 1074.1378509999995,
+          "launchToReadyMs": 615.6587679999998,
+          "warmTurnMs": [
+            38,
+            42,
+            39,
+            40,
+            42,
+            41,
+            40,
+            41,
+            36,
+            41,
+            38,
+            39,
+            40,
+            41,
+            41,
+            35,
+            42,
+            41,
+            47,
+            40,
+            38,
+            46,
+            42,
+            51,
+            43,
+            43,
+            43,
+            43,
+            51,
+            57,
+            46,
+            42,
+            43,
+            45,
+            39,
+            40,
+            38,
+            40,
+            44,
+            68,
+            39,
+            35,
+            38,
+            39,
+            39,
+            40,
+            44,
+            42,
+            36,
+            36
+          ],
+          "coldSqliteCalls": 8,
+          "coldHostSqlMs": 10.316462000000229,
+          "coldGuestSqlMs": 20
+        }
+      ],
+      "sampledTreeCpuSeconds": 5.91,
+      "accountedTreeCpuSeconds": 5.91,
+      "phaseCpuIncludesReapedChildren": true,
+      "cpuAffinity": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "phaseCpuSeconds": {
+        "provision": 0.7,
+        "stage": 0.8,
+        "cold": 0.6200000000000001,
+        "warmFive": 0.21999999999999975,
+        "warmAll": 2.4999999999999996,
+        "idle": 0.07000000000000028
+      },
+      "peakPssMiB": 411.2509765625,
+      "peakRssMiB": 412.9921875,
+      "allIdlePssMiB": 411.2509765625,
+      "baselinePssMiB": 64.64892578125,
+      "emptyVmsPssMiB": 143.3935546875,
+      "stagedPssMiB": 160.0625,
+      "disposedVmsPssMiB": 247.4619140625,
+      "disposedSidecarsPssMiB": 72.5009765625
+    },
+    {
+      "file": "benchmark-1vm-52.json",
+      "runtime": "agentos",
+      "workload": "boundaries",
+      "profile": "core",
+      "schemaExecution": "host-batched",
+      "allocatorEnvironment": {
+        "MALLOC_ARENA_MAX": "1",
+        "MALLOC_TRIM_THRESHOLD_": "65536",
+        "MALLOC_MMAP_THRESHOLD_": "65536"
+      },
+      "diagnostics": {
+        "BENCH_PROFILE_CORE": "0",
+        "BENCH_PROFILE_FS": "0",
+        "BENCH_SQL_SCHEMA_MODE": "0",
+        "BENCH_PROFILE_PROCESS": "0",
+        "BENCH_PROFILE_SQL": "0",
+        "CORE_HEAP_MB": null,
+        "CORE_WASM_HEAP_MB": null,
+        "AGENTOS_V8_WARM_ISOLATES": "0",
+        "AGENTOS_WASM_SNAPSHOT_RUNNER": null,
+        "BENCH_WARM_TURNS": null,
+        "BENCH_WORKLOAD": "boundaries",
+        "BENCH_REVERSE": null
+      },
+      "experimentNotes": [],
+      "configuredInstances": 1,
+      "passed": true,
+      "placement": "one-sidecar-pool-per-vm",
+      "splitInitializer": false,
+      "instances": [],
+      "sampledTreeCpuSeconds": 31.48,
+      "accountedTreeCpuSeconds": 31.66,
+      "phaseCpuIncludesReapedChildren": true,
+      "cpuAffinity": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "phaseCpuSeconds": {
+        "provision": 0.6100000000000001,
+        "stage": 0.6200000000000001,
+        "cold": null,
+        "warmFive": null,
+        "warmAll": null,
+        "idle": 0.029999999999997584
+      },
+      "peakPssMiB": 451.9140625,
+      "peakRssMiB": 453.63671875,
+      "allIdlePssMiB": 359.6025390625,
+      "baselinePssMiB": 64.615234375,
+      "emptyVmsPssMiB": 143.7353515625,
+      "stagedPssMiB": 159.9501953125,
+      "disposedVmsPssMiB": 248.9970703125,
+      "disposedSidecarsPssMiB": 68.3291015625
+    },
+    {
+      "file": "benchmark-1vm-53.json",
+      "runtime": "agentos",
+      "workload": "core-read-ready",
+      "profile": "core",
+      "schemaExecution": "host-batched",
+      "allocatorEnvironment": {
+        "MALLOC_ARENA_MAX": "1",
+        "MALLOC_TRIM_THRESHOLD_": "65536",
+        "MALLOC_MMAP_THRESHOLD_": "65536"
+      },
+      "diagnostics": {
+        "BENCH_PROFILE_CORE": "0",
+        "BENCH_PROFILE_FS": "1",
+        "BENCH_SQL_SCHEMA_MODE": "0",
+        "BENCH_PROFILE_PROCESS": "0",
+        "BENCH_PROFILE_SQL": "0",
+        "CORE_HEAP_MB": null,
+        "CORE_WASM_HEAP_MB": null,
+        "AGENTOS_V8_WARM_ISOLATES": "0",
+        "AGENTOS_WASM_SNAPSHOT_RUNNER": null,
+        "BENCH_WARM_TURNS": null,
+        "BENCH_WORKLOAD": "core-read-ready",
+        "BENCH_REVERSE": null
+      },
+      "experimentNotes": [],
+      "configuredInstances": 1,
+      "passed": true,
+      "placement": "one-sidecar-pool-per-vm",
+      "splitInitializer": false,
+      "instances": [
+        {
+          "index": 0,
+          "coldTurnMs": 421,
+          "launchToFirstResultMs": 1047.838624,
+          "launchToReadyMs": 619.6580679999997,
+          "warmTurnMs": [
+            31,
+            33,
+            31,
+            42,
+            32
+          ],
+          "coldSqliteCalls": 8,
+          "coldHostSqlMs": 9.865006000000449,
+          "coldGuestSqlMs": 19
+        }
+      ],
+      "sampledTreeCpuSeconds": 3.2,
+      "accountedTreeCpuSeconds": 3.29,
+      "phaseCpuIncludesReapedChildren": true,
+      "cpuAffinity": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "phaseCpuSeconds": {
+        "provision": 0.59,
+        "stage": 0.5299999999999999,
+        "cold": 0.77,
+        "warmFive": 0.1200000000000001,
+        "warmAll": 0.1200000000000001,
+        "idle": 0.03000000000000025
+      },
+      "peakPssMiB": 401.29296875,
+      "peakRssMiB": 402.9921875,
+      "allIdlePssMiB": 396.166015625,
+      "baselinePssMiB": 64.6328125,
+      "emptyVmsPssMiB": 144.169921875,
+      "stagedPssMiB": 161.076171875,
+      "disposedVmsPssMiB": 246.337890625,
+      "disposedSidecarsPssMiB": 70.98046875
+    },
+    {
       "file": "benchmark-1vm-6.json",
       "runtime": "agentos",
+      "workload": "core-shell",
       "profile": "full",
       "schemaExecution": "guest-individual",
       "allocatorEnvironment": {},
@@ -2698,6 +3642,8 @@
         }
       ],
       "sampledTreeCpuSeconds": 30.52,
+      "accountedTreeCpuSeconds": null,
+      "phaseCpuIncludesReapedChildren": false,
       "cpuAffinity": null,
       "phaseCpuSeconds": {
         "provision": 0.63,
@@ -2719,6 +3665,7 @@
     {
       "file": "benchmark-1vm-7.json",
       "runtime": "agentos",
+      "workload": "core-shell",
       "profile": "full",
       "schemaExecution": "guest-individual",
       "allocatorEnvironment": {},
@@ -2747,6 +3694,8 @@
         }
       ],
       "sampledTreeCpuSeconds": 29.97,
+      "accountedTreeCpuSeconds": null,
+      "phaseCpuIncludesReapedChildren": false,
       "cpuAffinity": null,
       "phaseCpuSeconds": {
         "provision": 0.72,
@@ -2768,6 +3717,7 @@
     {
       "file": "benchmark-1vm-8.json",
       "runtime": "agentos",
+      "workload": "core-shell",
       "profile": "full",
       "schemaExecution": "guest-individual",
       "allocatorEnvironment": {},
@@ -2796,6 +3746,8 @@
         }
       ],
       "sampledTreeCpuSeconds": 30.03,
+      "accountedTreeCpuSeconds": null,
+      "phaseCpuIncludesReapedChildren": false,
       "cpuAffinity": null,
       "phaseCpuSeconds": {
         "provision": 0.64,
@@ -2817,6 +3769,7 @@
     {
       "file": "benchmark-1vm-9.json",
       "runtime": "agentos",
+      "workload": "core-shell",
       "profile": "full",
       "schemaExecution": "guest-individual",
       "allocatorEnvironment": {},
@@ -2845,6 +3798,8 @@
         }
       ],
       "sampledTreeCpuSeconds": 29.95,
+      "accountedTreeCpuSeconds": null,
+      "phaseCpuIncludesReapedChildren": false,
       "cpuAffinity": null,
       "phaseCpuSeconds": {
         "provision": 0.7799999999999999,
@@ -2866,6 +3821,7 @@
     {
       "file": "benchmark-2vm-1.json",
       "runtime": "agentos",
+      "workload": "core-shell",
       "profile": "full",
       "schemaExecution": "guest-individual",
       "allocatorEnvironment": {},
@@ -2893,6 +3849,8 @@
         }
       ],
       "sampledTreeCpuSeconds": 40.46,
+      "accountedTreeCpuSeconds": null,
+      "phaseCpuIncludesReapedChildren": false,
       "cpuAffinity": null,
       "phaseCpuSeconds": {
         "provision": null,
@@ -2914,6 +3872,7 @@
     {
       "file": "benchmark-2vm-2.json",
       "runtime": "agentos",
+      "workload": "core-shell",
       "profile": "full",
       "schemaExecution": "guest-individual",
       "allocatorEnvironment": {},
@@ -2958,6 +3917,8 @@
         }
       ],
       "sampledTreeCpuSeconds": 63.25,
+      "accountedTreeCpuSeconds": null,
+      "phaseCpuIncludesReapedChildren": false,
       "cpuAffinity": null,
       "phaseCpuSeconds": {
         "provision": null,
@@ -2979,6 +3940,7 @@
     {
       "file": "benchmark-2vm-3.json",
       "runtime": "agentos",
+      "workload": "core-shell",
       "profile": "core",
       "schemaExecution": "guest-individual",
       "allocatorEnvironment": {
@@ -3030,6 +3992,8 @@
         }
       ],
       "sampledTreeCpuSeconds": 22.21,
+      "accountedTreeCpuSeconds": null,
+      "phaseCpuIncludesReapedChildren": false,
       "cpuAffinity": null,
       "phaseCpuSeconds": {
         "provision": null,
@@ -3051,6 +4015,7 @@
     {
       "file": "benchmark-2vm-4.json",
       "runtime": "agentos",
+      "workload": "core-shell",
       "profile": "core",
       "schemaExecution": "host-batched",
       "allocatorEnvironment": {
@@ -3105,6 +4070,8 @@
         }
       ],
       "sampledTreeCpuSeconds": 19.78,
+      "accountedTreeCpuSeconds": null,
+      "phaseCpuIncludesReapedChildren": false,
       "cpuAffinity": null,
       "phaseCpuSeconds": {
         "provision": null,
@@ -3126,6 +4093,7 @@
     {
       "file": "benchmark-2vm-5.json",
       "runtime": "agentos",
+      "workload": "core-shell",
       "profile": "core",
       "schemaExecution": "host-batched",
       "allocatorEnvironment": {
@@ -3185,6 +4153,8 @@
         }
       ],
       "sampledTreeCpuSeconds": 19.33,
+      "accountedTreeCpuSeconds": null,
+      "phaseCpuIncludesReapedChildren": false,
       "cpuAffinity": [
         0,
         1,
@@ -3216,6 +4186,7 @@
     {
       "file": "benchmark-native-1.json",
       "runtime": "native-node",
+      "workload": "core-shell",
       "profile": "full",
       "schemaExecution": "native",
       "allocatorEnvironment": {},
@@ -3241,6 +4212,8 @@
         }
       ],
       "sampledTreeCpuSeconds": 3.1,
+      "accountedTreeCpuSeconds": null,
+      "phaseCpuIncludesReapedChildren": false,
       "cpuAffinity": null,
       "phaseCpuSeconds": {
         "provision": null,
@@ -3262,6 +4235,7 @@
     {
       "file": "benchmark-native-2.json",
       "runtime": "native",
+      "workload": "core-shell",
       "profile": "full",
       "schemaExecution": "native",
       "allocatorEnvironment": {},
@@ -3287,6 +4261,8 @@
         }
       ],
       "sampledTreeCpuSeconds": 2.93,
+      "accountedTreeCpuSeconds": null,
+      "phaseCpuIncludesReapedChildren": false,
       "cpuAffinity": null,
       "phaseCpuSeconds": {
         "provision": null,
@@ -3308,6 +4284,7 @@
     {
       "file": "benchmark-native-3.json",
       "runtime": "native",
+      "workload": "core-shell",
       "profile": "core",
       "schemaExecution": "native",
       "allocatorEnvironment": {
@@ -3340,6 +4317,8 @@
         }
       ],
       "sampledTreeCpuSeconds": 3.44,
+      "accountedTreeCpuSeconds": null,
+      "phaseCpuIncludesReapedChildren": false,
       "cpuAffinity": null,
       "phaseCpuSeconds": {
         "provision": null,
@@ -3361,6 +4340,7 @@
     {
       "file": "benchmark-native-compiled-1.json",
       "runtime": "native-compiled",
+      "workload": "core-shell",
       "profile": "full",
       "schemaExecution": "native",
       "allocatorEnvironment": {},
@@ -3386,6 +4366,8 @@
         }
       ],
       "sampledTreeCpuSeconds": 3.32,
+      "accountedTreeCpuSeconds": null,
+      "phaseCpuIncludesReapedChildren": false,
       "cpuAffinity": null,
       "phaseCpuSeconds": {
         "provision": null,
@@ -3407,6 +4389,7 @@
     {
       "file": "benchmark-native-core-1.json",
       "runtime": "native-core",
+      "workload": "core-shell",
       "profile": "core",
       "schemaExecution": "native",
       "allocatorEnvironment": {},
@@ -3435,6 +4418,8 @@
         }
       ],
       "sampledTreeCpuSeconds": 2.13,
+      "accountedTreeCpuSeconds": null,
+      "phaseCpuIncludesReapedChildren": false,
       "cpuAffinity": null,
       "phaseCpuSeconds": {
         "provision": null,
@@ -3454,8 +4439,501 @@
       "disposedSidecarsPssMiB": null
     },
     {
+      "file": "benchmark-native-core-10.json",
+      "runtime": "native-core",
+      "workload": "core-shell",
+      "profile": "core",
+      "schemaExecution": "native",
+      "allocatorEnvironment": {
+        "MALLOC_ARENA_MAX": "1",
+        "MALLOC_TRIM_THRESHOLD_": "65536",
+        "MALLOC_MMAP_THRESHOLD_": "65536"
+      },
+      "diagnostics": {
+        "BENCH_PROFILE_CORE": "0",
+        "BENCH_PROFILE_FS": "0",
+        "BENCH_SQL_SCHEMA_MODE": "0",
+        "BENCH_PROFILE_PROCESS": "0",
+        "BENCH_PROFILE_SQL": "0",
+        "CORE_HEAP_MB": null,
+        "CORE_WASM_HEAP_MB": null,
+        "AGENTOS_V8_WARM_ISOLATES": null,
+        "AGENTOS_WASM_SNAPSHOT_RUNNER": null,
+        "BENCH_WARM_TURNS": "50",
+        "BENCH_WORKLOAD": "core-shell",
+        "BENCH_REVERSE": null
+      },
+      "experimentNotes": [],
+      "configuredInstances": 1,
+      "passed": true,
+      "placement": "native-process",
+      "splitInitializer": false,
+      "instances": [
+        {
+          "index": 0,
+          "coldTurnMs": 515.1136769999999,
+          "launchToFirstResultMs": 1237.4123929985217,
+          "launchToReadyMs": 721.0164449970762,
+          "warmTurnMs": [
+            29.55510000000004,
+            37.50415100000009,
+            26.722953999999845,
+            33.981475000000046,
+            38.50529400000005,
+            40.00994200000014,
+            37.09159200000022,
+            29.975255999999945,
+            28.96959099999981,
+            23.33139899999992,
+            24.027964999999995,
+            26.843710999999985,
+            26.847907000000077,
+            22.223395999999866,
+            22.37809799999991,
+            26.38120600000002,
+            26.098212000000103,
+            20.054280999999946,
+            23.695465000000013,
+            22.324807999999848,
+            21.803876000000173,
+            22.012448999999833,
+            27.02360099999987,
+            25.293214000000035,
+            26.134896000000026,
+            29.28134,
+            38.06165800000008,
+            28.120747000000165,
+            25.267714999999953,
+            27.08238900000015,
+            38.19636500000024,
+            24.580953999999565,
+            22.77827900000011,
+            26.988096999999925,
+            31.310535000000073,
+            25.247475000000122,
+            23.827694000000065,
+            29.697755000000143,
+            29.55075399999987,
+            24.25257099999999,
+            29.563548000000083,
+            30.62578799999983,
+            30.08286300000009,
+            31.214400000000296,
+            25.43175199999996,
+            27.799465000000055,
+            28.733919000000242,
+            33.571038000000044,
+            29.579197000000022,
+            31.92313600000034
+          ]
+        }
+      ],
+      "sampledTreeCpuSeconds": 3.44,
+      "accountedTreeCpuSeconds": 3.65,
+      "phaseCpuIncludesReapedChildren": true,
+      "cpuAffinity": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "phaseCpuSeconds": {
+        "provision": null,
+        "stage": null,
+        "cold": 0.77,
+        "warmFive": 0.42999999999999994,
+        "warmAll": 2.09,
+        "idle": 0.040000000000000036
+      },
+      "peakPssMiB": 739.5869140625,
+      "peakRssMiB": 740.41796875,
+      "allIdlePssMiB": 324.3466796875,
+      "baselinePssMiB": null,
+      "emptyVmsPssMiB": null,
+      "stagedPssMiB": null,
+      "disposedVmsPssMiB": null,
+      "disposedSidecarsPssMiB": null
+    },
+    {
+      "file": "benchmark-native-core-11.json",
+      "runtime": "native-core",
+      "workload": "boundaries",
+      "profile": "core",
+      "schemaExecution": "native",
+      "allocatorEnvironment": {
+        "MALLOC_ARENA_MAX": "1",
+        "MALLOC_TRIM_THRESHOLD_": "65536",
+        "MALLOC_MMAP_THRESHOLD_": "65536"
+      },
+      "diagnostics": {
+        "BENCH_PROFILE_CORE": "0",
+        "BENCH_PROFILE_FS": "0",
+        "BENCH_SQL_SCHEMA_MODE": "0",
+        "BENCH_PROFILE_PROCESS": "0",
+        "BENCH_PROFILE_SQL": "0",
+        "CORE_HEAP_MB": null,
+        "CORE_WASM_HEAP_MB": null,
+        "AGENTOS_V8_WARM_ISOLATES": null,
+        "AGENTOS_WASM_SNAPSHOT_RUNNER": null,
+        "BENCH_WARM_TURNS": null,
+        "BENCH_WORKLOAD": "boundaries",
+        "BENCH_REVERSE": null
+      },
+      "experimentNotes": [],
+      "configuredInstances": 1,
+      "passed": true,
+      "placement": "native-process",
+      "splitInitializer": false,
+      "instances": [],
+      "sampledTreeCpuSeconds": 2.14,
+      "accountedTreeCpuSeconds": 3.89,
+      "phaseCpuIncludesReapedChildren": true,
+      "cpuAffinity": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "phaseCpuSeconds": {
+        "provision": null,
+        "stage": null,
+        "cold": null,
+        "warmFive": null,
+        "warmAll": null,
+        "idle": 0.050000000000000266
+      },
+      "peakPssMiB": 188.767578125,
+      "peakRssMiB": 209.9375,
+      "allIdlePssMiB": 173.830078125,
+      "baselinePssMiB": null,
+      "emptyVmsPssMiB": null,
+      "stagedPssMiB": null,
+      "disposedVmsPssMiB": null,
+      "disposedSidecarsPssMiB": null
+    },
+    {
+      "file": "benchmark-native-core-12.json",
+      "runtime": "native-core",
+      "workload": "boundaries",
+      "profile": "core",
+      "schemaExecution": "native",
+      "allocatorEnvironment": {
+        "MALLOC_ARENA_MAX": "1",
+        "MALLOC_TRIM_THRESHOLD_": "65536",
+        "MALLOC_MMAP_THRESHOLD_": "65536"
+      },
+      "diagnostics": {
+        "BENCH_PROFILE_CORE": "0",
+        "BENCH_PROFILE_FS": "0",
+        "BENCH_SQL_SCHEMA_MODE": "0",
+        "BENCH_PROFILE_PROCESS": "0",
+        "BENCH_PROFILE_SQL": "0",
+        "CORE_HEAP_MB": null,
+        "CORE_WASM_HEAP_MB": null,
+        "AGENTOS_V8_WARM_ISOLATES": null,
+        "AGENTOS_WASM_SNAPSHOT_RUNNER": null,
+        "BENCH_WARM_TURNS": null,
+        "BENCH_WORKLOAD": "boundaries",
+        "BENCH_REVERSE": "1"
+      },
+      "experimentNotes": [],
+      "configuredInstances": 1,
+      "passed": true,
+      "placement": "native-process",
+      "splitInitializer": false,
+      "instances": [],
+      "sampledTreeCpuSeconds": 2.23,
+      "accountedTreeCpuSeconds": 3.98,
+      "phaseCpuIncludesReapedChildren": true,
+      "cpuAffinity": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "phaseCpuSeconds": {
+        "provision": null,
+        "stage": null,
+        "cold": null,
+        "warmFive": null,
+        "warmAll": null,
+        "idle": 0
+      },
+      "peakPssMiB": 179.2236328125,
+      "peakRssMiB": 199.875,
+      "allIdlePssMiB": 174.25390625,
+      "baselinePssMiB": null,
+      "emptyVmsPssMiB": null,
+      "stagedPssMiB": null,
+      "disposedVmsPssMiB": null,
+      "disposedSidecarsPssMiB": null
+    },
+    {
+      "file": "benchmark-native-core-13.json",
+      "runtime": "native-core",
+      "workload": "boundaries",
+      "profile": "core",
+      "schemaExecution": "native",
+      "allocatorEnvironment": {
+        "MALLOC_ARENA_MAX": "1",
+        "MALLOC_TRIM_THRESHOLD_": "65536",
+        "MALLOC_MMAP_THRESHOLD_": "65536"
+      },
+      "diagnostics": {
+        "BENCH_PROFILE_CORE": "0",
+        "BENCH_PROFILE_FS": "0",
+        "BENCH_SQL_SCHEMA_MODE": "0",
+        "BENCH_PROFILE_PROCESS": "0",
+        "BENCH_PROFILE_SQL": "0",
+        "CORE_HEAP_MB": null,
+        "CORE_WASM_HEAP_MB": null,
+        "AGENTOS_V8_WARM_ISOLATES": null,
+        "AGENTOS_WASM_SNAPSHOT_RUNNER": null,
+        "BENCH_WARM_TURNS": null,
+        "BENCH_WORKLOAD": "boundaries",
+        "BENCH_REVERSE": "1"
+      },
+      "experimentNotes": [
+        "Exploratory synchronous stdout markers failed with EAGAIN while emitting timing samples. Reverted to console markers; phase accounting aligns recorded monotonic timestamps to avoid buffering skew. This failed run is excluded."
+      ],
+      "configuredInstances": 1,
+      "passed": false,
+      "placement": "native-process",
+      "splitInitializer": false,
+      "instances": [],
+      "sampledTreeCpuSeconds": 1.22,
+      "accountedTreeCpuSeconds": 3.03,
+      "phaseCpuIncludesReapedChildren": true,
+      "cpuAffinity": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "phaseCpuSeconds": {
+        "provision": null,
+        "stage": null,
+        "cold": null,
+        "warmFive": null,
+        "warmAll": null,
+        "idle": null
+      },
+      "peakPssMiB": 179.1513671875,
+      "peakRssMiB": 199.9140625,
+      "allIdlePssMiB": null,
+      "baselinePssMiB": null,
+      "emptyVmsPssMiB": null,
+      "stagedPssMiB": null,
+      "disposedVmsPssMiB": null,
+      "disposedSidecarsPssMiB": null
+    },
+    {
+      "file": "benchmark-native-core-14.json",
+      "runtime": "native-core",
+      "workload": "boundaries",
+      "profile": "core",
+      "schemaExecution": "native",
+      "allocatorEnvironment": {
+        "MALLOC_ARENA_MAX": "1",
+        "MALLOC_TRIM_THRESHOLD_": "65536",
+        "MALLOC_MMAP_THRESHOLD_": "65536"
+      },
+      "diagnostics": {
+        "BENCH_PROFILE_CORE": "0",
+        "BENCH_PROFILE_FS": "0",
+        "BENCH_SQL_SCHEMA_MODE": "0",
+        "BENCH_PROFILE_PROCESS": "0",
+        "BENCH_PROFILE_SQL": "0",
+        "CORE_HEAP_MB": null,
+        "CORE_WASM_HEAP_MB": null,
+        "AGENTOS_V8_WARM_ISOLATES": null,
+        "AGENTOS_WASM_SNAPSHOT_RUNNER": null,
+        "BENCH_WARM_TURNS": null,
+        "BENCH_WORKLOAD": "boundaries",
+        "BENCH_REVERSE": "1"
+      },
+      "experimentNotes": [],
+      "configuredInstances": 1,
+      "passed": true,
+      "placement": "native-process",
+      "splitInitializer": false,
+      "instances": [],
+      "sampledTreeCpuSeconds": 1.96,
+      "accountedTreeCpuSeconds": 3.75,
+      "phaseCpuIncludesReapedChildren": true,
+      "cpuAffinity": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "phaseCpuSeconds": {
+        "provision": null,
+        "stage": null,
+        "cold": null,
+        "warmFive": null,
+        "warmAll": null,
+        "idle": 0.029999999999999805
+      },
+      "peakPssMiB": 177.005859375,
+      "peakRssMiB": 197.0625,
+      "allIdlePssMiB": 174.794921875,
+      "baselinePssMiB": null,
+      "emptyVmsPssMiB": null,
+      "stagedPssMiB": null,
+      "disposedVmsPssMiB": null,
+      "disposedSidecarsPssMiB": null
+    },
+    {
+      "file": "benchmark-native-core-15.json",
+      "runtime": "native-core",
+      "workload": "core-read-ready",
+      "profile": "core",
+      "schemaExecution": "native",
+      "allocatorEnvironment": {
+        "MALLOC_ARENA_MAX": "1",
+        "MALLOC_TRIM_THRESHOLD_": "65536",
+        "MALLOC_MMAP_THRESHOLD_": "65536"
+      },
+      "diagnostics": {
+        "BENCH_PROFILE_CORE": "0",
+        "BENCH_PROFILE_FS": "0",
+        "BENCH_SQL_SCHEMA_MODE": "0",
+        "BENCH_PROFILE_PROCESS": "0",
+        "BENCH_PROFILE_SQL": "0",
+        "CORE_HEAP_MB": null,
+        "CORE_WASM_HEAP_MB": null,
+        "AGENTOS_V8_WARM_ISOLATES": null,
+        "AGENTOS_WASM_SNAPSHOT_RUNNER": null,
+        "BENCH_WARM_TURNS": "50",
+        "BENCH_WORKLOAD": "core-read-ready",
+        "BENCH_REVERSE": null
+      },
+      "experimentNotes": [],
+      "configuredInstances": 1,
+      "passed": true,
+      "placement": "native-process",
+      "splitInitializer": false,
+      "instances": [
+        {
+          "index": 0,
+          "coldTurnMs": 268.821324,
+          "launchToFirstResultMs": 803.2681230033631,
+          "launchToReadyMs": 533.5294000033173,
+          "warmTurnMs": [
+            12.996301000000017,
+            8.363743,
+            7.611833000000047,
+            8.740147999999976,
+            7.5414670000000115,
+            9.765627999999992,
+            7.501317999999969,
+            8.372575999999981,
+            7.834266999999954,
+            7.397611999999981,
+            8.356551999999965,
+            7.9419690000000855,
+            9.862503999999944,
+            7.301345999999967,
+            13.05745300000001,
+            10.539161000000036,
+            18.670194000000038,
+            8.079736000000025,
+            7.258562999999981,
+            7.732894999999985,
+            7.336599999999976,
+            7.320725999999922,
+            11.551259999999957,
+            7.780206000000021,
+            13.422492000000034,
+            10.561103000000003,
+            7.554646999999932,
+            9.220039000000043,
+            7.911573999999973,
+            9.503875000000107,
+            8.159376000000066,
+            9.633289999999988,
+            8.957584999999881,
+            10.366731000000073,
+            8.753809000000047,
+            9.668040999999903,
+            8.975652999999966,
+            9.166008000000147,
+            11.082807000000003,
+            8.013157000000092,
+            8.183321999999862,
+            8.556432000000086,
+            8.74916200000007,
+            18.15762399999994,
+            9.59920800000009,
+            10.06508800000006,
+            8.65499100000011,
+            9.466700000000174,
+            10.883687999999893,
+            10.429765999999972
+          ]
+        }
+      ],
+      "sampledTreeCpuSeconds": 1.61,
+      "accountedTreeCpuSeconds": 1.61,
+      "phaseCpuIncludesReapedChildren": true,
+      "cpuAffinity": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "phaseCpuSeconds": {
+        "provision": null,
+        "stage": null,
+        "cold": 0.42999999999999994,
+        "warmFive": 0,
+        "warmAll": 0.6300000000000001,
+        "idle": 0
+      },
+      "peakPssMiB": 298.2998046875,
+      "peakRssMiB": 299.109375,
+      "allIdlePssMiB": 298.2998046875,
+      "baselinePssMiB": null,
+      "emptyVmsPssMiB": null,
+      "stagedPssMiB": null,
+      "disposedVmsPssMiB": null,
+      "disposedSidecarsPssMiB": null
+    },
+    {
       "file": "benchmark-native-core-2.json",
       "runtime": "native-core",
+      "workload": "core-shell",
       "profile": "core",
       "schemaExecution": "native",
       "allocatorEnvironment": {
@@ -3488,6 +4966,8 @@
         }
       ],
       "sampledTreeCpuSeconds": 1.89,
+      "accountedTreeCpuSeconds": null,
+      "phaseCpuIncludesReapedChildren": false,
       "cpuAffinity": null,
       "phaseCpuSeconds": {
         "provision": null,
@@ -3509,6 +4989,7 @@
     {
       "file": "benchmark-native-core-3.json",
       "runtime": "native-core",
+      "workload": "core-shell",
       "profile": "core",
       "schemaExecution": "native",
       "allocatorEnvironment": {
@@ -3541,6 +5022,8 @@
         }
       ],
       "sampledTreeCpuSeconds": 1.8,
+      "accountedTreeCpuSeconds": null,
+      "phaseCpuIncludesReapedChildren": false,
       "cpuAffinity": null,
       "phaseCpuSeconds": {
         "provision": null,
@@ -3562,6 +5045,7 @@
     {
       "file": "benchmark-native-core-4.json",
       "runtime": "native-core",
+      "workload": "core-shell",
       "profile": "core",
       "schemaExecution": "native",
       "allocatorEnvironment": {
@@ -3594,6 +5078,8 @@
         }
       ],
       "sampledTreeCpuSeconds": 2.03,
+      "accountedTreeCpuSeconds": null,
+      "phaseCpuIncludesReapedChildren": false,
       "cpuAffinity": null,
       "phaseCpuSeconds": {
         "provision": null,
@@ -3615,6 +5101,7 @@
     {
       "file": "benchmark-native-core-5.json",
       "runtime": "native-core",
+      "workload": "core-shell",
       "profile": "core",
       "schemaExecution": "native",
       "allocatorEnvironment": {
@@ -3650,6 +5137,8 @@
         }
       ],
       "sampledTreeCpuSeconds": 1.97,
+      "accountedTreeCpuSeconds": null,
+      "phaseCpuIncludesReapedChildren": false,
       "cpuAffinity": null,
       "phaseCpuSeconds": {
         "provision": null,
@@ -3671,6 +5160,7 @@
     {
       "file": "benchmark-native-core-6.json",
       "runtime": "native-core",
+      "workload": "core-shell",
       "profile": "core",
       "schemaExecution": "native",
       "allocatorEnvironment": {
@@ -3756,6 +5246,8 @@
         }
       ],
       "sampledTreeCpuSeconds": 3.38,
+      "accountedTreeCpuSeconds": null,
+      "phaseCpuIncludesReapedChildren": false,
       "cpuAffinity": [
         0,
         1,
@@ -3778,6 +5270,310 @@
       "peakPssMiB": 634.46484375,
       "peakRssMiB": 635.28515625,
       "allIdlePssMiB": 324.044921875,
+      "baselinePssMiB": null,
+      "emptyVmsPssMiB": null,
+      "stagedPssMiB": null,
+      "disposedVmsPssMiB": null,
+      "disposedSidecarsPssMiB": null
+    },
+    {
+      "file": "benchmark-native-core-7.json",
+      "runtime": "native-core",
+      "workload": "boundaries",
+      "profile": "core",
+      "schemaExecution": "native",
+      "allocatorEnvironment": {
+        "MALLOC_ARENA_MAX": "1",
+        "MALLOC_TRIM_THRESHOLD_": "65536",
+        "MALLOC_MMAP_THRESHOLD_": "65536"
+      },
+      "diagnostics": {
+        "BENCH_PROFILE_CORE": "0",
+        "BENCH_PROFILE_FS": "0",
+        "BENCH_SQL_SCHEMA_MODE": "0",
+        "BENCH_PROFILE_PROCESS": "0",
+        "BENCH_PROFILE_SQL": "0",
+        "CORE_HEAP_MB": null,
+        "CORE_WASM_HEAP_MB": null,
+        "AGENTOS_V8_WARM_ISOLATES": null,
+        "AGENTOS_WASM_SNAPSHOT_RUNNER": null,
+        "BENCH_WARM_TURNS": null,
+        "BENCH_WORKLOAD": "boundaries",
+        "BENCH_REVERSE": null
+      },
+      "experimentNotes": [],
+      "configuredInstances": 1,
+      "passed": true,
+      "placement": "native-process",
+      "splitInitializer": false,
+      "instances": [],
+      "sampledTreeCpuSeconds": 1.95,
+      "accountedTreeCpuSeconds": null,
+      "phaseCpuIncludesReapedChildren": false,
+      "cpuAffinity": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "phaseCpuSeconds": {
+        "provision": null,
+        "stage": null,
+        "cold": null,
+        "warmFive": null,
+        "warmAll": null,
+        "idle": 0
+      },
+      "peakPssMiB": 189.2119140625,
+      "peakRssMiB": 210.60546875,
+      "allIdlePssMiB": 174.07421875,
+      "baselinePssMiB": null,
+      "emptyVmsPssMiB": null,
+      "stagedPssMiB": null,
+      "disposedVmsPssMiB": null,
+      "disposedSidecarsPssMiB": null
+    },
+    {
+      "file": "benchmark-native-core-8.json",
+      "runtime": "native-core",
+      "workload": "core-read",
+      "profile": "core",
+      "schemaExecution": "native",
+      "allocatorEnvironment": {
+        "MALLOC_ARENA_MAX": "1",
+        "MALLOC_TRIM_THRESHOLD_": "65536",
+        "MALLOC_MMAP_THRESHOLD_": "65536"
+      },
+      "diagnostics": {
+        "BENCH_PROFILE_CORE": "0",
+        "BENCH_PROFILE_FS": "0",
+        "BENCH_SQL_SCHEMA_MODE": "0",
+        "BENCH_PROFILE_PROCESS": "0",
+        "BENCH_PROFILE_SQL": "0",
+        "CORE_HEAP_MB": null,
+        "CORE_WASM_HEAP_MB": null,
+        "AGENTOS_V8_WARM_ISOLATES": null,
+        "AGENTOS_WASM_SNAPSHOT_RUNNER": null,
+        "BENCH_WARM_TURNS": "50",
+        "BENCH_WORKLOAD": "core-read",
+        "BENCH_REVERSE": null
+      },
+      "experimentNotes": [],
+      "configuredInstances": 1,
+      "passed": true,
+      "placement": "native-process",
+      "splitInitializer": false,
+      "instances": [
+        {
+          "index": 0,
+          "coldTurnMs": 284.22704799999997,
+          "launchToFirstResultMs": 941.3589779978793,
+          "launchToReadyMs": 655.8818339981372,
+          "warmTurnMs": [
+            10.629865999999993,
+            8.955782999999997,
+            8.433698999999933,
+            9.93722600000001,
+            12.861545999999976,
+            7.4977649999999585,
+            7.304173999999989,
+            8.31514100000004,
+            7.988480999999979,
+            7.112105999999926,
+            6.391644999999926,
+            6.392174999999952,
+            7.1284709999999905,
+            6.258264000000054,
+            15.164862999999968,
+            12.472721999999976,
+            15.051583000000164,
+            17.480929999999944,
+            7.196362000000136,
+            6.974038000000064,
+            6.710071999999855,
+            7.822593000000097,
+            7.032506000000012,
+            6.784582999999884,
+            6.697033000000147,
+            7.248370000000023,
+            6.775300000000016,
+            6.871583999999984,
+            7.037162999999964,
+            7.330042000000049,
+            7.954409999999825,
+            8.723144000000048,
+            9.009424000000081,
+            8.54418499999997,
+            8.410403999999971,
+            9.021522000000004,
+            9.513500000000022,
+            9.185518000000002,
+            11.321924999999965,
+            7.8052470000000085,
+            9.085908000000018,
+            8.119948000000022,
+            8.839347999999973,
+            8.382331000000022,
+            8.4488530000001,
+            8.76952399999982,
+            8.577244000000064,
+            8.948462000000063,
+            10.208974000000126,
+            11.51487400000019
+          ]
+        }
+      ],
+      "sampledTreeCpuSeconds": 1.74,
+      "accountedTreeCpuSeconds": 1.74,
+      "phaseCpuIncludesReapedChildren": true,
+      "cpuAffinity": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "phaseCpuSeconds": {
+        "provision": null,
+        "stage": null,
+        "cold": 0.44000000000000006,
+        "warmFive": 0.11999999999999988,
+        "warmAll": 0.6699999999999999,
+        "idle": 0
+      },
+      "peakPssMiB": 297.7626953125,
+      "peakRssMiB": 298.5703125,
+      "allIdlePssMiB": 297.7548828125,
+      "baselinePssMiB": null,
+      "emptyVmsPssMiB": null,
+      "stagedPssMiB": null,
+      "disposedVmsPssMiB": null,
+      "disposedSidecarsPssMiB": null
+    },
+    {
+      "file": "benchmark-native-core-9.json",
+      "runtime": "native-core",
+      "workload": "core-none",
+      "profile": "core",
+      "schemaExecution": "native",
+      "allocatorEnvironment": {
+        "MALLOC_ARENA_MAX": "1",
+        "MALLOC_TRIM_THRESHOLD_": "65536",
+        "MALLOC_MMAP_THRESHOLD_": "65536"
+      },
+      "diagnostics": {
+        "BENCH_PROFILE_CORE": "0",
+        "BENCH_PROFILE_FS": "0",
+        "BENCH_SQL_SCHEMA_MODE": "0",
+        "BENCH_PROFILE_PROCESS": "0",
+        "BENCH_PROFILE_SQL": "0",
+        "CORE_HEAP_MB": null,
+        "CORE_WASM_HEAP_MB": null,
+        "AGENTOS_V8_WARM_ISOLATES": null,
+        "AGENTOS_WASM_SNAPSHOT_RUNNER": null,
+        "BENCH_WARM_TURNS": "50",
+        "BENCH_WORKLOAD": "core-none",
+        "BENCH_REVERSE": null
+      },
+      "experimentNotes": [],
+      "configuredInstances": 1,
+      "passed": true,
+      "placement": "native-process",
+      "splitInitializer": false,
+      "instances": [
+        {
+          "index": 0,
+          "coldTurnMs": 289.219698,
+          "launchToFirstResultMs": 941.1670659974334,
+          "launchToReadyMs": 650.502823998977,
+          "warmTurnMs": [
+            6.120416999999975,
+            4.727917000000048,
+            4.698473000000035,
+            4.336368999999991,
+            3.8746659999999338,
+            5.364031000000068,
+            3.789026999999919,
+            4.267946000000052,
+            4.7666849999999386,
+            3.689828000000034,
+            3.1075739999999996,
+            3.4495379999999614,
+            3.2324519999999666,
+            3.7475259999999935,
+            4.11340400000006,
+            3.4609739999999647,
+            3.6216160000000173,
+            4.175027,
+            4.7466949999999315,
+            4.394104999999968,
+            4.415747999999894,
+            4.180174999999963,
+            3.801146000000017,
+            3.3584809999999834,
+            3.4762980000000425,
+            15.954267000000073,
+            7.7236729999999625,
+            7.667597999999998,
+            13.854654999999866,
+            5.042157999999972,
+            4.625192999999854,
+            4.258231999999907,
+            4.223670000000084,
+            5.035888999999997,
+            3.8278560000001107,
+            4.554307000000108,
+            3.399902999999995,
+            3.3297580000000835,
+            3.385671999999886,
+            3.362276999999949,
+            3.4596829999998135,
+            3.902407999999923,
+            3.382816999999932,
+            3.529898000000003,
+            4.049046999999973,
+            3.7797630000000026,
+            3.473083000000088,
+            3.476237000000083,
+            3.6168390000000272,
+            3.9429479999998875
+          ]
+        }
+      ],
+      "sampledTreeCpuSeconds": 1.51,
+      "accountedTreeCpuSeconds": 1.51,
+      "phaseCpuIncludesReapedChildren": true,
+      "cpuAffinity": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8
+      ],
+      "phaseCpuSeconds": {
+        "provision": null,
+        "stage": null,
+        "cold": 0.43000000000000005,
+        "warmFive": 0,
+        "warmAll": 0.42999999999999994,
+        "idle": 0
+      },
+      "peakPssMiB": 266.9150390625,
+      "peakRssMiB": 267.72265625,
+      "allIdlePssMiB": 266.9072265625,
       "baselinePssMiB": null,
       "emptyVmsPssMiB": null,
       "stagedPssMiB": null,
