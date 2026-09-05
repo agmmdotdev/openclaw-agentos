@@ -17,15 +17,31 @@ if (sha256 !== expected) throw new Error(`Unreviewed worker artifact: ${sha256}`
 const profile = process.env.CORE_PROFILE ?? 'core';
 if (!['core', 'full'].includes(profile)) throw new Error('Unknown CORE_PROFILE');
 const prepared = profile === 'core' ? prepareCoreProfile(source) : { source };
+// Keep upstream database creation, schema execution, and finally/close in the
+// guest. Extract only the existing read-only metadata scan from its try block.
+const canonicalAnchor = 'function readCanonicalStrictTables(Ot){';
+if (prepared.source.split(canonicalAnchor).length !== 2) throw new Error('Canonical table scan boundary changed');
+const canonicalStart = prepared.source.indexOf(canonicalAnchor);
+const canonicalAst = ts.createSourceFile('canonical.mjs', prepared.source.slice(canonicalStart, canonicalStart + 6000), ts.ScriptTarget.Latest, true, ts.ScriptKind.JS);
+const canonicalFunction = canonicalAst.statements[0];
+const canonicalTry = canonicalFunction.body?.statements[1];
+if (!ts.isFunctionDeclaration(canonicalFunction) || !canonicalTry || !ts.isTryStatement(canonicalTry)
+  || canonicalTry.tryBlock.statements[0]?.getText(canonicalAst) !== 'Zt.exec(Ot);') throw new Error('Canonical scan structure changed');
+const canonicalCollector = 'function collectCanonicalStrictTableMetadata(Zt){' + canonicalTry.tryBlock.statements.slice(1).map(statement => statement.getText(canonicalAst)).join('') + '}';
+const rowidAliases = 'SQLITE_ROWID_ALIASES=[`_rowid_`,`rowid`,`oid`]';
+if (prepared.source.split(rowidAliases).length !== 2) throw new Error('Canonical rowid aliases changed');
 // Extract the original read-only collector before installing the guest hook.
 // It accepts an already-authorized database handle; it opens no connections.
-const schemaCollector = sliceCoreArtifact(prepared.source, {
-  roots: ['init_sqlite_schema_sql', 'collectSqliteTableContract', 'collectSqliteNamedIndexContract'], registerRuntime: false,
-  wrapper: '\ninit_sqlite_schema_sql(); export { collectSqliteTableContract, collectSqliteNamedIndexContract };\n',
+const schemaCollector = sliceCoreArtifact(prepared.source + '\n' + canonicalCollector, {
+  roots: ['init_sqlite_schema_sql', 'collectSqliteTableContract', 'collectSqliteNamedIndexContract', 'collectCanonicalStrictTableMetadata'], registerRuntime: false,
+  wrapper: `\ninit_sqlite_schema_sql(); ${rowidAliases}; export { collectSqliteTableContract, collectSqliteNamedIndexContract, collectCanonicalStrictTableMetadata };\n`,
 });
 if (/^import\s/m.test(schemaCollector.source) || Buffer.byteLength(schemaCollector.source) > 40000) {
   throw new Error('Schema collector dependency boundary expanded');
 }
+const canonicalHook = canonicalAnchor + 'let Zt=openNodeSqliteDatabase(`:memory:`);try{Zt.exec(Ot);';
+if (prepared.source.split(canonicalHook).length !== 2) throw new Error('Canonical metadata hook changed');
+prepared.source = prepared.source.replace(canonicalHook, canonicalHook + 'if(typeof Zt.collectOpenClawCanonicalStrictTables===`function`)return Zt.collectOpenClawCanonicalStrictTables();');
 const collectorAnchor = 'function collectSqliteTableContract(Ot,Zt){';
 if (prepared.source.split(collectorAnchor).length !== 2) throw new Error('Schema collector hook boundary changed');
 prepared.source = prepared.source.replace(collectorAnchor, collectorAnchor +

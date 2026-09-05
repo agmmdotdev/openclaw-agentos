@@ -13,7 +13,8 @@ import { createCoreArtifactStore } from '../../src/core-artifact-store.mjs';
 
 const coreMount = process.env.BENCH_CORE_MOUNT ?? 'upload';
 if (!['upload', 'host_dir'].includes(coreMount)) throw new Error('Unknown BENCH_CORE_MOUNT');
-if (process.env.BENCH_SQL_SCHEMA_MODE && !['individual', 'table-only'].includes(process.env.BENCH_SQL_SCHEMA_MODE)) throw new Error('Unknown BENCH_SQL_SCHEMA_MODE');
+if (process.env.BENCH_SQL_SCHEMA_MODE && !['individual', 'table-only', 'table-index'].includes(process.env.BENCH_SQL_SCHEMA_MODE)) throw new Error('Unknown BENCH_SQL_SCHEMA_MODE');
+const canonicalBatching = process.env.BENCH_CANONICAL_BATCHING === '1' && !process.env.BENCH_SQL_SCHEMA_MODE;
 const warmTurns = Number(process.env.BENCH_WARM_TURNS ?? 5);
 if (!Number.isSafeInteger(warmTurns) || warmTurns < 1 || warmTurns > 100) throw new Error('BENCH_WARM_TURNS must be between 1 and 100');
 const heapMb = Number(process.env.CORE_HEAP_MB ?? 256);
@@ -27,7 +28,7 @@ const root = await mkdtemp(join(tmpdir(), 'openclaw-bench-'));
 function mark(label, data = {}) { console.log('BENCH_EVENT=' + JSON.stringify({ label, atMs: performance.now() - start, ...data })); }
 const settle = () => new Promise(resolve => setTimeout(resolve, 600));
 try {
-  mark('baseline', { placement: 'one-sidecar-pool-per-vm', coreMount }); await settle();
+  mark('baseline', { placement: 'one-sidecar-pool-per-vm', coreMount, canonicalBatching }); await settle();
   if (coreMount === 'host_dir') artifactStore = await createCoreArtifactStore();
   for (let index = 0; index < instances; index++) {
     const directory = join(root, String(index)); await mkdir(directory);
@@ -77,6 +78,11 @@ try {
     for (const name of await readdir('artifacts/core/compat')) {
       let content = await readFile(`artifacts/core/compat/${name}`, 'utf8');
       if (name === 'sqlite.mjs') {
+        if (!canonicalBatching) {
+          const method = 'collectOpenClawCanonicalStrictTables()';
+          if (content.split(method).length !== 2) throw new Error('Canonical batching control boundary changed');
+          content = content.replace(method, '__disabledCollectOpenClawCanonicalStrictTables()');
+        }
         if (['individual', 'table-only'].includes(process.env.BENCH_SQL_SCHEMA_MODE)) {
           const method = 'collectOpenClawNamedIndexContract(indexName)';
           if (content.split(method).length !== 2) throw new Error('Named index batching control boundary changed');

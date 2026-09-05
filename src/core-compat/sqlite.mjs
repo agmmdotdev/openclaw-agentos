@@ -37,6 +37,7 @@ export class DatabaseSync {
   }
   collectOpenClawTableContract(tableName) { return call({ op: 'openclaw-table-contract', handle: this.handle, tableName }); }
   collectOpenClawNamedIndexContract(indexName) { return call({ op: 'openclaw-named-index-contract', handle: this.handle, indexName }); }
+  collectOpenClawCanonicalStrictTables() { return call({ op: 'openclaw-canonical-strict-tables', handle: this.handle }); }
   exec(sql) { return call({ op: 'exec', handle: this.handle, sql }); }
   get isTransaction() { return call({ op: 'state', handle: this.handle }).isTransaction; }
   close() { call({ op: 'close', handle: this.handle }); this.isOpen = false; }
@@ -54,3 +55,5 @@ export class DatabaseSync {
   }
 }
 export default { DatabaseSync };
+// Cold-start tradeoff: opt in explicitly; repeated warm workloads did not
+// establish a memory/CPU win for this additional batch.

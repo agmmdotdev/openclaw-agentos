@@ -1,0 +1,112 @@
+{
+  "agentos": "0.2.19",
+  "coreutils": "0.3.4",
+  "optimizer": "binaryen@132.0.0",
+  "inputBytes": 3090134,
+  "inputSha256": "afe65bc64a0c698291d110f18218862efda7bdee4484a94248d9f749e06de961",
+  "outputBytes": 3040622,
+  "outputSha256": "762feb195105a485c4be3007d84bcc6f0a001aeea13cda6ce8da593100ac4ed0",
+  "optimizationLevel": 2,
+  "shrinkLevel": 2,
+  "passes": 2,
+  "features": [
+    "MutableGlobals",
+    "NontrappingFPToInt",
+    "BulkMemory",
+    "BulkMemoryOpt",
+    "SignExt"
+  ],
+  "adopted": false,
+  "notes": [
+    "Initial Features.All output used features unsupported by host V8 and agentOS; it was rejected.",
+    "Restricted-feature output validates in host V8 and executes as a separate software package.",
+    "Each group has one separately recorded first operation and 15 warm checked printf commands. The later first operations are not new cold processes.",
+    "No real-core performance gain or full shell semantic equivalence is claimed."
+  ],
+  "runs": [
+    {
+      "name": "control-sh",
+      "coldMs": 697.0740860000001,
+      "warmMs": [
+        148.51405899999986,
+        113.01703100000009,
+        106.90621399999986,
+        133.33987300000013,
+        146.93116299999997,
+        111.82409899999993,
+        126.86855499999979,
+        158.6374569999998,
+        128.87311,
+        134.931869,
+        113.92138399999976,
+        131.70343999999977,
+        124.18701400000009,
+        136.79578700000002,
+        138.8678030000001
+      ]
+    },
+    {
+      "name": "optimized-sh",
+      "coldMs": 238.3736160000003,
+      "warmMs": [
+        153.48832400000038,
+        130.63948299999993,
+        130.56007899999986,
+        122.71403700000019,
+        118.53598300000021,
+        143.09638399999994,
+        122.55106300000034,
+        123.3118800000002,
+        131.17719100000068,
+        120.84193999999934,
+        128.45872899999995,
+        116.17550399999982,
+        107.641302,
+        122.15362199999981,
+        126.23187400000006
+      ]
+    },
+    {
+      "name": "optimized-sh",
+      "coldMs": 131.77719200000047,
+      "warmMs": [
+        113.38840299999993,
+        122.10922399999981,
+        109.94071200000053,
+        122.20863800000006,
+        116.9691759999996,
+        125.6637810000002,
+        119.15676800000074,
+        123.14595400000053,
+        134.80449599999974,
+        160.84854799999994,
+        122.13749899999948,
+        110.62716900000032,
+        151.21316899999965,
+        112.76774000000023,
+        119.24792400000024
+      ]
+    },
+    {
+      "name": "control-sh",
+      "coldMs": 138.56565200000023,
+      "warmMs": [
+        109.23516299999937,
+        130.1208259999994,
+        109.35627100000056,
+        118.32655400000021,
+        113.76028099999985,
+        127.57857200000035,
+        118.06176699999924,
+        116.46209900000031,
+        170.4397200000003,
+        115.60911799999849,
+        141.82785200000035,
+        113.26508699999977,
+        126.7416000000012,
+        117.13811400000122,
+        120.12282400000004
+      ]
+    }
+  ]
+}

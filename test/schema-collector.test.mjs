@@ -6,7 +6,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { createCoreHostSqlite } from '../src/core-host-sqlite.mjs';
 import { encode, decode } from '../src/host-sqlite.mjs';
-import { collectSqliteTableContract, collectSqliteNamedIndexContract } from '../artifacts/core/schema-collector.mjs';
+import { collectSqliteTableContract, collectSqliteNamedIndexContract, collectCanonicalStrictTableMetadata } from '../artifacts/core/schema-collector.mjs';
 
 test('batched upstream schema collector matches direct SQLite and observes DDL/rollback without caching', async () => {
   const root = mkdtempSync(join(tmpdir(), 'core-schema-test-'));
@@ -69,4 +69,42 @@ test('batched upstream schema collector matches direct SQLite and observes DDL/r
     assert.throws(() => inspect('example'), /Unknown SQLite handle/);
     assert.throws(() => inspectIndex('example_value'), /Unknown SQLite handle/);
   } finally { db.close(); service.dispose(); foreign.dispose(); rmSync(root, { recursive: true, force: true }); }
+});
+
+test('canonical metadata scan preserves rowid safety, strict checks and transaction state', async () => {
+  const root = mkdtempSync(join(tmpdir(), 'core-canonical-test-'));
+  const service = await createCoreHostSqlite(root);
+  const db = new DatabaseSync(':memory:');
+  const call = request => {
+    const result = JSON.parse(service.execute({ payload: JSON.stringify(encode(request)) }));
+    if (!result.ok) throw new Error(result.error.message);
+    return decode(JSON.parse(result.result));
+  };
+  try {
+    const handle = call({ op: 'open', path: ':memory:' });
+    const exec = sql => { db.exec(sql); call({ op: 'exec', handle, sql }); };
+    const inspect = () => call({ op: 'openclaw-canonical-strict-tables', handle });
+    exec(`CREATE TABLE "é"(id INTEGER PRIMARY KEY AUTOINCREMENT, value TEXT) STRICT;
+      CREATE TABLE composite(a TEXT,b INTEGER,PRIMARY KEY(a,b)) STRICT, WITHOUT ROWID;
+      CREATE TABLE aliases(_rowid_ TEXT,rowid TEXT) STRICT;
+      CREATE TABLE descending(id INTEGER PRIMARY KEY DESC,value TEXT) STRICT;
+      CREATE TABLE generated(value INTEGER, doubled INTEGER GENERATED ALWAYS AS (value*2)) STRICT;`);
+    assert.deepEqual(inspect(), collectCanonicalStrictTableMetadata(db));
+    const byName = Object.fromEntries(inspect().map(table => [table.name, table]));
+    assert.equal(byName['é'].rowidStorage, 'integer-primary-key');
+    assert.equal(byName['é'].usesAutoincrement, true);
+    assert.equal(byName.composite.rowidStorage, 'without-rowid');
+    assert.equal(byName.aliases.rowidAlias, 'oid');
+    assert.equal(byName.descending.rowidStorage, 'implicit');
+    exec('BEGIN; ALTER TABLE aliases ADD COLUMN extra BLOB');
+    assert.deepEqual(inspect(), collectCanonicalStrictTableMetadata(db));
+    assert.equal(call({ op: 'state', handle }).isTransaction, true);
+    exec('ROLLBACK');
+    assert.deepEqual(inspect(), collectCanonicalStrictTableMetadata(db));
+    exec('CREATE TABLE unsafe(_rowid_ TEXT,rowid TEXT,oid TEXT) STRICT');
+    assert.throws(inspect, /shadows every rowid alias/);
+    exec('DROP TABLE unsafe; CREATE TABLE legacy(value TEXT)');
+    assert.throws(inspect, /non-STRICT tables: legacy/);
+    assert.throws(() => call({ op: 'openclaw-canonical-strict-tables', handle: 'foreign' }), /Unknown SQLite handle/);
+  } finally { db.close(); service.dispose(); rmSync(root, { recursive: true, force: true }); }
 });

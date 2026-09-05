@@ -45,3 +45,26 @@ try {
   if (compareProfileSchema().length !== 0) throw new Error('Schema rollback was not observed');
 } finally { profileDatabase.close(); }
 console.log('SCHEMA_BATCH_RESULT=' + JSON.stringify({ differentialStates: 3, passed: true }));
+
+// The original guest function still opens/configures its SQLite connection,
+// executes the schema, and closes in finally. Only its read scan is batched.
+const canonicalSchemas = [
+  'CREATE TABLE "é"(id INTEGER PRIMARY KEY AUTOINCREMENT,value TEXT) STRICT; CREATE TABLE "Å"(a TEXT,b INTEGER,PRIMARY KEY(a,b)) STRICT, WITHOUT ROWID; CREATE TABLE z(_rowid_ TEXT,rowid TEXT) STRICT;',
+  'CREATE TABLE descending(id INTEGER PRIMARY KEY DESC,value TEXT) STRICT; CREATE TABLE generated(value INTEGER,doubled INTEGER GENERATED ALWAYS AS(value*2)) STRICT;',
+  'CREATE TABLE legacy(value TEXT)',
+  'CREATE TABLE unsafe(_rowid_ TEXT,rowid TEXT,oid TEXT) STRICT',
+];
+const canonicalEnabled = typeof ProfileDatabase.prototype.collectOpenClawCanonicalStrictTables === 'function';
+for (const schema of canonicalEnabled ? canonicalSchemas : []) {
+  const inspect = () => { try { return { value: readCanonicalStrictTables(schema) }; } catch(error) { return { error: error.message }; } };
+  const batched = inspect();
+  const method = ProfileDatabase.prototype.collectOpenClawCanonicalStrictTables;
+  ProfileDatabase.prototype.collectOpenClawCanonicalStrictTables = undefined;
+  let individual;
+  try { individual = inspect(); }
+  finally { ProfileDatabase.prototype.collectOpenClawCanonicalStrictTables = method; }
+  if (JSON.stringify(batched) !== JSON.stringify(individual)) throw new Error('Canonical table metadata differs from original guest scan');
+  if (schema.includes('legacy') && !batched.error?.includes('non-STRICT')) throw new Error('Non-STRICT schema was accepted');
+  if (schema.includes('unsafe') && !batched.error?.includes('shadows every rowid')) throw new Error('Unsafe rowid aliases were accepted');
+}
+console.log('CANONICAL_BATCH_RESULT=' + JSON.stringify({ enabled: canonicalEnabled, differentialSchemas: canonicalEnabled ? canonicalSchemas.length : 0, passed: true }));

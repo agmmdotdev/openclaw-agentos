@@ -98,6 +98,19 @@ listener-table representation. See the report for these compatibility limits.
 
 ## Performance and placement
 
+The [canonical table experiment](docs/runtime-canonical-pass.md) reduces cold
+SQLite calls from **1,373 to 961** and launch-to-first-result from **3.36 to
+2.90 s** across three runs per configuration. It stays **opt-in**: warm CPU
+increases about 4% and idle memory about 11 MiB. The default keeps the previous
+table and index batching. Enable the experiment with
+`CORE_CANONICAL_BATCHING=1 npm run test:core:economy`.
+
+The [shell diagnosis](docs/wasm-shell-copy-cost.md) identifies a costly full
+binary copy in the published runtime's memory-limit rewrite. A prepared
+upstream patch preserves its checks and passes 156 differential cases, but is
+**not applied or submitted**. Its isolated function speedup is not a delivered
+agentOS runtime improvement.
+
 The latest [startup pass](docs/runtime-startup-pass.md) shares read-only core
 artifacts through a published mount and batches named-index inspection. In two
 51-turn runs per configuration, staging falls from **492 to 16 ms**, cold SQL

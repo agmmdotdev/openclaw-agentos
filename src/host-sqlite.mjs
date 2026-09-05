@@ -25,7 +25,7 @@ export function decode([kind, value]) {
   throw new Error('Invalid SQLite wire value');
 }
 
-export function createHostSqlite(root, { collectTableContract, collectNamedIndexContract } = {}) {
+export function createHostSqlite(root, { collectTableContract, collectNamedIndexContract, collectCanonicalStrictTables } = {}) {
   mkdirSync(root, { recursive: true, mode: 0o700 });
   const databases = new Map();
   const stats = { calls: 0, opens: 0, version: undefined, failures: [] };
@@ -56,6 +56,10 @@ export function createHostSqlite(root, { collectTableContract, collectNamedIndex
         if (request.op === 'close') { db.close(); databases.delete(request.handle); }
         else if (request.op === 'state') value = { isOpen: db.isOpen, isTransaction: db.isTransaction };
         else if (request.op === 'exec') value = db.exec(request.sql);
+        else if (request.op === 'openclaw-canonical-strict-tables') {
+          if (!collectCanonicalStrictTables) throw new Error('Canonical table collector is not configured');
+          value = collectCanonicalStrictTables(db);
+        }
         else if (request.op === 'openclaw-table-contract') {
           if (!collectTableContract) throw new Error('Schema collector is not configured');
           if (typeof request.tableName !== 'string' || request.tableName.length > 4096) throw new Error('Invalid table name');

@@ -1,0 +1,77 @@
+{
+  "recordedAt": "2026-09-05T15:02:50.002Z",
+  "node": "v24.19.0",
+  "artifactMode": "host_dir",
+  "canonicalBatching": true,
+  "validationPassed": true,
+  "openclaw": "2026.8.1",
+  "agentos": "0.2.19",
+  "runtimeEnvironment": {
+    "MALLOC_ARENA_MAX": "1",
+    "MALLOC_TRIM_THRESHOLD_": "65536",
+    "MALLOC_MMAP_THRESHOLD_": "65536",
+    "AGENTOS_V8_WARM_ISOLATES": "0"
+  },
+  "sqlite": {
+    "calls": 1876,
+    "opens": 35,
+    "version": "3.53.3",
+    "failures": [
+      {
+        "message": "not authorized",
+        "code": "ERR_SQLITE_ERROR"
+      },
+      {
+        "message": "Canonical SQLite schema contains non-STRICT tables: legacy"
+      },
+      {
+        "message": "SQLite table unsafe shadows every rowid alias; its implicit rowids cannot be migrated safely"
+      },
+      {
+        "message": "Canonical SQLite schema contains non-STRICT tables: legacy"
+      },
+      {
+        "message": "SQLite table unsafe shadows every rowid alias; its implicit rowids cannot be migrated safely"
+      }
+    ]
+  },
+  "reports": [
+    {
+      "generation": "capabilities",
+      "result": {
+        "exitCode": 0,
+        "stdout": "CAPABILITIES_RESULT={\"assertions\":132,\"failures\":[],\"parallel\":[\"first\",\"second\"],\"sqlite\":\"host-backed\",\"unsupported\":[\"X509Certificate\",\"monitorEventLoopDelay\"]}\n",
+        "stderr": "",
+        "stdoutTruncated": false,
+        "stderrTruncated": false,
+        "outcome": "succeeded"
+      }
+    },
+    {
+      "generation": "initial",
+      "durationMs": 4373,
+      "sqliteCalls": 1250,
+      "result": {
+        "exitCode": 0,
+        "stdout": "CORE_RESULT={\"phase\":\"tools\",\"durationMs\":1963,\"calls\":6,\"tools\":[\"write\",\"read\",\"edit\",\"exec\",\"apply_patch\"],\"transcriptMessages\":12,\"priorMessages\":0,\"events\":[{\"kind\":\"lifecycle\",\"phase\":\"start\"},{\"kind\":\"tool\",\"phase\":\"start\"},{\"kind\":\"tool\",\"phase\":\"result\"},{\"kind\":\"tool\",\"phase\":\"start\"},{\"kind\":\"tool\",\"phase\":\"result\"},{\"kind\":\"tool\",\"phase\":\"start\"},{\"kind\":\"tool\",\"phase\":\"result\"},{\"kind\":\"tool\",\"phase\":\"start\"},{\"kind\":\"tool\",\"phase\":\"result\"},{\"kind\":\"tool\",\"phase\":\"start\"},{\"kind\":\"tool\",\"phase\":\"result\"},{\"kind\":\"assistant\"},{\"kind\":\"lifecycle\",\"phase\":\"finishing\"}],\"order\":[\"commit\",\"commit\",\"commit\",\"commit\",\"commit\",\"commit\",\"commit\",\"commit\",\"commit\",\"commit\",\"commit\",\"commit\",\"terminal\"]}\nCORE_RESULT={\"phase\":\"resume\",\"durationMs\":418,\"calls\":3,\"tools\":[\"read\",\"exec\"],\"transcriptMessages\":6,\"priorMessages\":12,\"events\":[{\"kind\":\"lifecycle\",\"phase\":\"start\"},{\"kind\":\"tool\",\"phase\":\"start\"},{\"kind\":\"tool\",\"phase\":\"result\"},{\"kind\":\"tool\",\"phase\":\"start\"},{\"kind\":\"tool\",\"phase\":\"update\"},{\"kind\":\"tool\",\"phase\":\"result\"},{\"kind\":\"assistant\"},{\"kind\":\"lifecycle\",\"phase\":\"finishing\"}],\"order\":[\"commit\",\"commit\",\"commit\",\"commit\",\"commit\",\"commit\",\"terminal\"]}\nFAILURE_CASES_RESULT={\"completed\":[\"pre-aborted\",\"inference-error\",\"transcript-error\",\"read-only\",\"missing-file\",\"background-process-0\",\"background-process-7\",\"background-process-127\"],\"failures\":[]}\nCORE_PROFILE_RESULT={\"assertions\":2,\"passed\":true}\nSCHEMA_BATCH_RESULT={\"differentialStates\":3,\"passed\":true}\nCANONICAL_BATCH_RESULT={\"enabled\":true,\"differentialSchemas\":4,\"passed\":true}\n",
+        "stderr": "[tools] read failed: File not found: /workspace/missing.txt. raw_params={\"path\":\"/workspace/missing.txt\"}\n",
+        "stdoutTruncated": false,
+        "stderrTruncated": false,
+        "outcome": "succeeded"
+      }
+    },
+    {
+      "generation": "restored",
+      "durationMs": 2823,
+      "sqliteCalls": 609,
+      "result": {
+        "exitCode": 0,
+        "stdout": "CORE_RESULT={\"phase\":\"resume\",\"durationMs\":2021,\"calls\":3,\"tools\":[\"read\",\"exec\"],\"transcriptMessages\":6,\"priorMessages\":18,\"events\":[{\"kind\":\"lifecycle\",\"phase\":\"start\"},{\"kind\":\"tool\",\"phase\":\"start\"},{\"kind\":\"tool\",\"phase\":\"result\"},{\"kind\":\"tool\",\"phase\":\"start\"},{\"kind\":\"tool\",\"phase\":\"update\"},{\"kind\":\"tool\",\"phase\":\"result\"},{\"kind\":\"assistant\"},{\"kind\":\"lifecycle\",\"phase\":\"finishing\"}],\"order\":[\"commit\",\"commit\",\"commit\",\"commit\",\"commit\",\"commit\",\"terminal\"]}\nCORE_PROFILE_RESULT={\"assertions\":2,\"passed\":true}\nSCHEMA_BATCH_RESULT={\"differentialStates\":3,\"passed\":true}\nCANONICAL_BATCH_RESULT={\"enabled\":true,\"differentialSchemas\":4,\"passed\":true}\n",
+        "stderr": "",
+        "stdoutTruncated": false,
+        "stderrTruncated": false,
+        "outcome": "succeeded"
+      }
+    }
+  ]
+}

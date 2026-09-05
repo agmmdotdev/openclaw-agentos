@@ -58,6 +58,7 @@ for path in sorted(folder.glob('benchmark-*.json')):
         'workload':report.get('diagnostics',{}).get('BENCH_WORKLOAD') or 'core-shell',
         'profile':report.get('coreManifest',{}).get('profile','full'),
         'coreArtifactMode': next((e.get('coreMount', 'upload') for e in events if e['label'] == 'baseline'), 'native'),
+        'canonicalTableBatching': (event('baseline') or {}).get('canonicalBatching', not native and 'collectCanonicalStrictTableMetadata' in report.get('coreManifest', {}).get('schemaCollector', {}).get('roots', []) and report.get('diagnostics', {}).get('BENCH_SQL_SCHEMA_MODE') not in ('individual', 'table-only', 'table-index')),
         'namedIndexBatching': not native and 'collectSqliteNamedIndexContract' in report.get('coreManifest', {}).get('schemaCollector', {}).get('roots', []) and report.get('diagnostics', {}).get('BENCH_SQL_SCHEMA_MODE') not in ('individual', 'table-only'),
         'schemaExecution':'native' if native else 'host-batched' if report.get('coreManifest',{}).get('schemaCollector') and report.get('diagnostics',{}).get('BENCH_SQL_SCHEMA_MODE') != 'individual' else 'guest-individual',
         'allocatorEnvironment':report.get('allocatorEnvironment',{}),

@@ -1,0 +1,35 @@
+--- a/crates/execution/assets/runners/wasm-runner.mjs
++++ b/crates/execution/assets/runners/wasm-runner.mjs
+@@ -1333,7 +1333,7 @@
+     throw new Error('module is not a valid WebAssembly binary');
+   }
+ 
+-  const rewritten = Array.from(bytes.slice(0, 8));
++  const rewritten = [bytes.subarray(0, 8)];
+   let offset = 8;
+ 
+   while (offset < bytes.length) {
+@@ -1349,19 +1349,18 @@
+     }
+ 
+     if (sectionId !== 5) {
+-      appendBytes(rewritten, bytes.slice(sectionStart, sectionEnd));
++      rewritten.push(bytes.subarray(sectionStart, sectionEnd));
+       offset = sectionEnd;
+       continue;
+     }
+ 
+     const rewrittenSection = rewriteMemorySection(bytes.slice(offset, sectionEnd), limitPages);
+-    rewritten.push(sectionId);
+-    appendBytes(rewritten, encodeVarUint(rewrittenSection.length));
+-    appendBytes(rewritten, rewrittenSection);
++    rewritten.push(Buffer.from([sectionId, ...encodeVarUint(rewrittenSection.length)]));
++    rewritten.push(Buffer.from(rewrittenSection));
+     offset = sectionEnd;
+   }
+ 
+-  return Buffer.from(rewritten);
++  return Buffer.concat(rewritten);
+ }
+ 
+ function decodeBase64ToUint8Array(value) {

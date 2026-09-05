@@ -53,8 +53,14 @@ try {
     }
     await stageFs.mkdir('/core/compat', { recursive: true });
     for (const name of await readdir('artifacts/core/compat')) {
-      const bytes = await readFile(`artifacts/core/compat/${name}`);
+      let bytes = await readFile(`artifacts/core/compat/${name}`);
       if (createHash('sha256').update(bytes).digest('hex') !== manifest.compatibilityFiles[name]) throw new Error(`Unverified core adapter: ${name}`);
+      if (name === 'sqlite.mjs' && process.env.CORE_CANONICAL_BATCHING !== '1') {
+        const method = 'collectOpenClawCanonicalStrictTables()';
+        const source = bytes.toString('utf8');
+        if (source.split(method).length !== 2) throw new Error('Canonical batching control boundary changed');
+        bytes = Buffer.from(source.replace(method, '__disabledCollectOpenClawCanonicalStrictTables()'));
+      }
       await stageFs.writeFile(`/core/compat/${name}`, bytes);
     }
     const packageRequire = createRequire(await realpath('node_modules/openclaw/package.json'));
@@ -95,6 +101,8 @@ try {
       timeoutMs: 90000, output: { capture: 'all' },
     });
     const report = { generation, durationMs: Math.round(performance.now() - started), sqliteCalls: sqlite.stats.calls - before, result };
+    const canonicalResult = result.stdout?.match(/^CANONICAL_BATCH_RESULT=(.+)$/m);
+    if (!canonicalResult || JSON.parse(canonicalResult[1]).enabled !== (process.env.CORE_CANONICAL_BATCHING === '1')) throw new Error('Canonical batching mode was not exercised as requested');
     reports.push(report);
     console.log(JSON.stringify(report, null, 2));
     if (/failed to asynchronously prepare wasm|Aborted\(Error:.*\/core\//.test(result.stderr ?? '')) throw new Error('Core parser asset failed to load');
@@ -104,6 +112,6 @@ try {
 } finally {
   await mkdir('artifacts/results', { recursive: true });
   const validationPassed = completed && reports.length === 3 && reports.every(report => report.result.exitCode === 0 && report.result.outcome === 'succeeded');
-  await writeFile('artifacts/results/core-probe.json', JSON.stringify({ recordedAt: new Date().toISOString(), node: process.version, artifactMode, validationPassed, openclaw: '2026.8.1', agentos: '0.2.19', runtimeEnvironment: Object.fromEntries(['MALLOC_ARENA_MAX', 'MALLOC_TRIM_THRESHOLD_', 'MALLOC_MMAP_THRESHOLD_', 'AGENTOS_V8_WARM_ISOLATES'].map(key => [key, process.env[key] ?? null])), sqlite: sqlite.stats, reports }, null, 2) + '\n');
+  await writeFile('artifacts/results/core-probe.json', JSON.stringify({ recordedAt: new Date().toISOString(), node: process.version, artifactMode, canonicalBatching: process.env.CORE_CANONICAL_BATCHING === '1', validationPassed, openclaw: '2026.8.1', agentos: '0.2.19', runtimeEnvironment: Object.fromEntries(['MALLOC_ARENA_MAX', 'MALLOC_TRIM_THRESHOLD_', 'MALLOC_MMAP_THRESHOLD_', 'AGENTOS_V8_WARM_ISOLATES'].map(key => [key, process.env[key] ?? null])), sqlite: sqlite.stats, reports }, null, 2) + '\n');
   await vm?.dispose(); sqlite.dispose(); await vm?.sidecar.dispose(); await artifactStore?.dispose(); await rm(sqliteRoot, { recursive: true, force: true });
 }

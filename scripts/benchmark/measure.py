@@ -160,7 +160,7 @@ report = {
     'runtime': native_label if args.native else 'agentos', 'splitInitializer': env.get('BENCH_SPLIT_INIT') == '1',
     'allocatorEnvironment': {k: env.get(k) for k in ['MALLOC_ARENA_MAX', 'MALLOC_TRIM_THRESHOLD_', 'MALLOC_MMAP_THRESHOLD_']},
     'coreManifest': json.loads((root / 'artifacts/core/manifest.json').read_text()),
-    'diagnostics': {k: env.get(k, '0') for k in ['BENCH_PROFILE_CORE', 'BENCH_PROFILE_FS', 'BENCH_SQL_SCHEMA_MODE', 'BENCH_PROFILE_PROCESS', 'BENCH_PROFILE_SQL']} | {k: env.get(k) for k in ['CORE_HEAP_MB', 'CORE_WASM_HEAP_MB', 'AGENTOS_V8_WARM_ISOLATES', 'AGENTOS_WASM_SNAPSHOT_RUNNER', 'BENCH_WARM_TURNS', 'BENCH_WORKLOAD', 'BENCH_REVERSE', 'BENCH_CORE_MOUNT']},
+    'diagnostics': {k: env.get(k, '0') for k in ['BENCH_PROFILE_CORE', 'BENCH_PROFILE_FS', 'BENCH_SQL_SCHEMA_MODE', 'BENCH_PROFILE_PROCESS', 'BENCH_PROFILE_SQL']} | {k: env.get(k) for k in ['CORE_HEAP_MB', 'CORE_WASM_HEAP_MB', 'AGENTOS_V8_WARM_ISOLATES', 'AGENTOS_WASM_SNAPSHOT_RUNNER', 'BENCH_WARM_TURNS', 'BENCH_WORKLOAD', 'BENCH_REVERSE', 'BENCH_CORE_MOUNT', 'BENCH_CANONICAL_BATCHING']},
     'method': 'Linux smaps_rollup RSS/PSS summed across isolated benchmark driver and descendants; compiler runs separately',
     'environment': {'platform': platform.platform(), 'cpuCount': os.cpu_count(), 'cpuAffinity': selected_cpus, 'clockTicksPerSecond': os.sysconf('SC_CLK_TCK'),
         'cpuMax': read_optional('/sys/fs/cgroup/cpu.max'), 'memoryMax': read_optional('/sys/fs/cgroup/memory.max')},
