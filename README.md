@@ -205,3 +205,12 @@ remains useful as evidence about the unchanged published runtime.
 The experimental [Wasmer SDK comparison](docs/wasmer-sdk-comparison.md) runs the
 same native OpenClaw core with Wasmer-backed file and shell tools, alongside
 agentOS and native tool baselines.
+
+## Planned native Linux SDK backend
+
+The SDK-fork direction is recorded separately from the current published-runtime
+experiments: [preflight](docs/native-linux-preflight.md),
+[architecture](docs/native-linux-architecture.md), and
+[implementation roadmap](docs/native-linux-roadmap.md). The first implementation
+milestone is a backend contract preserving the agentOS API. Linux enforcement
+requires host capabilities that are not available for validation in this environment.
