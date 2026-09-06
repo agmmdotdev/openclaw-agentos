@@ -11,18 +11,20 @@ parser.add_argument('--interval', type=float, default=0.1)
 parser.add_argument('--native', action='store_true')
 parser.add_argument('--node-max-opt', type=int, choices=[0, 1, 2, 3], help='Diagnostic host V8 maximum compiler tier; requires revalidation on Node upgrades')
 parser.add_argument('--node-semi-space-mb', type=int, choices=[1, 2, 4, 8, 16, 32, 64], help='Host Node young-generation semi-space cap; does not change guest V8 limits')
+parser.add_argument('--wasmer', action='store_true', help='Native core with Wasmer SDK tools; requires --native --core')
 parser.add_argument('--hybrid', action='store_true', help='Trusted native core with agentOS tools; requires --native --core')
 parser.add_argument('--compiled', action='store_true', help='Use the lowered native Node baseline; requires --native')
 parser.add_argument('--core', action='store_true', help='Use the smaller native core; requires --native')
 parser.add_argument('--allocator', choices=['default', 'compact'], default='default', help='compact: glibc arena/trim settings, applied equally to host and descendants')
 args = parser.parse_args()
+if args.wasmer and (not (args.native and args.core) or args.hybrid): parser.error('--wasmer requires --native --core without --hybrid')
 if args.hybrid and not (args.native and args.core): parser.error('--hybrid requires --native --core')
 if args.core and (not args.native or args.compiled): parser.error('--core requires --native without --compiled')
 if args.compiled and not args.native: parser.error('--compiled requires --native')
 root = Path(__file__).resolve().parents[2]
 if args.core and json.loads((root / 'artifacts/core/manifest.json').read_text()).get('profile') != 'core':
     parser.error('--core requires a reduced core build')
-native_label = 'hybrid-native-core' if args.hybrid else 'native-core' if args.core else 'native-compiled' if args.compiled else 'native'
+native_label = 'wasmer-native-core' if args.wasmer else 'hybrid-native-core' if args.hybrid else 'native-core' if args.core else 'native-compiled' if args.compiled else 'native'
 output = root / (f'artifacts/results/benchmark-{native_label}-{args.trial}.json' if args.native else f'artifacts/results/benchmark-{args.instances}vm-{args.trial}.json')
 
 if output.exists(): parser.error(f'Result already exists: {output}; choose a new trial')
@@ -87,7 +89,9 @@ if native_root:
     env.update(BENCH_ROOT=native_root, OPENCLAW_STATE_DIR=f'{native_root}/state/openclaw', OPENCLAW_CHILD_OOM_SCORE_ADJ='0')
 native_entry = 'artifacts/core/native-core-benchmark.mjs' if args.core else 'artifacts/core/native-compiled-benchmark.mjs' if args.compiled else 'artifacts/core/native-benchmark.mjs'
 if args.hybrid: native_entry = 'artifacts/core/hybrid-core-benchmark.mjs'
+if args.wasmer: native_entry = 'artifacts/core/wasmer-core-benchmark.mjs'
 command = ['node', '--expose-gc', native_entry, '--internal-worker-prewarm'] if args.native else ['node', '--expose-gc', 'scripts/benchmark/driver.mjs', str(args.instances)]
+if args.wasmer: command.insert(1, '--experimental-wasm-jspi')
 if args.node_semi_space_mb is not None: command.insert(1, f'--max-semi-space-size={args.node_semi_space_mb}')
 if args.node_max_opt is not None: command.insert(1, f'--max-opt={args.node_max_opt}')
 process = subprocess.Popen(command, cwd=root, env=env,
@@ -168,6 +172,7 @@ report = {
     'recordedAt': time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime()),
     'instances': args.instances, 'trial': args.trial, 'sampleIntervalMs': args.interval * 1000,
     'nodeSemiSpaceMiB': args.node_semi_space_mb, 'nodeMaxOpt': args.node_max_opt,
+    'wasmer': {'sdkVersion': '0.11.0', 'package': 'wasmer/edgejs@0.2.0', 'parallelism': 2, 'experimentalWasmJspi': True, 'filesystem': 'in-memory', 'cacheDirectory': env.get('WASMER_CACHE_DIR', '/tmp/openclaw-wasmer-cache')} if args.wasmer else None,
     'runtime': native_label if args.native else 'agentos', 'splitInitializer': env.get('BENCH_SPLIT_INIT') == '1',
     'sqlStatementCacheSize': int(env.get('BENCH_SQL_STATEMENT_CACHE', '0')),
     'dataMount': env.get('BENCH_DATA_MOUNT', 'chunked_local'),

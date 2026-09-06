@@ -18,7 +18,7 @@ let denied = false;
 try { await hybrid.sandbox.fsBridge.readFile({ filePath: '/etc/passwd' }); } catch { denied = true; }
 assert(denied, 'outside workspace accepted');
 const result = await call('exec', { command: 'cat /workspace/check.txt; exit 7', workdir: '/workspace' });
-assert(result.details.exitCode === 7 && result.content.some(c => c.text?.includes('after')), 'shell exit/output mismatch');
+assert(result.details.exitCode === 7 && result.content.some(c => c.text?.includes('after')), `shell exit/output mismatch: ${JSON.stringify(result)}`);
 const timeout = await call('exec', { command: 'sleep 5', workdir: '/workspace', timeoutSeconds: 1 });
 assert(timeout.details.timedOut === true, `timeout lost: ${JSON.stringify(timeout)}`);
 console.log('HYBRID_PROBE=passed: write/edit/read, guest-only file, denied outside path, shell output/exit, timeout');

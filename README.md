@@ -201,3 +201,7 @@ Cloudflare deployment and actor adoption remain outside this phase.
 The Rust patch in `patches/` and `docs/agentos-patch.md` is historical and is
 **not applied or needed** by the current tests. The raw builtin audit also
 remains useful as evidence about the unchanged published runtime.
+
+The experimental [Wasmer SDK comparison](docs/wasmer-sdk-comparison.md) runs the
+same native OpenClaw core with Wasmer-backed file and shell tools, alongside
+agentOS and native tool baselines.
