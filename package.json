@@ -58,7 +58,10 @@
     "test:request-state": "node --test test/request-state.test.mjs",
     "bench:lifecycle": "python3 scripts/benchmark/request-lifecycle.py",
     "bench:lifecycle:report": "python3 scripts/benchmark/summarize-lifecycle.py",
-    "bench:supervisor-control": "node scripts/benchmark/build-supervisor-control.mjs"
+    "bench:supervisor-control": "node scripts/benchmark/build-supervisor-control.mjs",
+    "test:parser-startup": "node --test test/parser-startup.test.mjs",
+    "test:native-sdk:request": "python3 scripts/benchmark/probe-hybrid.py --native-sdk --request-profile",
+    "profile:startup": "node scripts/diagnostics/profile-native-startup.mjs"
   },
   "dependencies": {
     "@rivet-dev/agentos-core": "0.2.19",

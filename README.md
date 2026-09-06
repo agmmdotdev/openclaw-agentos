@@ -219,3 +219,11 @@ The [extracted native Node SDK](packages/agentos-sdk/README.md) now implements t
 filesystem/process/JavaScript slice and has a [test and benchmark report](docs/native-node-sdk-implementation.md).
 Its native backend requires explicit trusted-only mode; Linux sandbox enforcement
 is not implemented and protected execution fails closed.
+
+The [restartable core](docs/core-request-lifecycle.md) restores history, executes
+real tools, publishes a checkpoint, and exits. A subsequent
+[startup profiling pass](docs/native-core-startup.md) identifies large transient
+allocations in the Bash grammar's optimizing Wasm compiler. The opt-in
+`scripts/run-core-node-request.mjs` launcher reduces matched cached-request peak
+PSS from 673 to 237 MiB and seven-turn CPU from 10.06 to 8.07 seconds. It is pinned
+to Node 24.19.0 / Linux x64; resident idle RAM is essentially unchanged.

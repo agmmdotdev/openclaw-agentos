@@ -1,0 +1,17 @@
+{
+  "node": "v24.19.0",
+  "nativeCoreSha256": "9cdf14575c806336f7f19f6db2e206dad6807f78a0a7ac53d60b8906259fdb7d",
+  "requestEntrySha256": "c38524e9bf2f6dec899d8d55d1e5b4cbdfb42983702b7bbc0de9cd37ee0d2d1a",
+  "allocationProbeMeasuredSource": "#define _GNU_SOURCE\n#include <execinfo.h>\n#include <stdlib.h>\n#include <stdio.h>\n#include <unistd.h>\nextern void *__libc_malloc(size_t);\nextern void *__libc_calloc(size_t,size_t);\nextern void *__libc_realloc(void*,size_t);\nstatic __thread int tracing;\nstatic void trace(size_t size){if(size<32*1024*1024||tracing)return;tracing=1;char b[100];int n=snprintf(b,sizeof(b),\"ALLOC pid=%d bytes=%zu\\n\",getpid(),size);write(2,b,n);void* stack[18];n=backtrace(stack,18);backtrace_symbols_fd(stack,n,2);tracing=0;}\nvoid *malloc(size_t s){trace(s);return __libc_malloc(s);}\nvoid *calloc(size_t n,size_t s){trace(n*s);return __libc_calloc(n,s);}\nvoid *realloc(void*p,size_t s){trace(s);return __libc_realloc(p,s);}\n",
+  "memoryPreloadMeasuredSource": "const fs=require('node:fs');const rows=[];const timer=setInterval(()=>rows.push({ms:performance.now(),...process.memoryUsage(),cpu:process.cpuUsage()}),10);timer.unref();process.on('exit',()=>fs.writeFileSync('/tmp/core-memory-timeline.json',JSON.stringify(rows)));\n",
+  "requestEnvironment": {
+    "BENCH_WORKLOAD": "core-workload",
+    "BENCH_REQUEST_TURN": "0",
+    "BENCH_WARM_TURNS": "1",
+    "OPENCLAW_CHILD_OOM_SCORE_ADJ": "0"
+  },
+  "requestCpuProfileExtraEnvironment": {
+    "BENCH_PROFILE_CORE": "1"
+  },
+  "note": "Diagnostic runs used temporary workspace/state directories; no compile cache. CPU profile instruments fixture phases. Memory timeline and allocation interposer were separate runs with compact allocator settings and no phase wrappers. None are included in performance summary."
+}
