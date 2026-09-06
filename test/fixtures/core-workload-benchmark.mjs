@@ -11,6 +11,10 @@ async function runRepresentativeBenchmarks() {
   const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
   const sourceFiles = 48, sourceBytes = 16384, catalogBytes = 1048576;
   const responseDelayMs = 60, betweenTurnsMs = 100;
+  const configTail = ('\n# Application configuration\n').padEnd(4096, '# configuration context\n');
+  const request = globalThis.__benchmarkRequestState;
+  const firstTurn = request?.turn ?? 0;
+  if (!request || firstTurn === 0) {
   mark('workload-stage:start');
   for (const name of ['src', 'data', 'reports', 'scripts']) await disk.mkdir(workspace + '/' + name);
   for (let i = 0; i < sourceFiles; i++) {
@@ -21,27 +25,31 @@ async function runRepresentativeBenchmarks() {
   for (let i = 0; i < catalogBytes / 128; i++) catalog += ('record-' + String(i).padStart(5, '0') + ' status=active ').padEnd(127, '.') + '\n';
   await disk.write(workspace + '/data/catalog.txt', catalog);
   catalog = '';
-  const configTail = ('\n# Application configuration\n').padEnd(4096, '# configuration context\n');
   await disk.write(workspace + '/config.txt', 'version=0' + configTail);
   const searchScript = "const fs=require('node:fs');for(const name of fs.readdirSync('src').sort()){const lines=fs.readFileSync('src/'+name,'utf8').split('\\n');for(let i=0;i<lines.length;i++)if(lines[i].includes('TASK'))console.log(name+':'+(i+1)+':'+lines[i]);}\n";
   const checkScript = "const fs=require('node:fs');const turn=Number(process.argv[2]);if(!fs.readFileSync('config.txt','utf8').startsWith('version='+(turn+1)+'\\n'))throw Error('version mismatch');const report=fs.readFileSync('reports/turn-'+turn+'.md','utf8');if(report.length!==8192||!report.startsWith('Turn '+turn+' '))throw Error('report mismatch');const data=fs.readFileSync('data/catalog.txt');if(data.length!==1048576)throw Error('catalog size mismatch');process.stdout.write(data.subarray(0,16384));console.log('CHECK-PASSED');\n";
   await disk.write(workspace + '/scripts/search.cjs', searchScript);
   await disk.write(workspace + '/scripts/check.cjs', checkScript);
   mark('workload-stage:end', { sourceFiles, sourceBytes, catalogBytes, totalSeedBytes: sourceFiles * sourceBytes + catalogBytes + 9 + configTail.length + searchScript.length + checkScript.length });
+  }
 
   const usage = { input: 1, output: 1, cacheRead: 0, cacheWrite: 0, totalTokens: 2, cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0, total: 0 } };
   const assistant = content => ({ role: 'assistant', content, api: 'openai-completions', provider: 'openai', model: 'gpt-4.1', usage, stopReason: 'stop', timestamp: Date.now() });
-  let history = [];
-  for (let i = 0; i < 12; i++) {
+  let history = request?.history ?? [];
+  if (!request?.history) for (let i = 0; i < 12; i++) {
     history.push({ role: 'user', content: [{ type: 'text', text: ('Earlier requirement ' + i + ': retain compatibility and document the changes.\n').padEnd(4096, 'Project context and acceptance criteria. ') }], timestamp: Date.now() });
     history.push(assistant([{ type: 'text', text: ('Earlier discussion ' + i + ': implementation details and validation results.\n').padEnd(4096, 'Prior analysis and decisions. ') }]));
   }
   const initialHistoryBytes = Buffer.byteLength(JSON.stringify(history));
-  const warmTurns = Number(process.env.BENCH_WARM_TURNS ?? 5);
+  const warmTurns = request ? firstTurn : Number(process.env.BENCH_WARM_TURNS ?? 5);
+  if (request) {
+    check(history.length === 24 + firstTurn * 12, 'resumed history length mismatch');
+    check(await disk.read(workspace + '/config.txt') === 'version=' + firstTurn + configTail, 'workspace differs from checkpoint; recovery required');
+  }
   let previewEvents = 0, largestContextBytes = 0;
   const toolCounts = { read: 0, exec: 0, edit: 0, write: 0 };
   mark('representative:config', { sourceFiles, sourceBytes, catalogBytes, initialHistoryBytes, initialMessages: history.length, responseDelayMs, betweenTurnsMs, warmTurns });
-  for (let turn = 0; turn <= warmTurns; turn++) {
+  for (let turn = firstTurn; turn <= warmTurns; turn++) {
     const label = turn === 0 ? 'cold-turn' : `warm-turn-${turn}`;
     mark(label + ':start');
     const started = performance.now(), transcript = [], terminals = [];
@@ -103,12 +111,15 @@ async function runRepresentativeBenchmarks() {
     check(await disk.read(workspace + '/config.txt') === 'version=' + (turn + 1) + configTail, 'edit did not persist');
     check(await disk.read(workspace + '/reports/turn-' + turn + '.md') === reportText, 'report did not persist');
     history.push(...transcript);
-    fs.writeFileSync(state + '/transcript.json', JSON.stringify(history));
-    history = JSON.parse(fs.readFileSync(state + '/transcript.json', 'utf8'));
+    if (request) await request.commit(history);
+    else {
+      fs.writeFileSync(state + '/transcript.json', JSON.stringify(history));
+      history = JSON.parse(fs.readFileSync(state + '/transcript.json', 'utf8'));
+    }
     mark(label + ':end', { durationMs: performance.now() - started, calls, transcriptMessages: history.length, transcriptBytes: Buffer.byteLength(JSON.stringify(history)), toolCalls: plan.length, streamedDeltas: deltas });
     if (turn < warmTurns) await pause(betweenTurnsMs);
   }
   check(history.length === 24 + (warmTurns + 1) * 12, 'history continuity failed');
   check(previewEvents > 0, 'no live preview events');
-  mark('representative:complete', { turns: warmTurns + 1, toolCounts, transcriptMessages: history.length, transcriptBytes: Buffer.byteLength(JSON.stringify(history)), largestContextBytes, previewEvents });
+  mark('representative:complete', { turns: warmTurns - firstTurn + 1, nextTurn: warmTurns + 1, toolCounts, transcriptMessages: history.length, transcriptBytes: Buffer.byteLength(JSON.stringify(history)), largestContextBytes, previewEvents });
 }

@@ -110,3 +110,26 @@ test('oversized initial stdin is rejected before a child launches',async t=>{
  await assert.rejects(vm.process.exec('cat',{stdin:'x'.repeat(33)}),{code:'STDIN_LIMIT'});
  assert.deepEqual(await vm.process.list(),[]);
 });
+test('bounded reads preserve exact binary bytes at empty, chunk and maximum sizes',async t=>{
+ const maxFileBytes=131072;const {vm}=await fixture(t,{maxFileBytes});
+ for(const size of [0,1,4096,65535,65536,65537,maxFileBytes]){
+  const bytes=Buffer.alloc(size);for(let i=0;i<size;i++)bytes[i]=(i*37)%256;
+  await vm.filesystem.writeFile('binary',bytes);assert.deepEqual(Buffer.from(await vm.filesystem.readFile('binary')),bytes);
+ }
+ await writeFile(join(vm.workspaceDir,'binary'),Buffer.alloc(maxFileBytes+1));
+ await assert.rejects(vm.filesystem.readFile('binary'),{code:'FILE_SIZE_LIMIT'});
+});
+test('Node ESM and CommonJS resolve relative imports, packages, cwd and argv',async t=>{
+ const {vm}=await fixture(t);
+ await vm.filesystem.mkdir('node_modules/local-fixture',{recursive:true});
+ await vm.filesystem.writeFile('node_modules/local-fixture/package.json',JSON.stringify({name:'local-fixture',exports:{import:'./value.mjs',require:'./value.cjs'}}));
+ await vm.filesystem.writeFile('node_modules/local-fixture/value.mjs','export default 41');
+ await vm.filesystem.writeFile('node_modules/local-fixture/value.cjs','module.exports=41');
+ await vm.filesystem.writeFile('relative.mjs','export const value=1');
+ await vm.filesystem.writeFile('main.mjs',`import base from 'local-fixture';import {value} from './relative.mjs';console.log(base+value,process.argv[2]);`);
+ await vm.filesystem.writeFile('main.cjs',`console.log(require('local-fixture')+1,process.argv[2]);`);
+ for(const file of ['main.mjs','main.cjs']){
+  const result=await vm.javascript.executeFile(file,{args:['argument with spaces'],output:{capture:'all'}});
+  assert.equal(result.outcome,'succeeded');assert.equal(result.stdout.trim(),'42 argument with spaces');
+ }
+});

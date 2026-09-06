@@ -22,7 +22,24 @@ export function createFileApi(root:string, assertOpen:()=>void, maxBytes:number)
   async readFile(p) { const h=await fs.open(await path(p),constants.O_RDONLY|constants.O_NOFOLLOW);try{
    const s=await h.stat();if(!s.isFile())throw new SdkError('INVALID_FILE','Only regular files can be read');
    if(s.size>maxBytes)throw new SdkError('FILE_SIZE_LIMIT',`File exceeds maxFileBytes=${maxBytes}`);
-   const chunks:Buffer[]=[];let total=0;for(;;){const b=Buffer.alloc(Math.min(65536,maxBytes+1-total));const {bytesRead}=await h.read(b);if(!bytesRead)break;total+=bytesRead;if(total>maxBytes)throw new SdkError('FILE_SIZE_LIMIT',`Read exceeds maxFileBytes=${maxBytes}`);chunks.push(b.subarray(0,bytesRead));}return Buffer.concat(chunks,total);
+   // Size the first buffer to this regular file plus one EOF/growth probe byte.
+   // Stable files need neither 64 KiB per tiny read nor a second full-size copy.
+   // Read only initialized slices; keep checking the bound if the file grows.
+   const chunks:Buffer[]=[];let total=0;
+   for(;;){
+    const b=Buffer.allocUnsafe(Math.min(chunks.length?65536:s.size+1,maxBytes+1-total));
+    const {bytesRead}=await h.read(b);if(!bytesRead)break;total+=bytesRead;
+    if(total>maxBytes)throw new SdkError('FILE_SIZE_LIMIT',`Read exceeds maxFileBytes=${maxBytes}`);
+    chunks.push(b.subarray(0,bytesRead));
+    if(bytesRead<b.length) {
+     // A short regular-file read need not be EOF; use a small next probe.
+     const probe=Buffer.allocUnsafe(1);const next=await h.read(probe);
+     if(!next.bytesRead)break;
+     if(++total>maxBytes)throw new SdkError('FILE_SIZE_LIMIT',`Read exceeds maxFileBytes=${maxBytes}`);
+     chunks.push(probe);
+    }
+   }
+   return chunks.length===1?chunks[0]:Buffer.concat(chunks,total);
   }finally{await h.close();} },
   async writeFile(p,data) {const bytes=typeof data==='string'?Buffer.byteLength(data):data.byteLength;if(bytes>maxBytes)throw new SdkError('FILE_SIZE_LIMIT',`Write exceeds maxFileBytes=${maxBytes}`);const h=await fs.open(await path(p,true),constants.O_WRONLY|constants.O_CREAT|constants.O_TRUNC|constants.O_NOFOLLOW,0o600);try{await h.writeFile(data);}finally{await h.close();}},
   async stat(p) {const s=await fs.stat(await path(p));return {...s,isDirectory:s.isDirectory(),isSymbolicLink:s.isSymbolicLink()};},
