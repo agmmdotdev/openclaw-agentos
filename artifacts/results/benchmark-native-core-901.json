@@ -1,0 +1,1745 @@
+{
+  "recordedAt": "2026-09-06T07:04:02Z",
+  "instances": 1,
+  "trial": 901,
+  "sampleIntervalMs": 100.0,
+  "runtime": "native-core",
+  "splitInitializer": false,
+  "sqlStatementCacheSize": 0,
+  "dataMount": "chunked_local",
+  "idleMs": 1500,
+  "allocatorEnvironment": {
+    "MALLOC_ARENA_MAX": "1",
+    "MALLOC_TRIM_THRESHOLD_": "65536",
+    "MALLOC_MMAP_THRESHOLD_": "65536",
+    "MALLOC_TOP_PAD_": null,
+    "GLIBC_TUNABLES": null
+  },
+  "coreManifest": {
+    "schemaCollector": {
+      "sha256": "9332ebdb5f95cb07092629b46eeb884f1a124e3f6a2b18052e9c7bacdd378d17",
+      "bytes": 15166,
+      "roots": [
+        "init_sqlite_schema_sql",
+        "collectSqliteTableContract",
+        "collectSqliteNamedIndexContract",
+        "collectCanonicalStrictTableMetadata"
+      ]
+    },
+    "profile": "core",
+    "profileReport": {
+      "roots": [
+        "init_embedded_agent_runtime",
+        "runWorkerEmbeddedTurn"
+      ],
+      "paths": {
+        "init_bundled_channel_config_metadata_generated": [
+          "init_embedded_agent_runtime",
+          "init_model_registry",
+          "init_model_discovery_context",
+          "init_config$14",
+          "init_validation$4",
+          "init_bundled_channel_config_metadata_generated"
+        ]
+      },
+      "largest": [
+        {
+          "names": [
+            "init_bundled_channel_config_metadata_generated"
+          ],
+          "bytes": 308217
+        },
+        {
+          "names": [
+            "index_incubating_exports"
+          ],
+          "bytes": 170036
+        },
+        {
+          "names": [
+            "require_llhttp_simd_wasm"
+          ],
+          "bytes": 144717
+        },
+        {
+          "names": [
+            "require_llhttp_wasm"
+          ],
+          "bytes": 144208
+        },
+        {
+          "names": [
+            "init_node"
+          ],
+          "bytes": 142909
+        },
+        {
+          "names": [
+            "require_isbl"
+          ],
+          "bytes": 142816
+        },
+        {
+          "names": [
+            "init_acorn"
+          ],
+          "bytes": 126506
+        },
+        {
+          "names": [
+            "require_mathematica"
+          ],
+          "bytes": 109955
+        },
+        {
+          "names": [
+            "require_ponyfill_es2018"
+          ],
+          "bytes": 98456
+        },
+        {
+          "names": [
+            "init_index_min"
+          ],
+          "bytes": 88455
+        },
+        {
+          "names": [
+            "init_experimental_attributes"
+          ],
+          "bytes": 83714
+        },
+        {
+          "names": [
+            "init_openclaw_state_schema"
+          ],
+          "bytes": 83197
+        }
+      ],
+      "inputStatements": 81389,
+      "retainedStatements": 36989,
+      "removedBytes": 31995835,
+      "legalNoticeBytes": 6648,
+      "eagerInitializers": 44,
+      "retainedRegistrations": [
+        "setWorkerDeployRuntime({highlightJs:worker_deploy_highlight_runtime_default,json5:worker_deploy_json5_runtime_default,resolveSecureTempRoot})"
+      ],
+      "excludedBoundaries": [
+        "gateway compaction runtime",
+        "source extension loader"
+      ]
+    },
+    "inputBytes": 46593544,
+    "nativeCoreBytes": 14597672,
+    "outputBytes": 16598881,
+    "nativeCoreSha256": "9cdf14575c806336f7f19f6db2e206dad6807f78a0a7ac53d60b8906259fdb7d",
+    "openclaw": "2026.8.1",
+    "agentos": "0.2.19",
+    "inputSha256": "03eca1d346aa24fd5028b2ca8d09385b764bf9dd2c82810ce564043a34356f1c",
+    "outputSha256": "03fafac4c25ad5c9b38fd00c902a4b422d56b0b2f564f81cfbdc526b6270196e",
+    "asyncCompiler": {
+      "name": "esbuild",
+      "version": "0.28.2",
+      "supported": {
+        "async-await": false,
+        "async-generator": false,
+        "for-await": false
+      }
+    },
+    "intrinsicReferences": 2,
+    "replacements": [
+      {
+        "start": 6698,
+        "end": 6711,
+        "from": "node:module",
+        "to": "./compat/module.mjs"
+      },
+      {
+        "start": 6737,
+        "end": 6750,
+        "from": "node:crypto",
+        "to": "./compat/crypto.mjs"
+      },
+      {
+        "start": 6919,
+        "end": 6932,
+        "from": "node:crypto",
+        "to": "./compat/crypto.mjs"
+      },
+      {
+        "start": 6955,
+        "end": 6964,
+        "from": "node:fs",
+        "to": "./compat/fs.mjs"
+      },
+      {
+        "start": 7343,
+        "end": 7352,
+        "from": "node:fs",
+        "to": "./compat/fs.mjs"
+      },
+      {
+        "start": 8113,
+        "end": 8131,
+        "from": "node:async_hooks",
+        "to": "./compat/async-hooks.mjs"
+      },
+      {
+        "start": 8152,
+        "end": 8172,
+        "from": "node:child_process",
+        "to": "./compat/child-process.mjs"
+      },
+      {
+        "start": 8264,
+        "end": 8284,
+        "from": "node:child_process",
+        "to": "./compat/child-process.mjs"
+      },
+      {
+        "start": 8448,
+        "end": 8459,
+        "from": "node:util",
+        "to": "./compat/util.mjs"
+      },
+      {
+        "start": 9125,
+        "end": 9142,
+        "from": "node:perf_hooks",
+        "to": "./compat/perf-hooks.mjs"
+      }
+    ],
+    "compatibilityFiles": {
+      "crypto.mjs": "e73413c8e40c0356177a8b79ea329597714e512bb28e18a9cc73384d549ca00e",
+      "fs.mjs": "9eef1b59ce9191195f33beb9b814bdcec103a9cd718a91f03da66247b6107347",
+      "module.mjs": "0b42e0632916a4922ac9a61537b55502c362c98fc7f2b94aeba1686e9f7d2c5f",
+      "perf-hooks.mjs": "bb1084bd98fb604747b4ce53cebc827a0a2f4c8b4fd7d4e5709e2d7962077d7c",
+      "readline-promises.mjs": "6705c91651cfb9f3a2d81631cb5c041448637f3aa839e76d621aec24f4d7ddc4",
+      "util.mjs": "8fb311c732efcf8f1936ececc0f8f14699442af0b089bb15ceb025428198955a",
+      "async-hooks.mjs": "62f7e3dd394203875115cc73b46c25abc52f484b74eb41ee81ea20f58e3f27df",
+      "child-process.mjs": "a44baff695fba23ddd978f5734d1fef33fb3d05674f1ce7cbe294c479a50259b",
+      "sqlite.mjs": "4c5b5c5623d373172a3cd375a4b584319d7e303b3d59623c1873de16b6b58650",
+      "init.mjs": "f7cecfb8fdfd3197bb3351f259b0c1453411e424d6516f0c6df0e2bee6045571",
+      "text-decoder.mjs": "ba47fd59fa220e984a900afe3e748b2660aa4f18fe5a1d2d1ae94cdc8d2ecaa4",
+      "async-intrinsics.mjs": "7b145fa1054d44ef04ee540e24efdc3c205caaad54da9b3705133dcfbb89179e"
+    },
+    "addedExports": [
+      "runOpenClawCoreTurn"
+    ],
+    "invokesUpstreamInitializer": "init_embedded_agent_runtime"
+  },
+  "diagnostics": {
+    "BENCH_NATIVE_MEMORY": "1",
+    "BENCH_GC_AT_IDLE": "0",
+    "BENCH_PROFILE_CORE": "0",
+    "BENCH_PROFILE_FS": "0",
+    "BENCH_SQL_SCHEMA_MODE": "0",
+    "BENCH_PROFILE_PROCESS": "0",
+    "BENCH_PROFILE_SQL": "0",
+    "CORE_HEAP_MB": null,
+    "CORE_WASM_HEAP_MB": null,
+    "AGENTOS_V8_WARM_ISOLATES": "0",
+    "AGENTOS_WASM_SNAPSHOT_RUNNER": null,
+    "BENCH_WARM_TURNS": "50",
+    "BENCH_WORKLOAD": null,
+    "BENCH_REVERSE": null,
+    "BENCH_CORE_MOUNT": null,
+    "BENCH_CANONICAL_BATCHING": null
+  },
+  "method": "Linux smaps_rollup RSS/PSS summed across isolated benchmark driver and descendants; compiler runs separately",
+  "environment": {
+    "platform": "Linux-6.18.35-x86_64-with-glibc2.39",
+    "cpuCount": 9,
+    "cpuAffinity": [
+      0,
+      1
+    ],
+    "clockTicksPerSecond": 100,
+    "cpuMax": "800000 100000",
+    "memoryMax": "21474836480"
+  },
+  "exitCode": 0,
+  "measurementValid": true,
+  "missingCheckpoints": [],
+  "wallMs": 4472.276421998686,
+  "driverAndReapedUserSeconds": 2.627325,
+  "driverAndReapedSystemSeconds": 1.503908,
+  "sampledTreeCpuSeconds": 3.9,
+  "accountedTreeCpuSeconds": 4.09,
+  "peakRssBytes": 802480128,
+  "peakPssBytes": 801620992,
+  "events": [
+    {
+      "label": "worker-ready",
+      "atMs": 0.038817999999992026,
+      "instance": 0,
+      "nativeMemory": {
+        "usage": {
+          "rss": 168062976,
+          "heapTotal": 50921472,
+          "heapUsed": 36809192,
+          "external": 33270051,
+          "arrayBuffers": 146999
+        },
+        "heap": {
+          "total_heap_size": 50921472,
+          "total_heap_size_executable": 1048576,
+          "total_physical_size": 39739392,
+          "total_available_size": 4458823328,
+          "used_heap_size": 36813864,
+          "heap_size_limit": 4496293888,
+          "malloced_memory": 2113600,
+          "peak_malloced_memory": 72272600,
+          "does_zap_garbage": 0,
+          "number_of_native_contexts": 1,
+          "number_of_detached_contexts": 0,
+          "total_global_handles_size": 8192,
+          "used_global_handles_size": 5568,
+          "external_memory": 33270091
+        },
+        "spaces": [
+          {
+            "space_name": "read_only_space",
+            "space_size": 0,
+            "space_used_size": 0,
+            "space_available_size": 0,
+            "physical_space_size": 0
+          },
+          {
+            "space_name": "new_space",
+            "space_size": 16777216,
+            "space_used_size": 4985680,
+            "space_available_size": 3402416,
+            "physical_space_size": 5582848
+          },
+          {
+            "space_name": "old_space",
+            "space_size": 23212032,
+            "space_used_size": 22394120,
+            "space_available_size": 808008,
+            "physical_space_size": 23330816
+          },
+          {
+            "space_name": "code_space",
+            "space_size": 1048576,
+            "space_used_size": 350720,
+            "space_available_size": 697728,
+            "physical_space_size": 1048576
+          },
+          {
+            "space_name": "shared_space",
+            "space_size": 0,
+            "space_used_size": 0,
+            "space_available_size": 0,
+            "physical_space_size": 0
+          },
+          {
+            "space_name": "trusted_space",
+            "space_size": 5877760,
+            "space_used_size": 5129984,
+            "space_available_size": 747296,
+            "physical_space_size": 6029312
+          },
+          {
+            "space_name": "shared_trusted_space",
+            "space_size": 0,
+            "space_used_size": 0,
+            "space_available_size": 0,
+            "physical_space_size": 0
+          },
+          {
+            "space_name": "new_large_object_space",
+            "space_size": 618496,
+            "space_used_size": 614920,
+            "space_available_size": 7773688,
+            "physical_space_size": 618496
+          },
+          {
+            "space_name": "large_object_space",
+            "space_size": 2752512,
+            "space_used_size": 2729616,
+            "space_available_size": 0,
+            "physical_space_size": 2752512
+          },
+          {
+            "space_name": "code_large_object_space",
+            "space_size": 0,
+            "space_used_size": 0,
+            "space_available_size": 0,
+            "physical_space_size": 0
+          },
+          {
+            "space_name": "shared_large_object_space",
+            "space_size": 0,
+            "space_used_size": 0,
+            "space_available_size": 0,
+            "physical_space_size": 0
+          },
+          {
+            "space_name": "shared_trusted_large_object_space",
+            "space_size": 0,
+            "space_used_size": 0,
+            "space_available_size": 0,
+            "physical_space_size": 0
+          },
+          {
+            "space_name": "trusted_large_object_space",
+            "space_size": 634880,
+            "space_used_size": 630600,
+            "space_available_size": 0,
+            "physical_space_size": 634880
+          }
+        ],
+        "code": {
+          "code_and_metadata_size": 2623220,
+          "bytecode_and_metadata_size": 3795992,
+          "external_script_source_size": 33123094,
+          "cpu_profiler_metadata_size": 0
+        }
+      },
+      "receivedAtMs": 555.5084209991037
+    },
+    {
+      "label": "workload",
+      "atMs": 5.807454000000007,
+      "instance": 0,
+      "workload": "core-shell",
+      "receivedAtMs": 555.7302059987705
+    },
+    {
+      "label": "cold-turn:start",
+      "atMs": 5.8650610000000825,
+      "instance": 0,
+      "receivedAtMs": 555.744216999301
+    },
+    {
+      "label": "cold-turn:end",
+      "atMs": 589.765681,
+      "instance": 0,
+      "durationMs": 583.8685320000001,
+      "calls": 3,
+      "transcriptMessages": 6,
+      "nativeMemory": {
+        "usage": {
+          "rss": 374001664,
+          "heapTotal": 212926464,
+          "heapUsed": 75129256,
+          "external": 68247614,
+          "arrayBuffers": 1543088
+        },
+        "heap": {
+          "total_heap_size": 212926464,
+          "total_heap_size_executable": 2097152,
+          "total_physical_size": 145072128,
+          "total_available_size": 4421085040,
+          "used_heap_size": 75132400,
+          "heap_size_limit": 4496293888,
+          "malloced_memory": 201270968,
+          "peak_malloced_memory": 271429968,
+          "does_zap_garbage": 0,
+          "number_of_native_contexts": 1,
+          "number_of_detached_contexts": 0,
+          "total_global_handles_size": 98304,
+          "used_global_handles_size": 6848,
+          "external_memory": 68247614
+        },
+        "spaces": [
+          {
+            "space_name": "read_only_space",
+            "space_size": 0,
+            "space_used_size": 0,
+            "space_available_size": 0,
+            "physical_space_size": 0
+          },
+          {
+            "space_name": "new_space",
+            "space_size": 134217728,
+            "space_used_size": 1830936,
+            "space_available_size": 65273832,
+            "physical_space_size": 66093056
+          },
+          {
+            "space_name": "old_space",
+            "space_size": 65155072,
+            "space_used_size": 60386472,
+            "space_available_size": 4728448,
+            "physical_space_size": 65273856
+          },
+          {
+            "space_name": "code_space",
+            "space_size": 2097152,
+            "space_used_size": 1767232,
+            "space_available_size": 329664,
+            "physical_space_size": 2097152
+          },
+          {
+            "space_name": "shared_space",
+            "space_size": 0,
+            "space_used_size": 0,
+            "space_available_size": 0,
+            "physical_space_size": 0
+          },
+          {
+            "space_name": "trusted_space",
+            "space_size": 7450624,
+            "space_used_size": 7194128,
+            "space_available_size": 255296,
+            "physical_space_size": 7602176
+          },
+          {
+            "space_name": "shared_trusted_space",
+            "space_size": 0,
+            "space_used_size": 0,
+            "space_available_size": 0,
+            "physical_space_size": 0
+          },
+          {
+            "space_name": "new_large_object_space",
+            "space_size": 0,
+            "space_used_size": 0,
+            "space_available_size": 67108864,
+            "physical_space_size": 0
+          },
+          {
+            "space_name": "large_object_space",
+            "space_size": 3371008,
+            "space_used_size": 3344536,
+            "space_available_size": 0,
+            "physical_space_size": 3371008
+          },
+          {
+            "space_name": "code_large_object_space",
+            "space_size": 0,
+            "space_used_size": 0,
+            "space_available_size": 0,
+            "physical_space_size": 0
+          },
+          {
+            "space_name": "shared_large_object_space",
+            "space_size": 0,
+            "space_used_size": 0,
+            "space_available_size": 0,
+            "physical_space_size": 0
+          },
+          {
+            "space_name": "shared_trusted_large_object_space",
+            "space_size": 0,
+            "space_used_size": 0,
+            "space_available_size": 0,
+            "physical_space_size": 0
+          },
+          {
+            "space_name": "trusted_large_object_space",
+            "space_size": 634880,
+            "space_used_size": 630600,
+            "space_available_size": 0,
+            "physical_space_size": 634880
+          }
+        ],
+        "code": {
+          "code_and_metadata_size": 4216608,
+          "bytecode_and_metadata_size": 5016632,
+          "external_script_source_size": 33148052,
+          "cpu_profiler_metadata_size": 0
+        }
+      },
+      "receivedAtMs": 1154.1302069999801
+    },
+    {
+      "label": "warm-turn-1:start",
+      "atMs": 604.165507,
+      "instance": 0,
+      "receivedAtMs": 1154.2855009993218
+    },
+    {
+      "label": "warm-turn-1:end",
+      "atMs": 717.0150890000001,
+      "instance": 0,
+      "durationMs": 112.80681699999991,
+      "calls": 3,
+      "transcriptMessages": 12,
+      "receivedAtMs": 1267.5676050002949
+    },
+    {
+      "label": "warm-turn-2:start",
+      "atMs": 717.186317,
+      "instance": 0,
+      "receivedAtMs": 1267.5845409994508
+    },
+    {
+      "label": "warm-turn-2:end",
+      "atMs": 747.1306940000001,
+      "instance": 0,
+      "durationMs": 29.92279500000018,
+      "calls": 3,
+      "transcriptMessages": 18,
+      "receivedAtMs": 1297.1257699991838
+    },
+    {
+      "label": "warm-turn-3:start",
+      "atMs": 747.2113860000001,
+      "instance": 0,
+      "receivedAtMs": 1297.135464999883
+    },
+    {
+      "label": "warm-turn-3:end",
+      "atMs": 770.8048600000001,
+      "instance": 0,
+      "durationMs": 23.547295000000076,
+      "calls": 3,
+      "transcriptMessages": 24,
+      "receivedAtMs": 1320.7667819988274
+    },
+    {
+      "label": "warm-turn-4:start",
+      "atMs": 770.9040800000001,
+      "instance": 0,
+      "receivedAtMs": 1320.7841879993794
+    },
+    {
+      "label": "warm-turn-4:end",
+      "atMs": 799.8028310000001,
+      "instance": 0,
+      "durationMs": 28.88173599999982,
+      "calls": 3,
+      "transcriptMessages": 30,
+      "receivedAtMs": 1349.7752289986238
+    },
+    {
+      "label": "warm-turn-5:start",
+      "atMs": 799.874369,
+      "instance": 0,
+      "receivedAtMs": 1349.7840319996612
+    },
+    {
+      "label": "warm-turn-5:end",
+      "atMs": 826.9112140000001,
+      "instance": 0,
+      "durationMs": 27.008732999999893,
+      "calls": 3,
+      "transcriptMessages": 36,
+      "receivedAtMs": 1376.9165049998264
+    },
+    {
+      "label": "warm-turn-6:start",
+      "atMs": 826.9812190000001,
+      "instance": 0,
+      "receivedAtMs": 1377.0730309988721
+    },
+    {
+      "label": "warm-turn-6:end",
+      "atMs": 850.756788,
+      "instance": 0,
+      "durationMs": 23.7603959999999,
+      "calls": 3,
+      "transcriptMessages": 42,
+      "receivedAtMs": 1400.7460409993655
+    },
+    {
+      "label": "warm-turn-7:start",
+      "atMs": 850.8194930000001,
+      "instance": 0,
+      "receivedAtMs": 1400.7556649994513
+    },
+    {
+      "label": "warm-turn-7:end",
+      "atMs": 879.046021,
+      "instance": 0,
+      "durationMs": 28.193878999999924,
+      "calls": 3,
+      "transcriptMessages": 48,
+      "receivedAtMs": 1429.0117679993273
+    },
+    {
+      "label": "warm-turn-8:start",
+      "atMs": 879.113733,
+      "instance": 0,
+      "receivedAtMs": 1429.0196199999627
+    },
+    {
+      "label": "warm-turn-8:end",
+      "atMs": 915.904371,
+      "instance": 0,
+      "durationMs": 36.776416000000154,
+      "calls": 3,
+      "transcriptMessages": 54,
+      "receivedAtMs": 1465.9228219989018
+    },
+    {
+      "label": "warm-turn-9:start",
+      "atMs": 915.982969,
+      "instance": 0,
+      "receivedAtMs": 1465.9327369990933
+    },
+    {
+      "label": "warm-turn-9:end",
+      "atMs": 947.7450660000001,
+      "instance": 0,
+      "durationMs": 31.747143999999935,
+      "calls": 3,
+      "transcriptMessages": 60,
+      "receivedAtMs": 1497.752806999415
+    },
+    {
+      "label": "warm-turn-10:start",
+      "atMs": 947.8219720000001,
+      "instance": 0,
+      "receivedAtMs": 1497.7624509992893
+    },
+    {
+      "label": "warm-turn-10:end",
+      "atMs": 975.0171859999999,
+      "instance": 0,
+      "durationMs": 27.17928999999981,
+      "calls": 3,
+      "transcriptMessages": 66,
+      "receivedAtMs": 1524.966727998617
+    },
+    {
+      "label": "warm-turn-11:start",
+      "atMs": 975.091618,
+      "instance": 0,
+      "receivedAtMs": 1524.9848860003112
+    },
+    {
+      "label": "warm-turn-11:end",
+      "atMs": 999.8837589999999,
+      "instance": 0,
+      "durationMs": 24.775396,
+      "calls": 3,
+      "transcriptMessages": 72,
+      "receivedAtMs": 1549.8915699990903
+    },
+    {
+      "label": "warm-turn-12:start",
+      "atMs": 999.964601,
+      "instance": 0,
+      "receivedAtMs": 1549.9011840001913
+    },
+    {
+      "label": "warm-turn-12:end",
+      "atMs": 1038.0236599999998,
+      "instance": 0,
+      "durationMs": 38.043916999999965,
+      "calls": 3,
+      "transcriptMessages": 78,
+      "receivedAtMs": 1588.031391000186
+    },
+    {
+      "label": "warm-turn-13:start",
+      "atMs": 1038.1040120000002,
+      "instance": 0,
+      "receivedAtMs": 1588.0402639995737
+    },
+    {
+      "label": "warm-turn-13:end",
+      "atMs": 1100.970155,
+      "instance": 0,
+      "durationMs": 62.83297300000004,
+      "calls": 3,
+      "transcriptMessages": 84,
+      "receivedAtMs": 1650.9876599993731
+    },
+    {
+      "label": "warm-turn-14:start",
+      "atMs": 1101.074803,
+      "instance": 0,
+      "receivedAtMs": 1650.997123999332
+    },
+    {
+      "label": "warm-turn-14:end",
+      "atMs": 1147.5412850000002,
+      "instance": 0,
+      "durationMs": 46.44999800000005,
+      "calls": 3,
+      "transcriptMessages": 90,
+      "receivedAtMs": 1697.5624059996335
+    },
+    {
+      "label": "warm-turn-15:start",
+      "atMs": 1147.6352270000002,
+      "instance": 0,
+      "receivedAtMs": 1697.5717099994654
+    },
+    {
+      "label": "warm-turn-15:end",
+      "atMs": 1182.1216410000002,
+      "instance": 0,
+      "durationMs": 34.46760599999993,
+      "calls": 3,
+      "transcriptMessages": 96,
+      "receivedAtMs": 1732.1008689996233
+    },
+    {
+      "label": "warm-turn-16:start",
+      "atMs": 1182.4036059999999,
+      "instance": 0,
+      "receivedAtMs": 1732.3005399994145
+    },
+    {
+      "label": "warm-turn-16:end",
+      "atMs": 1231.6852720000002,
+      "instance": 0,
+      "durationMs": 49.23673800000006,
+      "calls": 3,
+      "transcriptMessages": 102,
+      "receivedAtMs": 1781.6979099989112
+    },
+    {
+      "label": "warm-turn-17:start",
+      "atMs": 1231.759614,
+      "instance": 0,
+      "receivedAtMs": 1781.7071839999699
+    },
+    {
+      "label": "warm-turn-17:end",
+      "atMs": 1259.384646,
+      "instance": 0,
+      "durationMs": 27.612933000000112,
+      "calls": 3,
+      "transcriptMessages": 108,
+      "receivedAtMs": 1809.3834529991
+    },
+    {
+      "label": "warm-turn-18:start",
+      "atMs": 1259.4576459999998,
+      "instance": 0,
+      "receivedAtMs": 1809.3935979995877
+    },
+    {
+      "label": "warm-turn-18:end",
+      "atMs": 1287.161416,
+      "instance": 0,
+      "durationMs": 27.691401999999925,
+      "calls": 3,
+      "transcriptMessages": 114,
+      "receivedAtMs": 1837.1609440000611
+    },
+    {
+      "label": "warm-turn-19:start",
+      "atMs": 1287.235427,
+      "instance": 0,
+      "receivedAtMs": 1837.1703180000623
+    },
+    {
+      "label": "warm-turn-19:end",
+      "atMs": 1320.0166560000002,
+      "instance": 0,
+      "durationMs": 32.76825900000017,
+      "calls": 3,
+      "transcriptMessages": 120,
+      "receivedAtMs": 1870.0512059986067
+    },
+    {
+      "label": "warm-turn-20:start",
+      "atMs": 1320.1147839999999,
+      "instance": 0,
+      "receivedAtMs": 1870.0610309988406
+    },
+    {
+      "label": "warm-turn-20:end",
+      "atMs": 1366.9234620000002,
+      "instance": 0,
+      "durationMs": 46.78958999999986,
+      "calls": 3,
+      "transcriptMessages": 126,
+      "receivedAtMs": 1916.946616000132
+    },
+    {
+      "label": "warm-turn-21:start",
+      "atMs": 1367.020349,
+      "instance": 0,
+      "receivedAtMs": 1916.9558599987795
+    },
+    {
+      "label": "warm-turn-21:end",
+      "atMs": 1414.5948560000002,
+      "instance": 0,
+      "durationMs": 47.55646999999999,
+      "calls": 3,
+      "transcriptMessages": 132,
+      "receivedAtMs": 1964.6294419999322
+    },
+    {
+      "label": "warm-turn-22:start",
+      "atMs": 1414.67715,
+      "instance": 0,
+      "receivedAtMs": 1964.6387559987488
+    },
+    {
+      "label": "warm-turn-22:end",
+      "atMs": 1446.6666810000002,
+      "instance": 0,
+      "durationMs": 31.97744200000011,
+      "calls": 3,
+      "transcriptMessages": 138,
+      "receivedAtMs": 1996.7639759997837
+    },
+    {
+      "label": "warm-turn-23:start",
+      "atMs": 1446.771819,
+      "instance": 0,
+      "receivedAtMs": 1996.7736500002502
+    },
+    {
+      "label": "warm-turn-23:end",
+      "atMs": 1498.316727,
+      "instance": 0,
+      "durationMs": 51.53179699999987,
+      "calls": 3,
+      "transcriptMessages": 144,
+      "receivedAtMs": 2048.3423139994557
+    },
+    {
+      "label": "warm-turn-24:start",
+      "atMs": 1498.409407,
+      "instance": 0,
+      "receivedAtMs": 2048.3518979999644
+    },
+    {
+      "label": "warm-turn-24:end",
+      "atMs": 1535.9507250000001,
+      "instance": 0,
+      "durationMs": 37.52798800000005,
+      "calls": 3,
+      "transcriptMessages": 150,
+      "receivedAtMs": 2085.9673189988825
+    },
+    {
+      "label": "warm-turn-25:start",
+      "atMs": 1536.0207110000001,
+      "instance": 0,
+      "receivedAtMs": 2085.977994998757
+    },
+    {
+      "label": "warm-turn-25:end",
+      "atMs": 1568.6174720000004,
+      "instance": 0,
+      "durationMs": 32.585783999999876,
+      "calls": 3,
+      "transcriptMessages": 156,
+      "receivedAtMs": 2118.651195998609
+    },
+    {
+      "label": "warm-turn-26:start",
+      "atMs": 1568.6943780000001,
+      "instance": 0,
+      "receivedAtMs": 2118.6613209993084
+    },
+    {
+      "label": "warm-turn-26:end",
+      "atMs": 1601.1952490000003,
+      "instance": 0,
+      "durationMs": 32.487321000000065,
+      "calls": 3,
+      "transcriptMessages": 162,
+      "receivedAtMs": 2151.191936998657
+    },
+    {
+      "label": "warm-turn-27:start",
+      "atMs": 1601.259055,
+      "instance": 0,
+      "receivedAtMs": 2151.2009010002657
+    },
+    {
+      "label": "warm-turn-27:end",
+      "atMs": 1632.7791780000002,
+      "instance": 0,
+      "durationMs": 31.509295999999722,
+      "calls": 3,
+      "transcriptMessages": 168,
+      "receivedAtMs": 2182.7872329995444
+    },
+    {
+      "label": "warm-turn-28:start",
+      "atMs": 1632.851517,
+      "instance": 0,
+      "receivedAtMs": 2182.7969679998205
+    },
+    {
+      "label": "warm-turn-28:end",
+      "atMs": 1659.5530560000002,
+      "instance": 0,
+      "durationMs": 26.68937199999982,
+      "calls": 3,
+      "transcriptMessages": 174,
+      "receivedAtMs": 2209.5730599994567
+    },
+    {
+      "label": "warm-turn-29:start",
+      "atMs": 1659.6324560000003,
+      "instance": 0,
+      "receivedAtMs": 2209.582423998654
+    },
+    {
+      "label": "warm-turn-29:end",
+      "atMs": 1689.9893350000002,
+      "instance": 0,
+      "durationMs": 30.345782000000327,
+      "calls": 3,
+      "transcriptMessages": 180,
+      "receivedAtMs": 2239.961796998614
+    },
+    {
+      "label": "warm-turn-30:start",
+      "atMs": 1690.051018,
+      "instance": 0,
+      "receivedAtMs": 2239.971050999884
+    },
+    {
+      "label": "warm-turn-30:end",
+      "atMs": 1725.717501,
+      "instance": 0,
+      "durationMs": 35.65471499999967,
+      "calls": 3,
+      "transcriptMessages": 186,
+      "receivedAtMs": 2275.7428730001266
+    },
+    {
+      "label": "warm-turn-31:start",
+      "atMs": 1725.808027,
+      "instance": 0,
+      "receivedAtMs": 2275.752757999726
+    },
+    {
+      "label": "warm-turn-31:end",
+      "atMs": 1749.3781360000003,
+      "instance": 0,
+      "durationMs": 23.540014000000156,
+      "calls": 3,
+      "transcriptMessages": 192,
+      "receivedAtMs": 2299.474845998702
+    },
+    {
+      "label": "warm-turn-32:start",
+      "atMs": 1749.4652180000003,
+      "instance": 0,
+      "receivedAtMs": 2299.485542000184
+    },
+    {
+      "label": "warm-turn-32:end",
+      "atMs": 1774.980188,
+      "instance": 0,
+      "durationMs": 25.50463499999978,
+      "calls": 3,
+      "transcriptMessages": 198,
+      "receivedAtMs": 2328.0099089988653
+    },
+    {
+      "label": "warm-turn-33:start",
+      "atMs": 1775.0246850000003,
+      "instance": 0,
+      "receivedAtMs": 2328.0178209988662
+    },
+    {
+      "label": "warm-turn-33:end",
+      "atMs": 1798.17414,
+      "instance": 0,
+      "durationMs": 23.110736999999972,
+      "calls": 3,
+      "transcriptMessages": 204,
+      "receivedAtMs": 2348.15653700025
+    },
+    {
+      "label": "warm-turn-34:start",
+      "atMs": 1798.2435250000003,
+      "instance": 0,
+      "receivedAtMs": 2348.1654309998703
+    },
+    {
+      "label": "warm-turn-34:end",
+      "atMs": 1824.168494,
+      "instance": 0,
+      "durationMs": 25.914262999999664,
+      "calls": 3,
+      "transcriptMessages": 210,
+      "receivedAtMs": 2374.1451519999828
+    },
+    {
+      "label": "warm-turn-35:start",
+      "atMs": 1824.2299560000001,
+      "instance": 0,
+      "receivedAtMs": 2374.1538349986513
+    },
+    {
+      "label": "warm-turn-35:end",
+      "atMs": 1867.0294920000001,
+      "instance": 0,
+      "durationMs": 42.789120000000366,
+      "calls": 3,
+      "transcriptMessages": 216,
+      "receivedAtMs": 2417.025298998851
+    },
+    {
+      "label": "warm-turn-36:start",
+      "atMs": 1867.0951610000002,
+      "instance": 0,
+      "receivedAtMs": 2417.0351939992543
+    },
+    {
+      "label": "warm-turn-36:end",
+      "atMs": 1893.8492800000004,
+      "instance": 0,
+      "durationMs": 26.74370299999964,
+      "calls": 3,
+      "transcriptMessages": 222,
+      "receivedAtMs": 2443.815642000118
+    },
+    {
+      "label": "warm-turn-37:start",
+      "atMs": 1893.9082280000002,
+      "instance": 0,
+      "receivedAtMs": 2443.8240849995054
+    },
+    {
+      "label": "warm-turn-37:end",
+      "atMs": 1918.0552670000002,
+      "instance": 0,
+      "durationMs": 24.134831000000304,
+      "calls": 3,
+      "transcriptMessages": 228,
+      "receivedAtMs": 2468.0289909993007
+    },
+    {
+      "label": "warm-turn-38:start",
+      "atMs": 1918.1173910000002,
+      "instance": 0,
+      "receivedAtMs": 2468.0376939995767
+    },
+    {
+      "label": "warm-turn-38:end",
+      "atMs": 1941.380928,
+      "instance": 0,
+      "durationMs": 23.254053000000113,
+      "calls": 3,
+      "transcriptMessages": 234,
+      "receivedAtMs": 2491.367710999839
+    },
+    {
+      "label": "warm-turn-39:start",
+      "atMs": 1941.4361510000003,
+      "instance": 0,
+      "receivedAtMs": 2491.3768249989516
+    },
+    {
+      "label": "warm-turn-39:end",
+      "atMs": 1964.96648,
+      "instance": 0,
+      "durationMs": 23.520434000000023,
+      "calls": 3,
+      "transcriptMessages": 240,
+      "receivedAtMs": 2514.943307998692
+    },
+    {
+      "label": "warm-turn-40:start",
+      "atMs": 1965.024007,
+      "instance": 0,
+      "receivedAtMs": 2514.9514109998563
+    },
+    {
+      "label": "warm-turn-40:end",
+      "atMs": 1990.2721650000003,
+      "instance": 0,
+      "durationMs": 25.238604000000123,
+      "calls": 3,
+      "transcriptMessages": 246,
+      "receivedAtMs": 2540.233529998659
+    },
+    {
+      "label": "warm-turn-41:start",
+      "atMs": 1990.334229,
+      "instance": 0,
+      "receivedAtMs": 2540.241392000098
+    },
+    {
+      "label": "warm-turn-41:end",
+      "atMs": 2026.3977400000003,
+      "instance": 0,
+      "durationMs": 36.05333700000028,
+      "calls": 3,
+      "transcriptMessages": 252,
+      "receivedAtMs": 2576.602221999565
+    },
+    {
+      "label": "warm-turn-42:start",
+      "atMs": 2026.4618570000002,
+      "instance": 0,
+      "receivedAtMs": 2576.616162999926
+    },
+    {
+      "label": "warm-turn-42:end",
+      "atMs": 2058.1972840000003,
+      "instance": 0,
+      "durationMs": 31.72582199999988,
+      "calls": 3,
+      "transcriptMessages": 258,
+      "receivedAtMs": 2608.1984390002617
+    },
+    {
+      "label": "warm-turn-43:start",
+      "atMs": 2058.259077,
+      "instance": 0,
+      "receivedAtMs": 2608.2075829999667
+    },
+    {
+      "label": "warm-turn-43:end",
+      "atMs": 2091.5686170000004,
+      "instance": 0,
+      "durationMs": 33.300125999999636,
+      "calls": 3,
+      "transcriptMessages": 264,
+      "receivedAtMs": 2641.5981549998833
+    },
+    {
+      "label": "warm-turn-44:start",
+      "atMs": 2091.64374,
+      "instance": 0,
+      "receivedAtMs": 2641.607268998996
+    },
+    {
+      "label": "warm-turn-44:end",
+      "atMs": 2117.316138,
+      "instance": 0,
+      "durationMs": 25.66324399999985,
+      "calls": 3,
+      "transcriptMessages": 270,
+      "receivedAtMs": 2667.2920159999194
+    },
+    {
+      "label": "warm-turn-45:start",
+      "atMs": 2117.373235,
+      "instance": 0,
+      "receivedAtMs": 2667.300447999878
+    },
+    {
+      "label": "warm-turn-45:end",
+      "atMs": 2142.598218,
+      "instance": 0,
+      "durationMs": 25.21602999999959,
+      "calls": 3,
+      "transcriptMessages": 276,
+      "receivedAtMs": 2692.600574999233
+    },
+    {
+      "label": "warm-turn-46:start",
+      "atMs": 2142.6520990000004,
+      "instance": 0,
+      "receivedAtMs": 2692.608506999022
+    },
+    {
+      "label": "warm-turn-46:end",
+      "atMs": 2170.251102,
+      "instance": 0,
+      "durationMs": 27.589918000000125,
+      "calls": 3,
+      "transcriptMessages": 282,
+      "receivedAtMs": 2720.225576998928
+    },
+    {
+      "label": "warm-turn-47:start",
+      "atMs": 2170.3083180000003,
+      "instance": 0,
+      "receivedAtMs": 2720.2334880003036
+    },
+    {
+      "label": "warm-turn-47:end",
+      "atMs": 2198.508576,
+      "instance": 0,
+      "durationMs": 28.191545000000133,
+      "calls": 3,
+      "transcriptMessages": 288,
+      "receivedAtMs": 2748.5051349995047
+    },
+    {
+      "label": "warm-turn-48:start",
+      "atMs": 2198.562938,
+      "instance": 0,
+      "receivedAtMs": 2748.5144389993366
+    },
+    {
+      "label": "warm-turn-48:end",
+      "atMs": 2225.391579,
+      "instance": 0,
+      "durationMs": 26.80052799999976,
+      "calls": 3,
+      "transcriptMessages": 294,
+      "receivedAtMs": 2775.3873459987517
+    },
+    {
+      "label": "warm-turn-49:start",
+      "atMs": 2225.453062,
+      "instance": 0,
+      "receivedAtMs": 2775.39564899962
+    },
+    {
+      "label": "warm-turn-49:end",
+      "atMs": 2254.917797,
+      "instance": 0,
+      "durationMs": 29.455399999999827,
+      "calls": 3,
+      "transcriptMessages": 300,
+      "receivedAtMs": 2804.8994519995176
+    },
+    {
+      "label": "warm-turn-50:start",
+      "atMs": 2254.978328,
+      "instance": 0,
+      "receivedAtMs": 2804.906862998905
+    },
+    {
+      "label": "warm-turn-50:end",
+      "atMs": 2278.943943,
+      "instance": 0,
+      "durationMs": 23.956562000000304,
+      "calls": 3,
+      "transcriptMessages": 306,
+      "nativeMemory": {
+        "usage": {
+          "rss": 341581824,
+          "heapTotal": 222363648,
+          "heapUsed": 99346800,
+          "external": 68250207,
+          "arrayBuffers": 1545681
+        },
+        "heap": {
+          "total_heap_size": 222363648,
+          "total_heap_size_executable": 5505024,
+          "total_physical_size": 200699904,
+          "total_available_size": 4396772496,
+          "used_heap_size": 99347024,
+          "heap_size_limit": 4496293888,
+          "malloced_memory": 2130000,
+          "peak_malloced_memory": 774188952,
+          "does_zap_garbage": 0,
+          "number_of_native_contexts": 1,
+          "number_of_detached_contexts": 0,
+          "total_global_handles_size": 98304,
+          "used_global_handles_size": 7232,
+          "external_memory": 68250207
+        },
+        "spaces": [
+          {
+            "space_name": "read_only_space",
+            "space_size": 0,
+            "space_used_size": 0,
+            "space_available_size": 0,
+            "physical_space_size": 0
+          },
+          {
+            "space_name": "new_space",
+            "space_size": 134217728,
+            "space_used_size": 12232632,
+            "space_available_size": 54872136,
+            "physical_space_size": 112283648
+          },
+          {
+            "space_name": "old_space",
+            "space_size": 69873664,
+            "space_used_size": 69427432,
+            "space_available_size": 309480,
+            "physical_space_size": 69992448
+          },
+          {
+            "space_name": "code_space",
+            "space_size": 5505024,
+            "space_used_size": 5273600,
+            "space_available_size": 230752,
+            "physical_space_size": 5505024
+          },
+          {
+            "space_name": "shared_space",
+            "space_size": 0,
+            "space_used_size": 0,
+            "space_available_size": 0,
+            "physical_space_size": 0
+          },
+          {
+            "space_name": "trusted_space",
+            "space_size": 8761344,
+            "space_used_size": 8439168,
+            "space_available_size": 320080,
+            "physical_space_size": 8912896
+          },
+          {
+            "space_name": "shared_trusted_space",
+            "space_size": 0,
+            "space_used_size": 0,
+            "space_available_size": 0,
+            "physical_space_size": 0
+          },
+          {
+            "space_name": "new_large_object_space",
+            "space_size": 0,
+            "space_used_size": 0,
+            "space_available_size": 67108864,
+            "physical_space_size": 0
+          },
+          {
+            "space_name": "large_object_space",
+            "space_size": 3371008,
+            "space_used_size": 3344536,
+            "space_available_size": 0,
+            "physical_space_size": 3371008
+          },
+          {
+            "space_name": "code_large_object_space",
+            "space_size": 0,
+            "space_used_size": 0,
+            "space_available_size": 0,
+            "physical_space_size": 0
+          },
+          {
+            "space_name": "shared_large_object_space",
+            "space_size": 0,
+            "space_used_size": 0,
+            "space_available_size": 0,
+            "physical_space_size": 0
+          },
+          {
+            "space_name": "shared_trusted_large_object_space",
+            "space_size": 0,
+            "space_used_size": 0,
+            "space_available_size": 0,
+            "physical_space_size": 0
+          },
+          {
+            "space_name": "trusted_large_object_space",
+            "space_size": 634880,
+            "space_used_size": 630600,
+            "space_available_size": 0,
+            "physical_space_size": 634880
+          }
+        ],
+        "code": {
+          "code_and_metadata_size": 8271914,
+          "bytecode_and_metadata_size": 5023584,
+          "external_script_source_size": 33148052,
+          "cpu_profiler_metadata_size": 0
+        }
+      },
+      "receivedAtMs": 2844.201013998827
+    },
+    {
+      "label": "sql-roundtrips:start",
+      "atMs": 2294.928397,
+      "instance": 0,
+      "receivedAtMs": 2844.833066999854
+    },
+    {
+      "label": "sql-roundtrips:end",
+      "atMs": 2295.0564600000002,
+      "instance": 0,
+      "durationMs": 0.08636000000024069,
+      "roundtrips": 50,
+      "receivedAtMs": 2844.9405189985555
+    },
+    {
+      "label": "idle:start",
+      "atMs": 2295.093005,
+      "instance": 0,
+      "nativeMemory": {
+        "usage": {
+          "rss": 341581824,
+          "heapTotal": 222363648,
+          "heapUsed": 99374384,
+          "external": 68250207,
+          "arrayBuffers": 1545681
+        },
+        "heap": {
+          "total_heap_size": 222363648,
+          "total_heap_size_executable": 5505024,
+          "total_physical_size": 200699904,
+          "total_available_size": 4396744912,
+          "used_heap_size": 99374608,
+          "heap_size_limit": 4496293888,
+          "malloced_memory": 2130000,
+          "peak_malloced_memory": 774188952,
+          "does_zap_garbage": 0,
+          "number_of_native_contexts": 1,
+          "number_of_detached_contexts": 0,
+          "total_global_handles_size": 98304,
+          "used_global_handles_size": 7296,
+          "external_memory": 68250207
+        },
+        "spaces": [
+          {
+            "space_name": "read_only_space",
+            "space_size": 0,
+            "space_used_size": 0,
+            "space_available_size": 0,
+            "physical_space_size": 0
+          },
+          {
+            "space_name": "new_space",
+            "space_size": 134217728,
+            "space_used_size": 12255896,
+            "space_available_size": 54848872,
+            "physical_space_size": 112283648
+          },
+          {
+            "space_name": "old_space",
+            "space_size": 69873664,
+            "space_used_size": 69431752,
+            "space_available_size": 305160,
+            "physical_space_size": 69992448
+          },
+          {
+            "space_name": "code_space",
+            "space_size": 5505024,
+            "space_used_size": 5273600,
+            "space_available_size": 230752,
+            "physical_space_size": 5505024
+          },
+          {
+            "space_name": "shared_space",
+            "space_size": 0,
+            "space_used_size": 0,
+            "space_available_size": 0,
+            "physical_space_size": 0
+          },
+          {
+            "space_name": "trusted_space",
+            "space_size": 8761344,
+            "space_used_size": 8439168,
+            "space_available_size": 320080,
+            "physical_space_size": 8912896
+          },
+          {
+            "space_name": "shared_trusted_space",
+            "space_size": 0,
+            "space_used_size": 0,
+            "space_available_size": 0,
+            "physical_space_size": 0
+          },
+          {
+            "space_name": "new_large_object_space",
+            "space_size": 0,
+            "space_used_size": 0,
+            "space_available_size": 67108864,
+            "physical_space_size": 0
+          },
+          {
+            "space_name": "large_object_space",
+            "space_size": 3371008,
+            "space_used_size": 3344536,
+            "space_available_size": 0,
+            "physical_space_size": 3371008
+          },
+          {
+            "space_name": "code_large_object_space",
+            "space_size": 0,
+            "space_used_size": 0,
+            "space_available_size": 0,
+            "physical_space_size": 0
+          },
+          {
+            "space_name": "shared_large_object_space",
+            "space_size": 0,
+            "space_used_size": 0,
+            "space_available_size": 0,
+            "physical_space_size": 0
+          },
+          {
+            "space_name": "shared_trusted_large_object_space",
+            "space_size": 0,
+            "space_used_size": 0,
+            "space_available_size": 0,
+            "physical_space_size": 0
+          },
+          {
+            "space_name": "trusted_large_object_space",
+            "space_size": 634880,
+            "space_used_size": 630600,
+            "space_available_size": 0,
+            "physical_space_size": 634880
+          }
+        ],
+        "code": {
+          "code_and_metadata_size": 8271914,
+          "bytecode_and_metadata_size": 5023584,
+          "external_script_source_size": 33148052,
+          "cpu_profiler_metadata_size": 0
+        }
+      },
+      "receivedAtMs": 2861.6688749989407
+    },
+    {
+      "label": "idle:end",
+      "atMs": 3822.5306270000005,
+      "instance": 0,
+      "nativeMemory": {
+        "usage": {
+          "rss": 341581824,
+          "heapTotal": 222363648,
+          "heapUsed": 99386904,
+          "external": 68250207,
+          "arrayBuffers": 1545681
+        },
+        "heap": {
+          "total_heap_size": 222363648,
+          "total_heap_size_executable": 5505024,
+          "total_physical_size": 200699904,
+          "total_available_size": 4396732392,
+          "used_heap_size": 99387128,
+          "heap_size_limit": 4496293888,
+          "malloced_memory": 2130000,
+          "peak_malloced_memory": 774188952,
+          "does_zap_garbage": 0,
+          "number_of_native_contexts": 1,
+          "number_of_detached_contexts": 0,
+          "total_global_handles_size": 98304,
+          "used_global_handles_size": 7264,
+          "external_memory": 68250207
+        },
+        "spaces": [
+          {
+            "space_name": "read_only_space",
+            "space_size": 0,
+            "space_used_size": 0,
+            "space_available_size": 0,
+            "physical_space_size": 0
+          },
+          {
+            "space_name": "new_space",
+            "space_size": 134217728,
+            "space_used_size": 12267976,
+            "space_available_size": 54836792,
+            "physical_space_size": 112283648
+          },
+          {
+            "space_name": "old_space",
+            "space_size": 69873664,
+            "space_used_size": 69432048,
+            "space_available_size": 304864,
+            "physical_space_size": 69992448
+          },
+          {
+            "space_name": "code_space",
+            "space_size": 5505024,
+            "space_used_size": 5273600,
+            "space_available_size": 230752,
+            "physical_space_size": 5505024
+          },
+          {
+            "space_name": "shared_space",
+            "space_size": 0,
+            "space_used_size": 0,
+            "space_available_size": 0,
+            "physical_space_size": 0
+          },
+          {
+            "space_name": "trusted_space",
+            "space_size": 8761344,
+            "space_used_size": 8439312,
+            "space_available_size": 319936,
+            "physical_space_size": 8912896
+          },
+          {
+            "space_name": "shared_trusted_space",
+            "space_size": 0,
+            "space_used_size": 0,
+            "space_available_size": 0,
+            "physical_space_size": 0
+          },
+          {
+            "space_name": "new_large_object_space",
+            "space_size": 0,
+            "space_used_size": 0,
+            "space_available_size": 67108864,
+            "physical_space_size": 0
+          },
+          {
+            "space_name": "large_object_space",
+            "space_size": 3371008,
+            "space_used_size": 3344536,
+            "space_available_size": 0,
+            "physical_space_size": 3371008
+          },
+          {
+            "space_name": "code_large_object_space",
+            "space_size": 0,
+            "space_used_size": 0,
+            "space_available_size": 0,
+            "physical_space_size": 0
+          },
+          {
+            "space_name": "shared_large_object_space",
+            "space_size": 0,
+            "space_used_size": 0,
+            "space_available_size": 0,
+            "physical_space_size": 0
+          },
+          {
+            "space_name": "shared_trusted_large_object_space",
+            "space_size": 0,
+            "space_used_size": 0,
+            "space_available_size": 0,
+            "physical_space_size": 0
+          },
+          {
+            "space_name": "trusted_large_object_space",
+            "space_size": 634880,
+            "space_used_size": 630600,
+            "space_available_size": 0,
+            "physical_space_size": 634880
+          }
+        ],
+        "code": {
+          "code_and_metadata_size": 8271914,
+          "bytecode_and_metadata_size": 5023712,
+          "external_script_source_size": 33148052,
+          "cpu_profiler_metadata_size": 0
+        }
+      },
+      "receivedAtMs": 4434.56113999855
+    }
+  ],
+  "stderr": [],
+  "samples": [
+    {"atMs":2.1564299986494007,"accountedTreeTicks":0,"rssBytes":1544192,"pssBytes":1131520,"processes":[{"pid":136706,"name":"node","ppid":136652,"ticks":0,"reapedChildTicks":0,"startTicks":1071270,"threads":1,"Rss":1544192,"Pss":1131520,"Private_Clean":864256,"Private_Dirty":184320,"Swap":0}]},
+    {"atMs":102.80119999879389,"accountedTreeTicks":10,"rssBytes":54484992,"pssBytes":53680128,"processes":[{"pid":136706,"name":"MainThread","ppid":136652,"ticks":10,"reapedChildTicks":0,"startTicks":1071270,"threads":7,"Rss":54484992,"Pss":53680128,"Private_Clean":21712896,"Private_Dirty":31768576,"Swap":0}]},
+    {"atMs":203.29257899902586,"accountedTreeTicks":20,"rssBytes":115699712,"pssBytes":114894848,"processes":[{"pid":136706,"name":"MainThread","ppid":136652,"ticks":20,"reapedChildTicks":0,"startTicks":1071270,"threads":7,"Rss":115699712,"Pss":114894848,"Private_Clean":22183936,"Private_Dirty":92512256,"Swap":0}]},
+    {"atMs":304.20748599863146,"accountedTreeTicks":30,"rssBytes":147873792,"pssBytes":147068928,"processes":[{"pid":136706,"name":"MainThread","ppid":136652,"ticks":30,"reapedChildTicks":0,"startTicks":1071270,"threads":7,"Rss":147873792,"Pss":147068928,"Private_Clean":22249472,"Private_Dirty":124620800,"Swap":0}]},
+    {"atMs":404.93394899931445,"accountedTreeTicks":40,"rssBytes":168411136,"pssBytes":167606272,"processes":[{"pid":136706,"name":"MainThread","ppid":136652,"ticks":40,"reapedChildTicks":0,"startTicks":1071270,"threads":7,"Rss":168411136,"Pss":167606272,"Private_Clean":22257664,"Private_Dirty":145149952,"Swap":0}]},
+    {"atMs":506.08729499981564,"accountedTreeTicks":52,"rssBytes":166387712,"pssBytes":165571584,"processes":[{"pid":136706,"name":"MainThread","ppid":136652,"ticks":52,"reapedChildTicks":0,"startTicks":1071270,"threads":7,"Rss":166387712,"Pss":165571584,"Private_Clean":23822336,"Private_Dirty":141549568,"Swap":0}]},
+    {"atMs":606.8645949999336,"accountedTreeTicks":63,"rssBytes":194625536,"pssBytes":193805312,"processes":[{"pid":136706,"name":"MainThread","ppid":136652,"ticks":63,"reapedChildTicks":0,"startTicks":1071270,"threads":7,"Rss":194625536,"Pss":193805312,"Private_Clean":30625792,"Private_Dirty":162975744,"Swap":0}]},
+    {"atMs":707.3002090000955,"accountedTreeTicks":75,"rssBytes":241311744,"pssBytes":240490496,"processes":[{"pid":136706,"name":"MainThread","ppid":136652,"ticks":75,"reapedChildTicks":0,"startTicks":1071270,"threads":7,"Rss":241311744,"Pss":240490496,"Private_Clean":30916608,"Private_Dirty":209383424,"Swap":0}]},
+    {"atMs":808.2775109996874,"accountedTreeTicks":87,"rssBytes":262451200,"pssBytes":261620736,"processes":[{"pid":136706,"name":"MainThread","ppid":136652,"ticks":87,"reapedChildTicks":0,"startTicks":1071270,"threads":7,"Rss":262451200,"Pss":261620736,"Private_Clean":31281152,"Private_Dirty":230146048,"Swap":0}]},
+    {"atMs":908.4734089992708,"accountedTreeTicks":100,"rssBytes":276443136,"pssBytes":275586048,"processes":[{"pid":136706,"name":"MainThread","ppid":136652,"ticks":100,"reapedChildTicks":0,"startTicks":1071270,"threads":11,"Rss":276443136,"Pss":275586048,"Private_Clean":31760384,"Private_Dirty":243625984,"Swap":0}]},
+    {"atMs":1009.5771409996814,"accountedTreeTicks":111,"rssBytes":281518080,"pssBytes":280660992,"processes":[{"pid":136706,"name":"MainThread","ppid":136652,"ticks":111,"reapedChildTicks":0,"startTicks":1071270,"threads":11,"Rss":281518080,"Pss":280660992,"Private_Clean":31825920,"Private_Dirty":248635392,"Swap":0}]},
+    {"atMs":1110.1211089990102,"accountedTreeTicks":127,"rssBytes":305557504,"pssBytes":304691200,"processes":[{"pid":136706,"name":"MainThread","ppid":136652,"ticks":127,"reapedChildTicks":0,"startTicks":1071270,"threads":11,"Rss":305557504,"Pss":304691200,"Private_Clean":33181696,"Private_Dirty":271306752,"Swap":0}]},
+    {"atMs":1215.0798509992455,"accountedTreeTicks":147,"rssBytes":536838144,"pssBytes":535971840,"processes":[{"pid":136706,"name":"MainThread","ppid":136652,"ticks":147,"reapedChildTicks":0,"startTicks":1071270,"threads":11,"Rss":536838144,"Pss":535971840,"Private_Clean":33214464,"Private_Dirty":502554624,"Swap":0}]},
+    {"atMs":1316.2500229991565,"accountedTreeTicks":164,"rssBytes":560865280,"pssBytes":559998976,"processes":[{"pid":136706,"name":"MainThread","ppid":136652,"ticks":163,"reapedChildTicks":1,"startTicks":1071270,"threads":11,"Rss":560865280,"Pss":559998976,"Private_Clean":33509376,"Private_Dirty":526286848,"Swap":0}]},
+    {"atMs":1416.8576069987466,"accountedTreeTicks":182,"rssBytes":591208448,"pssBytes":387825664,"processes":[{"pid":136706,"name":"MainThread","ppid":136652,"ticks":180,"reapedChildTicks":2,"startTicks":1071270,"threads":11,"Rss":591208448,"Pss":387825664,"Private_Clean":33529856,"Private_Dirty":151576576,"Swap":0}]},
+    {"atMs":1517.8776430002472,"accountedTreeTicks":200,"rssBytes":627679232,"pssBytes":626822144,"processes":[{"pid":136706,"name":"MainThread","ppid":136652,"ticks":197,"reapedChildTicks":3,"startTicks":1071270,"threads":11,"Rss":627679232,"Pss":626822144,"Private_Clean":33554432,"Private_Dirty":593059840,"Swap":0}]},
+    {"atMs":1618.1714129998,"accountedTreeTicks":218,"rssBytes":662614016,"pssBytes":464354304,"processes":[{"pid":136706,"name":"MainThread","ppid":136652,"ticks":214,"reapedChildTicks":4,"startTicks":1071270,"threads":11,"Rss":662614016,"Pss":464354304,"Private_Clean":33714176,"Private_Dirty":233029632,"Swap":0}]},
+    {"atMs":1718.683492999844,"accountedTreeTicks":238,"rssBytes":701034496,"pssBytes":495194112,"processes":[{"pid":136706,"name":"MainThread","ppid":136652,"ticks":233,"reapedChildTicks":5,"startTicks":1071270,"threads":11,"Rss":701034496,"Pss":495194112,"Private_Clean":33722368,"Private_Dirty":256282624,"Swap":0}]},
+    {"atMs":1819.5215039995674,"accountedTreeTicks":255,"rssBytes":740151296,"pssBytes":739292160,"processes":[{"pid":136706,"name":"MainThread","ppid":136652,"ticks":249,"reapedChildTicks":6,"startTicks":1071270,"threads":11,"Rss":740151296,"Pss":739292160,"Private_Clean":33738752,"Private_Dirty":705343488,"Swap":0}]},
+    {"atMs":1920.0495929999306,"accountedTreeTicks":276,"rssBytes":768954368,"pssBytes":768095232,"processes":[{"pid":136706,"name":"MainThread","ppid":136652,"ticks":267,"reapedChildTicks":9,"startTicks":1071270,"threads":11,"Rss":768954368,"Pss":768095232,"Private_Clean":33755136,"Private_Dirty":734130176,"Swap":0}]},
+    {"atMs":2020.8813899989764,"accountedTreeTicks":294,"rssBytes":802480128,"pssBytes":801620992,"processes":[{"pid":136706,"name":"MainThread","ppid":136652,"ticks":285,"reapedChildTicks":9,"startTicks":1071270,"threads":11,"Rss":802480128,"Pss":801620992,"Private_Clean":33759232,"Private_Dirty":767651840,"Swap":0}]},
+    {"atMs":2121.7653099993186,"accountedTreeTicks":313,"rssBytes":329015296,"pssBytes":328156160,"processes":[{"pid":136706,"name":"MainThread","ppid":136652,"ticks":302,"reapedChildTicks":11,"startTicks":1071270,"threads":11,"Rss":329015296,"Pss":328156160,"Private_Clean":33771520,"Private_Dirty":294174720,"Swap":0}]},
+    {"atMs":2223.6903899993194,"accountedTreeTicks":330,"rssBytes":334929920,"pssBytes":334070784,"processes":[{"pid":136706,"name":"MainThread","ppid":136652,"ticks":319,"reapedChildTicks":11,"startTicks":1071270,"threads":11,"Rss":334929920,"Pss":334070784,"Private_Clean":33882112,"Private_Dirty":299978752,"Swap":0}]},
+    {"atMs":2324.628791999203,"accountedTreeTicks":343,"rssBytes":335224832,"pssBytes":334365696,"processes":[{"pid":136706,"name":"MainThread","ppid":136652,"ticks":330,"reapedChildTicks":13,"startTicks":1071270,"threads":11,"Rss":335224832,"Pss":334365696,"Private_Clean":33947648,"Private_Dirty":300208128,"Swap":0}]},
+    {"atMs":2425.12583899952,"accountedTreeTicks":353,"rssBytes":337178624,"pssBytes":336319488,"processes":[{"pid":136706,"name":"MainThread","ppid":136652,"ticks":340,"reapedChildTicks":13,"startTicks":1071270,"threads":11,"Rss":337178624,"Pss":336319488,"Private_Clean":33947648,"Private_Dirty":302161920,"Swap":0}]},
+    {"atMs":2526.0470359989995,"accountedTreeTicks":364,"rssBytes":337326080,"pssBytes":321150976,"processes":[{"pid":136706,"name":"MainThread","ppid":136652,"ticks":349,"reapedChildTicks":15,"startTicks":1071270,"threads":11,"Rss":337326080,"Pss":321150976,"Private_Clean":33943552,"Private_Dirty":271683584,"Swap":0}]},
+    {"atMs":2627.330768998945,"accountedTreeTicks":377,"rssBytes":339415040,"pssBytes":323237888,"processes":[{"pid":136706,"name":"MainThread","ppid":136652,"ticks":360,"reapedChildTicks":17,"startTicks":1071270,"threads":11,"Rss":339415040,"Pss":323237888,"Private_Clean":33972224,"Private_Dirty":273739776,"Swap":0}]},
+    {"atMs":2728.3369839988154,"accountedTreeTicks":385,"rssBytes":339513344,"pssBytes":338654208,"processes":[{"pid":136706,"name":"MainThread","ppid":136652,"ticks":368,"reapedChildTicks":17,"startTicks":1071270,"threads":11,"Rss":339513344,"Pss":338654208,"Private_Clean":33976320,"Private_Dirty":304467968,"Swap":0}]},
+    {"atMs":2829.0244179988804,"accountedTreeTicks":398,"rssBytes":341696512,"pssBytes":340837376,"processes":[{"pid":136706,"name":"MainThread","ppid":136652,"ticks":379,"reapedChildTicks":19,"startTicks":1071270,"threads":11,"Rss":341696512,"Pss":340837376,"Private_Clean":33984512,"Private_Dirty":306642944,"Swap":0}]},
+    {"atMs":2929.8615179995977,"accountedTreeTicks":401,"rssBytes":341700608,"pssBytes":340841472,"processes":[{"pid":136706,"name":"MainThread","ppid":136652,"ticks":382,"reapedChildTicks":19,"startTicks":1071270,"threads":11,"Rss":341700608,"Pss":340841472,"Private_Clean":33984512,"Private_Dirty":306647040,"Swap":0}]},
+    {"atMs":3030.8620340001653,"accountedTreeTicks":401,"rssBytes":341700608,"pssBytes":340841472,"processes":[{"pid":136706,"name":"MainThread","ppid":136652,"ticks":382,"reapedChildTicks":19,"startTicks":1071270,"threads":11,"Rss":341700608,"Pss":340841472,"Private_Clean":33984512,"Private_Dirty":306647040,"Swap":0}]},
+    {"atMs":3131.1702519997198,"accountedTreeTicks":401,"rssBytes":341700608,"pssBytes":340825088,"processes":[{"pid":136706,"name":"MainThread","ppid":136652,"ticks":382,"reapedChildTicks":19,"startTicks":1071270,"threads":11,"Rss":341700608,"Pss":340825088,"Private_Clean":33980416,"Private_Dirty":306647040,"Swap":0}]},
+    {"atMs":3231.74107199884,"accountedTreeTicks":401,"rssBytes":341700608,"pssBytes":340825088,"processes":[{"pid":136706,"name":"MainThread","ppid":136652,"ticks":382,"reapedChildTicks":19,"startTicks":1071270,"threads":11,"Rss":341700608,"Pss":340825088,"Private_Clean":33980416,"Private_Dirty":306647040,"Swap":0}]},
+    {"atMs":3332.5295009999536,"accountedTreeTicks":401,"rssBytes":341700608,"pssBytes":340824064,"processes":[{"pid":136706,"name":"MainThread","ppid":136652,"ticks":382,"reapedChildTicks":19,"startTicks":1071270,"threads":11,"Rss":341700608,"Pss":340824064,"Private_Clean":33980416,"Private_Dirty":306647040,"Swap":0}]},
+    {"atMs":3433.2109349998063,"accountedTreeTicks":401,"rssBytes":341700608,"pssBytes":340841472,"processes":[{"pid":136706,"name":"MainThread","ppid":136652,"ticks":382,"reapedChildTicks":19,"startTicks":1071270,"threads":11,"Rss":341700608,"Pss":340841472,"Private_Clean":33984512,"Private_Dirty":306647040,"Swap":0}]},
+    {"atMs":3533.3913459999167,"accountedTreeTicks":401,"rssBytes":341700608,"pssBytes":340841472,"processes":[{"pid":136706,"name":"MainThread","ppid":136652,"ticks":382,"reapedChildTicks":19,"startTicks":1071270,"threads":11,"Rss":341700608,"Pss":340841472,"Private_Clean":33984512,"Private_Dirty":306647040,"Swap":0}]},
+    {"atMs":3634.5515719985997,"accountedTreeTicks":401,"rssBytes":341700608,"pssBytes":340841472,"processes":[{"pid":136706,"name":"MainThread","ppid":136652,"ticks":382,"reapedChildTicks":19,"startTicks":1071270,"threads":11,"Rss":341700608,"Pss":340841472,"Private_Clean":33984512,"Private_Dirty":306647040,"Swap":0}]},
+    {"atMs":3735.0152899998648,"accountedTreeTicks":401,"rssBytes":341700608,"pssBytes":340841472,"processes":[{"pid":136706,"name":"MainThread","ppid":136652,"ticks":382,"reapedChildTicks":19,"startTicks":1071270,"threads":11,"Rss":341700608,"Pss":340841472,"Private_Clean":33984512,"Private_Dirty":306647040,"Swap":0}]},
+    {"atMs":3835.2481780002563,"accountedTreeTicks":401,"rssBytes":341700608,"pssBytes":340841472,"processes":[{"pid":136706,"name":"MainThread","ppid":136652,"ticks":382,"reapedChildTicks":19,"startTicks":1071270,"threads":11,"Rss":341700608,"Pss":340841472,"Private_Clean":33984512,"Private_Dirty":306647040,"Swap":0}]},
+    {"atMs":3935.53894499928,"accountedTreeTicks":401,"rssBytes":341700608,"pssBytes":340841472,"processes":[{"pid":136706,"name":"MainThread","ppid":136652,"ticks":382,"reapedChildTicks":19,"startTicks":1071270,"threads":11,"Rss":341700608,"Pss":340841472,"Private_Clean":33984512,"Private_Dirty":306647040,"Swap":0}]},
+    {"atMs":4035.9748939990823,"accountedTreeTicks":401,"rssBytes":341700608,"pssBytes":340841472,"processes":[{"pid":136706,"name":"MainThread","ppid":136652,"ticks":382,"reapedChildTicks":19,"startTicks":1071270,"threads":11,"Rss":341700608,"Pss":340841472,"Private_Clean":33984512,"Private_Dirty":306647040,"Swap":0}]},
+    {"atMs":4142.98070499899,"accountedTreeTicks":401,"rssBytes":341700608,"pssBytes":340841472,"processes":[{"pid":136706,"name":"MainThread","ppid":136652,"ticks":382,"reapedChildTicks":19,"startTicks":1071270,"threads":11,"Rss":341700608,"Pss":340841472,"Private_Clean":33984512,"Private_Dirty":306647040,"Swap":0}]},
+    {"atMs":4244.162215998585,"accountedTreeTicks":402,"rssBytes":341700608,"pssBytes":340841472,"processes":[{"pid":136706,"name":"MainThread","ppid":136652,"ticks":383,"reapedChildTicks":19,"startTicks":1071270,"threads":11,"Rss":341700608,"Pss":340841472,"Private_Clean":33984512,"Private_Dirty":306647040,"Swap":0}]},
+    {"atMs":4344.457627999873,"accountedTreeTicks":402,"rssBytes":341700608,"pssBytes":340841472,"processes":[{"pid":136706,"name":"MainThread","ppid":136652,"ticks":383,"reapedChildTicks":19,"startTicks":1071270,"threads":11,"Rss":341700608,"Pss":340841472,"Private_Clean":33984512,"Private_Dirty":306647040,"Swap":0}]},
+    {"atMs":4444.676397999501,"accountedTreeTicks":409,"rssBytes":245534720,"pssBytes":244675584,"processes":[{"pid":136706,"name":"MainThread","ppid":136652,"ticks":390,"reapedChildTicks":19,"startTicks":1071270,"threads":11,"Rss":245534720,"Pss":244675584,"Private_Clean":34185216,"Private_Dirty":210280448,"Swap":0}]}
+  ]
+}

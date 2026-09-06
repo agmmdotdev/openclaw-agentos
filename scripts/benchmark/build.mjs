@@ -19,9 +19,10 @@ nativeFixture = nativeFixture.replace("import { DatabaseSync as BenchDatabase, g
 const markerStart = nativeFixture.indexOf('function mark('), markerEnd = nativeFixture.indexOf("mark('worker-ready');", markerStart);
 if (markerStart < 0 || markerEnd < 0) throw new Error('Native fixture marker boundary changed');
 nativeFixture = nativeFixture.slice(0, markerStart) + `
+const memoryCheckpoint = process.env.BENCH_NATIVE_MEMORY === "1" ? (await import("../../scripts/benchmark/native-memory.mjs")).nativeMemoryCheckpoint : () => ({});
 const benchStart = performance.now();
 const benchWorkspace = process.env.BENCH_ROOT + "/workspace", benchState = process.env.BENCH_ROOT + "/state";
-function mark(label, data = {}) { console.log('BENCH_EVENT=' + JSON.stringify({ label, atMs: performance.now() - benchStart, instance: 0, ...data })); }
+function mark(label, data = {}) { console.log('BENCH_EVENT=' + JSON.stringify({ label, atMs: performance.now() - benchStart, instance: 0, ...data, ...memoryCheckpoint(label) })); }
 ` + nativeFixture.slice(markerEnd);
 nativeFixture = nativeFixture.replaceAll("'/tmp/boundary-seed.txt'", "process.env.BENCH_ROOT + '/boundary-seed.txt'");
 nativeFixture = nativeFixture.replaceAll("'/workspace/seed.txt'", "benchWorkspace + '/seed.txt'").replaceAll("'/workspace'", 'benchWorkspace').replaceAll("'/state/transcript.json'", "benchState + '/transcript.json'").replaceAll("'/state'", 'benchState').replaceAll("'cat /workspace/seed.txt'", "'cat ' + benchWorkspace + '/seed.txt'");
