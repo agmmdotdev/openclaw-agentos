@@ -13,6 +13,7 @@ export interface Capabilities {
  backend: 'native-node'; sandboxed: false; security: 'trusted-only';
  processTreeLimits: false; filesystemQuota: false; virtualRoot: false;
  detachedDescendantContainment: false; sidecar: false;
+ filesystemBackend: 'node' | 'linux-openat2';
 }
 export interface NativeOptions {
  backend: 'native-node';
@@ -23,6 +24,8 @@ export interface NativeOptions {
  outputLimitBytes?: number;
  retainedProcessLimit?: number;
  maxFileBytes?: number;
+ // This selects host file access only. Process execution remains trusted-only.
+ filesystemBackend?: 'node' | 'linux-openat2';
  env?: Record<string,string>;
 }
 export interface NativeExit extends ProcessExit { error?: { code: string; message: string }; }

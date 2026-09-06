@@ -7,11 +7,12 @@ import { SdkError, unsupported, rejectUnknown, positive } from './contracts.js';
 import type { SpawnOptions, LanguageExecutionOptions, CodeExecutionResult, ExecutionSignal } from './language-execution.js';
 import { createFileApi } from './filesystem.js';
 import { inspectLinuxCapabilities } from './preflight.js';
+import type { LinuxFileAccess } from './linux-filesystem.js';
 type RecordEntry={ descriptor:NativeDescriptor; child:ChildProcessWithoutNullStreams; done:Promise<NativeExit>; exit?:NativeExit; events:Event[]; sequence:number; bytes:number; failure?:{code:string,message:string}; timeout:boolean; };
 const allowedSpawn=['cwd','env','stdin','timeoutMs','signal','onStdout','onStderr','output'];
 const signals=new Set<ExecutionSignal>(['SIGHUP','SIGINT','SIGQUIT','SIGTERM','SIGKILL','SIGSTOP','SIGCONT','SIGUSR1','SIGUSR2']);
 export class NativeAgentOs implements Backend {
- readonly capabilities:Readonly<Capabilities>=Object.freeze({backend:'native-node',sandboxed:false,security:'trusted-only',processTreeLimits:false,filesystemQuota:false,virtualRoot:false,detachedDescendantContainment:false,sidecar:false});
+ readonly capabilities:Readonly<Capabilities>;
  readonly filesystem:Backend['filesystem'];
  readonly process:ProcessApi;
  readonly javascript:JavaScriptApi;
@@ -26,14 +27,15 @@ export class NativeAgentOs implements Backend {
  #maxOutput:number;
  #maxRetained:number;
  #inFlight=0;
- private constructor(root:string,options:NativeOptions){
+ private constructor(root:string,options:NativeOptions,private fileAccess?:LinuxFileAccess){
+  this.capabilities=Object.freeze({backend:'native-node',sandboxed:false,security:'trusted-only',processTreeLimits:false,filesystemQuota:false,virtualRoot:false,detachedDescendantContainment:false,sidecar:false,filesystemBackend:options.filesystemBackend??'node'});
   this.workspaceDir=root;
   this.#maxActive=positive(options.managedProcessLimit??32,'managedProcessLimit');
   this.#maxOutput=positive(options.outputLimitBytes??1048576,'outputLimitBytes');
   this.#maxRetained=positive(options.retainedProcessLimit??32,'retainedProcessLimit');
   this.#env={PATH:process.env.PATH??'/usr/bin:/bin',HOME:root,LANG:'C.UTF-8',...options.env};
   const guard=<T extends object>(api:T,name:string):T=>new Proxy(api,{get(target,key,receiver){if(key in target||typeof key!=='string')return Reflect.get(target,key,receiver);if(key==='then')return undefined;return unsupported(`${name}.${key}`);}});
-  this.filesystem=guard(createFileApi(root,()=>this.#assertOpen(),positive(options.maxFileBytes??16777216,'maxFileBytes')),'filesystem');
+  this.filesystem=guard(fileAccess?.api??createFileApi(root,()=>this.#assertOpen(),positive(options.maxFileBytes??16777216,'maxFileBytes')),'filesystem');
   const spawn=(command:string,args:string[]=[],opts:SpawnOptions={})=>{
    const pending=this.#spawn(command,args,opts);this.#pending.add(pending);
    void pending.then(()=>this.#pending.delete(pending),()=>this.#pending.delete(pending));return pending;
@@ -69,12 +71,20 @@ export class NativeAgentOs implements Backend {
  get cron():never { return unsupported('cron'); }
  get sidecar():never { return unsupported('sidecar'); }
  static async create(options:NativeOptions){
-  rejectUnknown(options,['backend','workspaceDir','security','managedProcessLimit','outputLimitBytes','retainedProcessLimit','maxFileBytes','env'],'create');
+  rejectUnknown(options,['backend','workspaceDir','security','managedProcessLimit','outputLimitBytes','retainedProcessLimit','maxFileBytes','filesystemBackend','env'],'create');
   if(process.platform!=='linux')throw new SdkError('UNSUPPORTED_PLATFORM','This backend is currently tested only on Linux');
   if(options.security!=='trusted-only')throw new SdkError('SANDBOX_UNAVAILABLE','Linux sandbox execution is unavailable: no verified enforcement launcher is implemented. Trusted-only execution requires explicit opt-in.',await inspectLinuxCapabilities());
   if(typeof options.workspaceDir!=='string')throw new SdkError('INVALID_OPTION','workspaceDir is required');
+  if(options.filesystemBackend!==undefined&&!['node','linux-openat2'].includes(options.filesystemBackend))throw new SdkError('INVALID_OPTION','Unknown filesystemBackend');
   const root=await realpath(options.workspaceDir);if(!(await stat(root)).isDirectory())throw new SdkError('INVALID_WORKSPACE','Workspace must be an existing directory');
-  return new NativeAgentOs(root,options);
+  let files:LinuxFileAccess|undefined;
+  try {
+   if(options.filesystemBackend==='linux-openat2') {
+    const {LinuxFileAccess}=await import('./linux-filesystem.js');
+    files=await LinuxFileAccess.create(root,options.maxFileBytes??16777216);
+   }
+   return new NativeAgentOs(root,options,files);
+  } catch(e) {await files?.dispose();throw e;}
  }
  #assertOpen(){if(this.#closed)throw new SdkError('DISPOSED','Workspace handle is disposed');}
  #get(pid:number){this.#assertOpen();const r=this.#records.get(pid);if(!r)throw new SdkError('PROCESS_NOT_FOUND','Unknown or evicted process handle');return r;}
@@ -160,6 +170,9 @@ export class NativeAgentOs implements Backend {
  dispose():Promise<void>{
   if(this.#dispose)return this.#dispose;
   this.#closed=true;
+  // Stop file admission immediately while process teardown proceeds independently.
+  const fileDisposal=this.fileAccess?.dispose();
+  const fileResult=fileDisposal?.then(()=>undefined,e=>e);
   this.#dispose=(async()=>{
    await Promise.allSettled([...this.#pending]);
    const records=[...this.#records.values()];for(const r of records)this.#kill(r,'SIGKILL');
@@ -167,7 +180,7 @@ export class NativeAgentOs implements Backend {
    // of claiming an entire hostile descendant tree is controlled.
    let timer:ReturnType<typeof setTimeout>|undefined;
    try{await Promise.race([Promise.all(records.map(r=>r.done)),new Promise<void>((_,no)=>{timer=setTimeout(()=>no(new SdkError('CLEANUP_TIMEOUT','A descendant may have escaped the managed process group')),3000);})]);}
-   finally{clearTimeout(timer);for(const r of records){r.child.stdin.destroy();r.child.stdout.destroy();r.child.stderr.destroy();}this.#records.clear();}
+   finally{clearTimeout(timer);for(const r of records){r.child.stdin.destroy();r.child.stdout.destroy();r.child.stderr.destroy();}this.#records.clear();const fileError=await fileResult;if(fileError)throw fileError;}
   })();return this.#dispose;
  }
 }

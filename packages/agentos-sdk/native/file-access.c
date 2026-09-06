@@ -49,9 +49,17 @@ int main(int argc, char **argv) {
     if (fstat(fd, &s)) fail("stat");
     // O_PATH|O_NOFOLLOW can return the symlink itself; never report it as a file.
     if (!S_ISREG(s.st_mode) && !S_ISDIR(s.st_mode)) { errno = EPERM; fail("file-type"); }
-    printf("{\"size\":%lld,\"directory\":%s,\"device\":%llu,\"inode\":%llu}\n",
-      (long long)s.st_size, S_ISDIR(s.st_mode) ? "true" : "false",
-      (unsigned long long)s.st_dev, (unsigned long long)s.st_ino);
+    printf("{\"size\":%lld,\"sizeExact\":\"%lld\",\"directory\":%s,\"isDirectory\":%s,"
+      "\"isSymbolicLink\":false,\"dev\":%llu,\"rdev\":%llu,\"ino\":%llu,\"inoExact\":\"%llu\","
+      "\"nlink\":%llu,\"nlinkExact\":\"%llu\",\"mode\":%u,\"uid\":%u,\"gid\":%u,\"blocks\":%lld,"
+      "\"atimeMs\":%.6f,\"mtimeMs\":%.6f,\"ctimeMs\":%.6f,\"birthtimeMs\":0}\n",
+      (long long)s.st_size, (long long)s.st_size, S_ISDIR(s.st_mode) ? "true" : "false",
+      S_ISDIR(s.st_mode) ? "true" : "false", (unsigned long long)s.st_dev,
+      (unsigned long long)s.st_rdev, (unsigned long long)s.st_ino, (unsigned long long)s.st_ino,
+      (unsigned long long)s.st_nlink, (unsigned long long)s.st_nlink, s.st_mode, s.st_uid, s.st_gid,
+      (long long)s.st_blocks, s.st_atim.tv_sec * 1000.0 + s.st_atim.tv_nsec / 1000000.0,
+      s.st_mtim.tv_sec * 1000.0 + s.st_mtim.tv_nsec / 1000000.0,
+      s.st_ctim.tv_sec * 1000.0 + s.st_ctim.tv_nsec / 1000000.0);
     close(fd); return 0;
   }
   if (strcmp(op, "read") && strcmp(op, "write")) { errno = EINVAL; fail("operation"); }
