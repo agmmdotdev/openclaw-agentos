@@ -12,3 +12,10 @@ export function coreEconomyEnvironment(base = process.env) {
   return { ...base, MALLOC_ARENA_MAX: '1', MALLOC_TRIM_THRESHOLD_: '65536',
     MALLOC_MMAP_THRESHOLD_: '65536', AGENTOS_V8_WARM_ISOLATES: '0' };
 }
+
+// Opt in when retained RAM matters more than the observed CPU/latency cost.
+// Do not disable glibc's thread cache; doing so worsened the tradeoff.
+export function coreMemoryEnvironment(base = process.env) {
+  return { ...coreEconomyEnvironment(base), MALLOC_TRIM_THRESHOLD_: '32768',
+    MALLOC_MMAP_THRESHOLD_: '32768', MALLOC_TOP_PAD_: '0' };
+}

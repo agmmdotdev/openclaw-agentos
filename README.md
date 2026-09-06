@@ -98,6 +98,12 @@ listener-table representation. See the report for these compatibility limits.
 
 ## Performance and placement
 
+The [optional memory profile](docs/runtime-low-memory.md) reduces retained
+memory after 51 turns from **465 to 385 MiB** across two runs per configuration.
+It costs about **12% more warm CPU** and **14% higher median latency** in that
+workload. `npm run test:core:memory` passes the full core gate; the existing
+economy profile remains unchanged.
+
 The [writable host-directory diagnostic](docs/writable-host-dir.md) observes
 39 → 29 ms warm read turns in one comparison, but that backend permits writes
 beyond the configured filesystem limit. It is **not adopted** for tenant data;

@@ -34,6 +34,7 @@ const options = {
 };
 let vm;
 const reports = [];
+const reportPath = process.env.CORE_PROBE_REPORT ?? (statementCacheSize ? `artifacts/results/core-probe-statement-cache-${statementCacheSize}.json` : 'artifacts/results/core-probe.json');
 let completed = false;
 try {
   if (artifactMode === 'host_dir') { artifactStore = await createCoreArtifactStore(); options.mounts.push(artifactStore.mount); }
@@ -113,6 +114,6 @@ try {
 } finally {
   await mkdir('artifacts/results', { recursive: true });
   const validationPassed = completed && reports.length === 3 && reports.every(report => report.result.exitCode === 0 && report.result.outcome === 'succeeded');
-  await writeFile(statementCacheSize ? `artifacts/results/core-probe-statement-cache-${statementCacheSize}.json` : 'artifacts/results/core-probe.json', JSON.stringify({ statementCacheSize, recordedAt: new Date().toISOString(), node: process.version, artifactMode, canonicalBatching: process.env.CORE_CANONICAL_BATCHING === '1', validationPassed, openclaw: '2026.8.1', agentos: '0.2.19', runtimeEnvironment: Object.fromEntries(['MALLOC_ARENA_MAX', 'MALLOC_TRIM_THRESHOLD_', 'MALLOC_MMAP_THRESHOLD_', 'AGENTOS_V8_WARM_ISOLATES'].map(key => [key, process.env[key] ?? null])), sqlite: sqlite.stats, reports }, null, 2) + '\n');
+  await writeFile(reportPath, JSON.stringify({ statementCacheSize, recordedAt: new Date().toISOString(), node: process.version, artifactMode, canonicalBatching: process.env.CORE_CANONICAL_BATCHING === '1', validationPassed, openclaw: '2026.8.1', agentos: '0.2.19', runtimeEnvironment: Object.fromEntries(['MALLOC_ARENA_MAX', 'MALLOC_TRIM_THRESHOLD_', 'MALLOC_MMAP_THRESHOLD_', 'MALLOC_TOP_PAD_', 'GLIBC_TUNABLES', 'AGENTOS_V8_WARM_ISOLATES'].map(key => [key, process.env[key] ?? null])), sqlite: sqlite.stats, reports }, null, 2) + '\n');
   await vm?.dispose(); sqlite.dispose(); await vm?.sidecar.dispose(); await artifactStore?.dispose(); await rm(sqliteRoot, { recursive: true, force: true });
 }

@@ -19,6 +19,8 @@ if (!['upload', 'host_dir'].includes(coreMount)) throw new Error('Unknown BENCH_
 if (process.env.BENCH_SQL_SCHEMA_MODE && !['individual', 'table-only', 'table-index'].includes(process.env.BENCH_SQL_SCHEMA_MODE)) throw new Error('Unknown BENCH_SQL_SCHEMA_MODE');
 const canonicalBatching = process.env.BENCH_CANONICAL_BATCHING === '1' && !process.env.BENCH_SQL_SCHEMA_MODE;
 const warmTurns = Number(process.env.BENCH_WARM_TURNS ?? 5);
+const idleMs = Number(process.env.BENCH_IDLE_MS ?? 1500);
+if (!Number.isSafeInteger(idleMs) || idleMs < 1500 || idleMs > 60000) throw new Error('BENCH_IDLE_MS must be between 1500 and 60000');
 if (!Number.isSafeInteger(warmTurns) || warmTurns < 1 || warmTurns > 100) throw new Error('BENCH_WARM_TURNS must be between 1 and 100');
 const heapMb = Number(process.env.CORE_HEAP_MB ?? 256);
 const wasmHeapMb = process.env.CORE_WASM_HEAP_MB ? Number(process.env.CORE_WASM_HEAP_MB) : undefined;
@@ -165,7 +167,7 @@ globalThis.__benchmarkFsTiming = () => benchmarkFsTiming;
   mark('staged'); await settle();
   mark('launch:start');
   const results = await Promise.all(resources.map(async ({ vm, index, sqlite }) => {
-    const result = await vm.process.execFile('node', ['/core/benchmark.mjs', '--internal-worker-prewarm'], { env: { OPENCLAW_STATE_DIR: '/state/openclaw', OPENCLAW_CHILD_OOM_SCORE_ADJ: '0', BENCH_WORKLOAD: process.env.BENCH_WORKLOAD ?? 'core-shell', BENCH_REVERSE: process.env.BENCH_REVERSE ?? '0', BENCH_WARM_TURNS: String(warmTurns), BENCH_SPLIT_INIT: process.env.BENCH_SPLIT_INIT ?? '0', BENCH_PROFILE_CORE: process.env.BENCH_PROFILE_CORE ?? '0' }, timeoutMs: 180000, output: { capture: 'all' } });
+    const result = await vm.process.execFile('node', ['/core/benchmark.mjs', '--internal-worker-prewarm'], { env: { OPENCLAW_STATE_DIR: '/state/openclaw', OPENCLAW_CHILD_OOM_SCORE_ADJ: '0', BENCH_WORKLOAD: process.env.BENCH_WORKLOAD ?? 'core-shell', BENCH_REVERSE: process.env.BENCH_REVERSE ?? '0', BENCH_WARM_TURNS: String(warmTurns), BENCH_IDLE_MS: String(idleMs), BENCH_SPLIT_INIT: process.env.BENCH_SPLIT_INIT ?? '0', BENCH_PROFILE_CORE: process.env.BENCH_PROFILE_CORE ?? '0' }, timeoutMs: 180000, output: { capture: 'all' } });
     mark('process:end', { instance: index, result, sqlite: sqlite.stats });
     if (/failed to asynchronously prepare wasm|Aborted\(Error:.*\/core\//.test(result.stderr ?? '')) throw new Error('Core parser asset failed to load');
     return result;

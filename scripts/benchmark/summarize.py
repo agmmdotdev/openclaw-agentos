@@ -63,6 +63,7 @@ for path in sorted(folder.glob('benchmark-*.json')):
     rows.append({'file':path.name,'runtime':report.get('runtime','native' if native else 'agentos'),
         'sqlStatementCacheSize':report.get('sqlStatementCacheSize',0),
         'dataMount':report.get('dataMount','chunked_local'),
+        'idleMs':report.get('idleMs',1500),
         'workload':report.get('diagnostics',{}).get('BENCH_WORKLOAD') or 'core-shell',
         'profile':report.get('coreManifest',{}).get('profile','full'),
         'coreArtifactMode': next((e.get('coreMount', 'upload') for e in events if e['label'] == 'baseline'), 'native'),
@@ -89,6 +90,8 @@ for path in sorted(folder.glob('benchmark-*.json')):
         },
         'peakPssMiB':report['peakPssBytes']/2**20,'peakRssMiB':report['peakRssBytes']/2**20,
         'allIdlePssMiB':median_memory(max(idle_starts),min(idle_ends)) if idle_starts and idle_ends and max(idle_starts)<min(idle_ends) else None,
+        'earlyIdlePssMiB':median_memory(max(idle_starts),min(min(idle_ends),max(idle_starts)+1500)) if idle_starts and idle_ends else None,
+        'lateIdlePssMiB':median_memory(max(max(idle_starts),min(idle_ends)-5000),min(idle_ends)) if idle_starts and idle_ends else None,
         'baselinePssMiB':checkpoint_memory('baseline'),'emptyVmsPssMiB':checkpoint_memory('empty-vms'),
         'stagedPssMiB':checkpoint_memory('staged'),'disposedVmsPssMiB':checkpoint_memory('disposed-host-gc'),
         'disposedSidecarsPssMiB':checkpoint_memory('sidecars-disposed')})
