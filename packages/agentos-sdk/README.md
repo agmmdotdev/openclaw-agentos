@@ -203,6 +203,13 @@ enforcement, host supervision and deployment acceptance gates pass. No performan
 
 ## Extraction maintenance
 
+The native package compatibility tests exercise ESM and CommonJS with the real
+Zod, YAML, Ajv, minimatch, Undici and AWS S3 client packages installed through
+the pinned OpenClaw dependency closure. They cover a file-processing workflow,
+schema validation, request signing/serialization and response parsing. Network
+transports are mocked and package installation is outside the test. See the
+[compatibility and initialization report](../../docs/native-lazy-initialization.md).
+
 `src/language-execution.ts` was copied from the pinned source with its `JsonValue`
 import replaced by a local recursive type. `src/sdk-surface.ts` extracts the
 selected namespace methods and supporting filesystem interfaces. Regenerate the

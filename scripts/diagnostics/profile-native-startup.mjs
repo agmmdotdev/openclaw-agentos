@@ -7,10 +7,11 @@ import { resolve } from 'node:path';
 const trial = process.argv[2];
 if (!/^\d+$/.test(trial ?? '')) throw new Error('Usage: node scripts/diagnostics/profile-native-startup.mjs TRIAL');
 const output = `artifacts/results/startup-initializers-${trial}.json`;
-const core = await readFile('artifacts/core/native-core.mjs', 'utf8');
+const eager = process.argv.includes('--eager');
+const core = await readFile(eager ? 'artifacts/core/eager-native-core.mjs' : 'artifacts/core/native-core.mjs', 'utf8');
 const manifest = JSON.parse(await readFile('artifacts/core/manifest.json', 'utf8'));
 const hash = value => createHash('sha256').update(value).digest('hex');
-if (hash(core) !== manifest.nativeCoreSha256) throw new Error('Native core differs from manifest');
+if (hash(core) !== (eager ? manifest.eagerNativeCoreSha256 : manifest.nativeCoreSha256)) throw new Error('Native core differs from manifest');
 const prefix = `
 const __startupRows=[], __startupStack=[], __startupEvaluationStart=performance.now();
 function __startupWrap(helper,name,fn) { return helper(function(...args) {
@@ -38,6 +39,12 @@ for (const name of ['parser-first-parse','parser-second-parse']) await __startup
   const tree=await parseBashForCommandExplanation('node scripts/search.cjs');
   try { if(tree.rootNode.hasError)throw new Error('Bash parse failed'); } finally { tree.delete(); }
 });
+${process.argv.includes('--deferred-use') ? `
+await __startupPhase('config-first-validation',()=>{if(!validateConfigObjectRaw({}).ok)throw new Error('Configuration rejected');});
+await __startupPhase('highlight-first-use',()=>getWorkerDeployHighlightJs().highlight('const value=42;', {language:'javascript'}));
+await __startupPhase('config-second-validation',()=>{if(!validateConfigObjectRaw({}).ok)throw new Error('Configuration rejected');});
+await __startupPhase('highlight-second-use',()=>getWorkerDeployHighlightJs().highlight('const value=42;', {language:'javascript'}));
+` : ''}
 console.log(JSON.stringify({node:process.version,v8:process.versions.v8,uptimeMs:process.uptime()*1000,phases:__startupPhases,initializers:__startupRows.sort((a,b)=>b.selfMs-a.selfMs)}));
 `;
 const entry = resolve(`artifacts/core/startup-instrumented-${trial}.mjs`);
@@ -56,5 +63,5 @@ for (const profile of ['default', 'request']) {
   if (payload.length !== 1) throw new Error('Unexpected diagnostic output');
   runs.push({ profile, wallMs: performance.now() - start, ...JSON.parse(payload[0]), engineTrace: lines.filter(line => !line.startsWith('{')), stderr: result.stderr });
 }
-await writeFile(output, JSON.stringify({ instrumented: true, initializerCount: count, coreSha256: hash(core), generatedSha256: hash(prefix + instrumented + suffix), runs }, null, 2) + '\n', { flag: 'wx' });
+await writeFile(output, JSON.stringify({ instrumented: true, eager, deferredUse: process.argv.includes('--deferred-use'), initializerCount: count, coreSha256: hash(core), generatedSha256: hash(prefix + instrumented + suffix), runs }, null, 2) + '\n', { flag: 'wx' });
 console.log(output);

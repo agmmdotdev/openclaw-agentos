@@ -1,0 +1,73 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> @agmmdotdev/openclaw-agentos@0.1.0 test:sdk
+> npm run sdk:build && node --test --test-concurrency=1 packages/agentos-sdk/test/*.test.mjs
+
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> @agmmdotdev/openclaw-agentos@0.1.0 sdk:build
+> npm exec -- tsc -p packages/agentos-sdk/tsconfig.json && node packages/agentos-sdk/scripts/build-native.mjs
+
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+✔ SDK openat2 file API returns bytes, metadata, batch results and explicit capabilities (22.388908ms)
+✔ SDK openat2 selection rejects escapes and workspace-root mutations without fallback (10.527779ms)
+✔ SDK openat2 directory CRUD preserves Unicode names and handles recursion and empty directories (21.965079ms)
+✔ SDK directory operations never follow final or intermediate symlinks (12.59788ms)
+✔ SDK openat2 handle follows pinned workspace identity after a trusted parent rename (11.654797ms)
+✔ SDK openat2 enforces file, aggregate batch and active-helper limits (11.679265ms)
+✔ SDK openat2 disposal stops admission and settles in-flight helpers (7.405493ms)
+✔ SDK openat2 repeated create/dispose and failed construction close pinned descriptors (60.860868ms)
+✔ openat2 read/write/stat use the pinned directory descriptor after root rename (16.091626ms)
+✔ openat2 rejects traversal, absolute paths and every symlink component (23.898023ms)
+✔ special files and hardlinks cannot be read or truncated by file helper (13.996848ms)
+✔ bounded file operations reject excess data without publishing partial reads or truncating on excess input (7.23182ms)
+✔ concurrent directory/symlink replacement cannot redirect helper reads or writes outside root (318.451614ms)
+✔ fixed seccomp self-test installs a filter and checks denied and permitted calls (2.12924ms)
+✔ actual syscall filter permits native Node files, threads and child processes (no Landlock/cgroup claim) (229.884497ms)
+✔ incomplete launcher enforcement fails before executing payload (4.34542ms)
+✔ protected mode fails before creating workspace; never falls back (14.597534ms)
+✔ unknown options and implicit trust are rejected (8.621205ms)
+✔ filesystem CRUD, batches, metadata, recursive listings and persistence (13.571146ms)
+✔ direct traversal and symlink outside workspace rejected (not a race-proof sandbox test) (2.86572ms)
+✔ native process argv, cwd, environment, stdin, Unicode output, exit and replay (75.709877ms)
+✔ nonzero, missing executable, capture modes and invalid options (6.482707ms)
+✔ timeout and AbortSignal terminate commands (107.321842ms)
+✔ output and input bounds; callback failure cannot crash the host (36.619824ms)
+✔ managed admission limits, bounded history and stale handles (14.615176ms)
+✔ dispose racing with spawn settles and never launches after disposal (1.437146ms)
+✔ same-process-group descendants are stopped when shell exits (2.752378ms)
+✔ JavaScript module, CommonJS and file execution use native Node (85.272571ms)
+✔ 20 create/run/dispose lifecycles leave no managed children; files reopen (45.56974ms)
+✔ unsupported SDK surfaces fail explicitly (2.893782ms)
+✔ oversized initial stdin is rejected before a child launches (1.126714ms)
+✔ bounded reads preserve exact binary bytes at empty, chunk and maximum sizes (12.240786ms)
+✔ Node ESM and CommonJS resolve relative imports, packages, cwd and argv (75.381301ms)
+✔ ESM skill-style workflow uses real validation, YAML, HTTP and AWS packages through native SDK (735.693225ms)
+ℹ {"versions":{"zod":"4.4.3","yaml":"2.9.0","ajv":"8.20.0","minimatch":"10.2.6","undici":"8.10.0","@aws-sdk/client-s3":"3.1125.0"},"externalNetwork":false,"trustedOnly":true}
+✔ installed packages expose CommonJS entry points through native SDK (243.603244ms)
+▶ shared extracted contract: native-node
+  ✔ stdin EOF: native completes; pinned upstream cat limitation recorded (3.839517ms)
+  ✔ stderr-only capture, environment and argument boundaries (3.041334ms)
+  ✔ timeout result settles (103.208896ms)
+  ✔ ESM file resolves relative imports (32.229872ms)
+✔ shared extracted contract: native-node (192.924775ms)
+▶ shared extracted contract: agentos
+  ✔ stdin EOF: native completes; pinned upstream cat limitation recorded (10203.636274ms)
+  ✔ stderr-only capture, environment and argument boundaries (153.742229ms)
+  ✔ timeout result settles (105.493856ms)
+  ✔ ESM file resolves relative imports (46.805483ms)
+✔ shared extracted contract: agentos (12010.307663ms)
+ℹ Known upstream 0.2.19 cat/stdin EOF limitation: {"exitCode":137,"stdout":"input 🐈\n","stderr":"","stdoutTruncated":false,"stderrTruncated":false,"outcome":"timed_out","error":{"code":"execution_timed_out","name":"ExecutionError","message":"execution timed out"}}
+✔ production supervisor rejects ordinary directories before running a payload (7.477451ms)
+✔ supervisor loop preserves stdout and root exit and reaps adopted children (test process-group controls) (192.733583ms)
+✔ supervisor loop detects explicit cancellation and manager pipe EOF (test process-group controls) (133.847785ms)
+✔ supervisor survives an actual manager SIGKILL and reaps its job (test process-group controls) (186.073188ms)
+✔ experimental SDK rejects absent acknowledgement and unavailable enforcement before opening a workspace (15.153571ms)
+ℹ tests 50
+ℹ suites 0
+ℹ pass 50
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 15522.137341

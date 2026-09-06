@@ -1,0 +1,256 @@
+{
+  "method": "Three serial alternating trials per group; seven turns/35 real tools each. Both variants use the request Wasm profile, two allowed CPUs, identical SDK/fixtures and a fresh compilation cache per trial. 420 ms scripted inference per turn. External sampler excluded.",
+  "benchmarkManifest": {
+    "nativeInitialization": {
+      "mode": "lazy",
+      "patches": [
+        {
+          "boundary": "highlight registration",
+          "beforeSha256": "151032dbfd3115907e2dcd7c4a5673e7ba1c3656f2b91be528cb8d7fc94ececb",
+          "afterSha256": "2bf4d80d5fa5e251cb3c79605af07aa982b027c978485444e4d28c65d84ea411"
+        },
+        {
+          "boundary": "highlight access",
+          "beforeSha256": "4aac076daf251850b3502af2f277c289bfdae463f6c74247039661441096e6e7",
+          "afterSha256": "82abf593630e4aca565a8b4e94ad2178ad99cbed3c5eb84ad50c94c73860317c"
+        },
+        {
+          "boundary": "validation initializer",
+          "beforeSha256": "41947cb863d48302ca722af9e8e75e4dbcbe32f457a376ac153afb1901abb28e",
+          "afterSha256": "0277421699c84f160f9f10d4bfac9645fa4dcc055ce43b49186b784ba8efe1a7"
+        },
+        {
+          "boundary": "schema locale",
+          "beforeSha256": "3199b9cac39be907f5f32261e87a1084b13189088fee78555e24ac437edf514a",
+          "afterSha256": "678f5ffae532dfd295ba6754f0778ad491a590a0dab2a4445cb5ded2789ab2d7"
+        },
+        {
+          "boundary": "validation entry",
+          "beforeSha256": "a13ee23d9d10647a37c5743894f34d8cfd666524def93ab446f4566714224df5",
+          "afterSha256": "d0c8c37fe6e44486c4b0cfbbe7199497651d8797447723fa53da5dc644f7f0a5"
+        }
+      ],
+      "preservesEagerLocale": true
+    },
+    "fixtureSourceSha256": "3aa3bed14c0b2546ba2861a27ac5163a496d2aabdf97d8ada5cdff9a41e07de2",
+    "hashes": {
+      "scripts/core/request-state.mjs": "f73f61cc0bce226027c2689af2e6efd4ebac22e2b381cc5001a07a52007db792",
+      "packages/agentos-sdk/dist/linux-filesystem.js": "aa1c3f1309e0e2714b407366bcd022f7304143a2a8e44164df7d5640587aa1de",
+      "packages/agentos-sdk/dist/linux-process-driver.js": "8a5e4d187ccfccb24b2d0b9b86f3a17f01a8de857ebf1ccaa78343254dfc55b7",
+      "packages/agentos-sdk/dist/linux-file-access": "3994e4c2ac0c809d4d9ef63469b1b61ef423488a008e21691caff9212a3ade38",
+      "packages/agentos-sdk/dist/linux-launcher-experimental": "3db7c2c43b64e1bfb13f358235c402c7bc3d44a130c4f43cc0393552da168878",
+      "packages/agentos-sdk/dist/linux-supervisor-experimental": "59b185c6a6c2d84c47b07b0c86f95c5d6026d8f582df909a4c8708fbcd5564f4",
+      "scripts/benchmark/native-sdk-adapter.mjs": "126bcee03fc079a5de7e24418418a93c1683f499c60cdf2f9d0f15e1523292b3",
+      "packages/agentos-sdk/dist/native.js": "213553b9cb1ca075db609063b647789797b67159602de722afd86197043330a1",
+      "packages/agentos-sdk/dist/filesystem.js": "e8a93ab7965f537c6613ba9f0f030f209028b8e840e6dd609d50a1e35a6f04e2",
+      "packages/agentos-sdk/dist/native-entry.js": "c7656d04db6068540d0c328c9d88bc6ec01b920d86f48b962f08e56b15c0a118",
+      "artifacts/core/native-sdk-core-benchmark.mjs": "87dc5aacde4a41d5b1b2ddd7a4da90b2d569a622e9926bccec60c744d1bcff09",
+      "scripts/benchmark/wasmer-adapter.mjs": "3e4d42355777b93a129c9513369ae0d4ff11228519dae85ddedf919fccc2c1a7",
+      "artifacts/core/wasmer-core-benchmark.mjs": "25949b33a69c70dd4620f06d4d6597cf1be28e995308348a9391092882eb3868",
+      "scripts/benchmark/build.mjs": "6e636e5de19c62e1bcdfd7489a138d79c8b7741bfa036e0b58bbb1178ed1a9fd",
+      "scripts/benchmark/hybrid-adapter.mjs": "74f43a568e12ae8cf04f95b842616fd9bc298ad98f2279d08012d02ec25eff58",
+      "test/fixtures/core-benchmark.mjs": "d8b1bb3d8b7c94ee707e1cdf603cb2554d0561f41c7bddb14f9819158775db21",
+      "test/fixtures/core-workload-benchmark.mjs": "9da04aa063442ec0ad7e63d86f378002d23d5b4fb0fd389b9818824fde9ffc6e",
+      "artifacts/core/benchmark.mjs": "3055bea3704f48ae1246d353fe1369fd2558d1a5bfa3febdb621fb94fc15777e",
+      "artifacts/core/native-core-benchmark.mjs": "10e165f231a522129aa2a11ea168e54d24d0da5513a5708309c87eccce667159",
+      "artifacts/core/hybrid-core-benchmark.mjs": "265846f624e13b0c4102b0681a4496372ee06414247a546241ebf7dfaa713cfc",
+      "scripts/defer-native-core-init.mjs": "88820f513f703f4c4155d0dc3ff511ddce3057d9c8f6e3a85b89f951013a0000",
+      "scripts/build-core-artifact.mjs": "2c6c98b107bd661f2f931055023ab03c4840d257e9cfcdf32fbdb0b90e51c03b",
+      "artifacts/core/eager-native-sdk-core-benchmark.mjs": "c38524e9bf2f6dec899d8d55d1e5b4cbdfb42983702b7bbc0de9cd37ee0d2d1a"
+    }
+  },
+  "groups": [
+    {
+      "mode": "request-cache",
+      "initialization": "eager",
+      "trials": [
+        1860,
+        1870,
+        1880
+      ],
+      "entrySha256": "c38524e9bf2f6dec899d8d55d1e5b4cbdfb42983702b7bbc0de9cd37ee0d2d1a",
+      "metrics": {
+        "warmTurnMedianMs": {
+          "median": 709.5587300000001,
+          "min": 709.1315705,
+          "max": 710.1464135000001
+        },
+        "totalCpuSeconds": {
+          "median": 8.169167,
+          "min": 7.863254000000001,
+          "max": 8.262782999999999
+        },
+        "totalProcessWallMs": {
+          "median": 10138.577990001068,
+          "min": 9834.466791988234,
+          "max": 10209.737490011321
+        },
+        "peakPssMiB": {
+          "median": 233.4365234375,
+          "min": 232.1015625,
+          "max": 238.791015625
+        },
+        "idleCorePssMiB": {
+          "median": 0,
+          "min": 0,
+          "max": 0
+        },
+        "firstProcessMs": {
+          "median": 1721.1759880010504,
+          "min": 1654.4104759959737,
+          "max": 1786.071679998713
+        },
+        "subsequentProcessMedianMs": {
+          "median": 1376.7378615011694,
+          "min": 1342.451140000776,
+          "max": 1401.2925255010487
+        },
+        "subsequentCpuMedianSeconds": {
+          "median": 1.1062480000000003,
+          "min": 1.0840625000000004,
+          "max": 1.1158574999999995
+        }
+      }
+    },
+    {
+      "mode": "request-cache",
+      "initialization": "current",
+      "trials": [
+        1861,
+        1871,
+        1881
+      ],
+      "entrySha256": "87dc5aacde4a41d5b1b2ddd7a4da90b2d569a622e9926bccec60c744d1bcff09",
+      "metrics": {
+        "warmTurnMedianMs": {
+          "median": 700.3817824999999,
+          "min": 692.13168,
+          "max": 704.2825705
+        },
+        "totalCpuSeconds": {
+          "median": 7.473123000000001,
+          "min": 7.193204,
+          "max": 7.682327000000001
+        },
+        "totalProcessWallMs": {
+          "median": 9450.940957991406,
+          "min": 9255.648640006257,
+          "max": 9687.950095001725
+        },
+        "peakPssMiB": {
+          "median": 217.7275390625,
+          "min": 216.5849609375,
+          "max": 222.0966796875
+        },
+        "idleCorePssMiB": {
+          "median": 0,
+          "min": 0,
+          "max": 0
+        },
+        "firstProcessMs": {
+          "median": 1640.1363080003648,
+          "min": 1629.557193002256,
+          "max": 1716.8658730006428
+        },
+        "subsequentProcessMedianMs": {
+          "median": 1306.8290614974103,
+          "min": 1260.9550835040864,
+          "max": 1326.4162039995426
+        },
+        "subsequentCpuMedianSeconds": {
+          "median": 1.0333065000000001,
+          "min": 0.9617715000000004,
+          "max": 1.0495445000000003
+        }
+      }
+    },
+    {
+      "mode": "resident",
+      "initialization": "eager",
+      "trials": [
+        1862,
+        1872,
+        1882
+      ],
+      "entrySha256": "c38524e9bf2f6dec899d8d55d1e5b4cbdfb42983702b7bbc0de9cd37ee0d2d1a",
+      "metrics": {
+        "warmTurnMedianMs": {
+          "median": 595.4996550000001,
+          "min": 570.1192644999998,
+          "max": 612.489063
+        },
+        "totalCpuSeconds": {
+          "median": 2.4499,
+          "min": 2.352072,
+          "max": 2.600432
+        },
+        "totalProcessWallMs": {
+          "median": 7289.773907003109,
+          "min": 7124.8933440001565,
+          "max": 7441.001712002617
+        },
+        "peakPssMiB": {
+          "median": 246.31640625,
+          "min": 242.6884765625,
+          "max": 247.4287109375
+        },
+        "idleCorePssMiB": {
+          "median": 235.166015625,
+          "min": 232.775390625,
+          "max": 235.861328125
+        },
+        "firstProcessMs": {
+          "median": 7289.773907003109,
+          "min": 7124.8933440001565,
+          "max": 7441.001712002617
+        },
+        "subsequentProcessMedianMs": null,
+        "subsequentCpuMedianSeconds": null
+      }
+    },
+    {
+      "mode": "resident",
+      "initialization": "current",
+      "trials": [
+        1863,
+        1873,
+        1883
+      ],
+      "entrySha256": "87dc5aacde4a41d5b1b2ddd7a4da90b2d569a622e9926bccec60c744d1bcff09",
+      "metrics": {
+        "warmTurnMedianMs": {
+          "median": 576.4089969999998,
+          "min": 573.1690710000003,
+          "max": 587.8506600000001
+        },
+        "totalCpuSeconds": {
+          "median": 2.315827,
+          "min": 2.314306,
+          "max": 2.397989
+        },
+        "totalProcessWallMs": {
+          "median": 7197.607859998243,
+          "min": 7165.893042998505,
+          "max": 7295.197703999293
+        },
+        "peakPssMiB": {
+          "median": 233.7939453125,
+          "min": 231.806640625,
+          "max": 234.7060546875
+        },
+        "idleCorePssMiB": {
+          "median": 223.998046875,
+          "min": 223.283203125,
+          "max": 225.814453125
+        },
+        "firstProcessMs": {
+          "median": 7197.607859998243,
+          "min": 7165.893042998505,
+          "max": 7295.197703999293
+        },
+        "subsequentProcessMedianMs": null,
+        "subsequentCpuMedianSeconds": null
+      }
+    }
+  ]
+}

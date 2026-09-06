@@ -227,3 +227,10 @@ allocations in the Bash grammar's optimizing Wasm compiler. The opt-in
 `scripts/run-core-node-request.mjs` launcher reduces matched cached-request peak
 PSS from 673 to 237 MiB and seven-turn CPU from 10.06 to 8.07 seconds. It is pinned
 to Node 24.19.0 / Linux x64; resident idle RAM is essentially unchanged.
+
+The subsequent [lazy-initialization pass](docs/native-lazy-initialization.md)
+defers native highlighting and root configuration-schema construction until use.
+Matched cached-request CPU falls another 8.5%, request latency 5.1%, and resident
+idle PSS from 235 to 224 MiB. Fifty SDK tests pass, including real npm package
+workflows. A separate parser-heavy benchmark documents the baseline-Wasm profile's
+54% higher warm parsing time; that compiler profile remains opt-in.
