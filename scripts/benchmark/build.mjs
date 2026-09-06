@@ -45,3 +45,20 @@ let nativeCompiled = worker.replace('import"./compat/init.mjs";', '');
 for (const replacement of manifest.replacements) nativeCompiled = nativeCompiled.replaceAll(JSON.stringify(replacement.to), JSON.stringify(replacement.from));
 if (/\.\/compat\/(?!async-intrinsics)/.test(nativeCompiled)) throw new Error('A guest adapter remains in the native compiled baseline');
 await writeFile('artifacts/core/native-compiled-benchmark.mjs', nativeCompiled + '\nawait (async()=>{\n' + nativeFixture + '\n})();\n');
+
+// Keep original native tools; inject their existing sandbox interfaces only.
+const hybridSetup = `
+const { createHybridAdapter } = await import('../../scripts/benchmark/hybrid-adapter.mjs');
+if (process.env.BENCH_WORKLOAD === 'boundaries') throw new Error('Hybrid boundary microbenchmarks are not implemented');
+const hybrid = await createHybridAdapter(process.env.BENCH_ROOT);
+init_embedded_agent_runtime();
+const originalCodingTools = createCoreCodingTools;
+createCoreCodingTools = options => originalCodingTools({ ...options, sandbox: hybrid.sandbox, execDefaults: { ...options.execDefaults, host: 'sandbox' } });
+const supervisor = getProcessSupervisor();
+supervisor.spawn = hybrid.spawn;
+`;
+let hybridFixture = nativeFixture.replace("fs.writeFileSync(benchWorkspace + '/seed.txt', 'benchmark-seed\\n');", "await hybrid.vm.filesystem.writeFile('/workspace/seed.txt', 'benchmark-seed\\n');");
+hybridFixture = hybridFixture.replace("'cat ' + benchWorkspace + '/seed.txt'", "'cat /workspace/seed.txt'");
+if (hybridFixture === nativeFixture || !hybridFixture.includes('await hybrid.vm.filesystem.writeFile')) throw new Error('Hybrid fixture boundary changed');
+await writeFile('artifacts/core/hybrid-core-benchmark.mjs', nativeCore + '\n' + hybridSetup + '\ntry { await (async()=>{\n' + hybridFixture + '\n})(); if ((process.env.BENCH_WORKLOAD ?? "core-shell") === "core-shell" && (hybrid.counts.read !== Number(process.env.BENCH_WARM_TURNS ?? 5) + 1 || hybrid.counts.shell !== hybrid.counts.read)) throw new Error("Hybrid tool delegation count mismatch"); console.log("HYBRID_COUNTS=" + JSON.stringify(hybrid.counts)); } finally { await hybrid.dispose(); }\n');
+await writeFile('artifacts/core/hybrid-probe.mjs', nativeCore + '\n' + hybridSetup + '\ntry {\n' + await readFile('test/fixtures/hybrid-probe.mjs', 'utf8') + '\n} finally { await hybrid.dispose(); }\n');
