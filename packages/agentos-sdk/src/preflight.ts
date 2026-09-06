@@ -17,5 +17,5 @@ export async function inspectLinuxCapabilities() {
  processSecurity:typeof status==='string'?status.split('\n').filter(x=>/^(CapEff|CapBnd|NoNewPrivs|Seccomp):/.test(x)):status,
  // launcherImplemented describes the production SDK path, not test-only helpers.
  launcherImplemented:false, sandboxEnforcementVerified:false,
- experimentalLauncher:{implemented:true,sdkIntegrated:false,minimumLandlockAbi:6,architecture:'x64',acceptance:'unverified'} };
+ experimentalLauncher:{implemented:true,sdkIntegrated:true,productionModeEnabled:false,supervisorImplemented:true,minimumLandlockAbi:6,architecture:'x64',acceptance:'unverified'} };
 }

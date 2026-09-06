@@ -1,0 +1,955 @@
+{
+  "recordedAt": "2026-09-06T14:16:43Z",
+  "instances": 1,
+  "trial": 1523,
+  "sampleIntervalMs": 100.0,
+  "nodeSemiSpaceMiB": 8,
+  "nodeMaxOpt": null,
+  "nativeSdk": {
+    "security": "trusted-only",
+    "sandboxed": false,
+    "processTreeLimits": false,
+    "filesystemBackend": "linux-openat2"
+  },
+  "wasmer": null,
+  "runtime": "native-sdk-trusted-core",
+  "splitInitializer": false,
+  "sqlStatementCacheSize": 0,
+  "dataMount": "chunked_local",
+  "idleMs": 1500,
+  "allocatorEnvironment": {
+    "MALLOC_ARENA_MAX": "1",
+    "MALLOC_TRIM_THRESHOLD_": "32768",
+    "MALLOC_MMAP_THRESHOLD_": "32768",
+    "MALLOC_TOP_PAD_": "0",
+    "GLIBC_TUNABLES": null
+  },
+  "benchmarkManifest": {
+    "fixtureSourceSha256": "83f6e16c20c2b23978911401f970cf87b9d6366a9ac98d18d163b0c08f0917af",
+    "hashes": {
+      "packages/agentos-sdk/dist/linux-filesystem.js": "aa1c3f1309e0e2714b407366bcd022f7304143a2a8e44164df7d5640587aa1de",
+      "packages/agentos-sdk/dist/linux-process-driver.js": "774bfedc0ab196515372324d3cdd2165a68c0a5570d1219f2b5980ecefc8b434",
+      "packages/agentos-sdk/dist/linux-file-access": "3994e4c2ac0c809d4d9ef63469b1b61ef423488a008e21691caff9212a3ade38",
+      "packages/agentos-sdk/dist/linux-launcher-experimental": "3db7c2c43b64e1bfb13f358235c402c7bc3d44a130c4f43cc0393552da168878",
+      "packages/agentos-sdk/dist/linux-supervisor-experimental": "469fd11904fc1bef16aaf2fa8758d4f3dc627e2eebc67717152d893dc7464e3b",
+      "scripts/benchmark/native-sdk-adapter.mjs": "126bcee03fc079a5de7e24418418a93c1683f499c60cdf2f9d0f15e1523292b3",
+      "packages/agentos-sdk/dist/native.js": "213553b9cb1ca075db609063b647789797b67159602de722afd86197043330a1",
+      "packages/agentos-sdk/dist/filesystem.js": "0eb31ab93f3cf01dc002653b6aeacb4781a3e403c07c9927721f67083c62db63",
+      "packages/agentos-sdk/dist/native-entry.js": "c7656d04db6068540d0c328c9d88bc6ec01b920d86f48b962f08e56b15c0a118",
+      "artifacts/core/native-sdk-core-benchmark.mjs": "f0c348da4edafa075706bc326db5be2239bac0793addda07ad5a801cb433481d",
+      "scripts/benchmark/wasmer-adapter.mjs": "3e4d42355777b93a129c9513369ae0d4ff11228519dae85ddedf919fccc2c1a7",
+      "artifacts/core/wasmer-core-benchmark.mjs": "65bf3c4a4819bc21be59bc0e1af5102d835da47e0349caa49f6bfd93dc4e289f",
+      "scripts/benchmark/build.mjs": "b73bbcd340b3eb37b5280a11f6a6d70a9e98395bd15b4f086df7eb19c3a15e5f",
+      "scripts/benchmark/hybrid-adapter.mjs": "74f43a568e12ae8cf04f95b842616fd9bc298ad98f2279d08012d02ec25eff58",
+      "test/fixtures/core-benchmark.mjs": "5129609510bc9639cea0983d1ccc6a73ea429569dd9a108ab772f76ab99f2b70",
+      "test/fixtures/core-workload-benchmark.mjs": "1e45053988ce5ce3555bee454186331cdeaebdaec1c20e2c8377784bf61a2eeb",
+      "artifacts/core/benchmark.mjs": "d0a64310f788310051f9314ed560bcd0c23ecffd5bd655080b083ff161d40d83",
+      "artifacts/core/native-core-benchmark.mjs": "29614129d467f5dd6cd07ad36e3b33eedd120c7eae180dae1ba54805196bb29b",
+      "artifacts/core/hybrid-core-benchmark.mjs": "406e5a219d64431dfd67f090d875e05d1361f4cb346568c0c54c72828e82fc51"
+    }
+  },
+  "coreManifest": {
+    "schemaCollector": {
+      "sha256": "9332ebdb5f95cb07092629b46eeb884f1a124e3f6a2b18052e9c7bacdd378d17",
+      "bytes": 15166,
+      "roots": [
+        "init_sqlite_schema_sql",
+        "collectSqliteTableContract",
+        "collectSqliteNamedIndexContract",
+        "collectCanonicalStrictTableMetadata"
+      ]
+    },
+    "profile": "core",
+    "profileReport": {
+      "roots": [
+        "init_embedded_agent_runtime",
+        "runWorkerEmbeddedTurn"
+      ],
+      "paths": {
+        "init_bundled_channel_config_metadata_generated": [
+          "init_embedded_agent_runtime",
+          "init_model_registry",
+          "init_model_discovery_context",
+          "init_config$14",
+          "init_validation$4",
+          "init_bundled_channel_config_metadata_generated"
+        ]
+      },
+      "largest": [
+        {
+          "names": [
+            "init_bundled_channel_config_metadata_generated"
+          ],
+          "bytes": 308217
+        },
+        {
+          "names": [
+            "index_incubating_exports"
+          ],
+          "bytes": 170036
+        },
+        {
+          "names": [
+            "require_llhttp_simd_wasm"
+          ],
+          "bytes": 144717
+        },
+        {
+          "names": [
+            "require_llhttp_wasm"
+          ],
+          "bytes": 144208
+        },
+        {
+          "names": [
+            "init_node"
+          ],
+          "bytes": 142909
+        },
+        {
+          "names": [
+            "require_isbl"
+          ],
+          "bytes": 142816
+        },
+        {
+          "names": [
+            "init_acorn"
+          ],
+          "bytes": 126506
+        },
+        {
+          "names": [
+            "require_mathematica"
+          ],
+          "bytes": 109955
+        },
+        {
+          "names": [
+            "require_ponyfill_es2018"
+          ],
+          "bytes": 98456
+        },
+        {
+          "names": [
+            "init_index_min"
+          ],
+          "bytes": 88455
+        },
+        {
+          "names": [
+            "init_experimental_attributes"
+          ],
+          "bytes": 83714
+        },
+        {
+          "names": [
+            "init_openclaw_state_schema"
+          ],
+          "bytes": 83197
+        }
+      ],
+      "inputStatements": 81389,
+      "retainedStatements": 36989,
+      "removedBytes": 31995835,
+      "legalNoticeBytes": 6648,
+      "eagerInitializers": 44,
+      "retainedRegistrations": [
+        "setWorkerDeployRuntime({highlightJs:worker_deploy_highlight_runtime_default,json5:worker_deploy_json5_runtime_default,resolveSecureTempRoot})"
+      ],
+      "excludedBoundaries": [
+        "gateway compaction runtime",
+        "source extension loader"
+      ]
+    },
+    "inputBytes": 46593544,
+    "nativeCoreBytes": 14597672,
+    "outputBytes": 16598881,
+    "nativeCoreSha256": "9cdf14575c806336f7f19f6db2e206dad6807f78a0a7ac53d60b8906259fdb7d",
+    "openclaw": "2026.8.1",
+    "agentos": "0.2.19",
+    "inputSha256": "03eca1d346aa24fd5028b2ca8d09385b764bf9dd2c82810ce564043a34356f1c",
+    "outputSha256": "03fafac4c25ad5c9b38fd00c902a4b422d56b0b2f564f81cfbdc526b6270196e",
+    "asyncCompiler": {
+      "name": "esbuild",
+      "version": "0.28.2",
+      "supported": {
+        "async-await": false,
+        "async-generator": false,
+        "for-await": false
+      }
+    },
+    "intrinsicReferences": 2,
+    "replacements": [
+      {
+        "start": 6698,
+        "end": 6711,
+        "from": "node:module",
+        "to": "./compat/module.mjs"
+      },
+      {
+        "start": 6737,
+        "end": 6750,
+        "from": "node:crypto",
+        "to": "./compat/crypto.mjs"
+      },
+      {
+        "start": 6919,
+        "end": 6932,
+        "from": "node:crypto",
+        "to": "./compat/crypto.mjs"
+      },
+      {
+        "start": 6955,
+        "end": 6964,
+        "from": "node:fs",
+        "to": "./compat/fs.mjs"
+      },
+      {
+        "start": 7343,
+        "end": 7352,
+        "from": "node:fs",
+        "to": "./compat/fs.mjs"
+      },
+      {
+        "start": 8113,
+        "end": 8131,
+        "from": "node:async_hooks",
+        "to": "./compat/async-hooks.mjs"
+      },
+      {
+        "start": 8152,
+        "end": 8172,
+        "from": "node:child_process",
+        "to": "./compat/child-process.mjs"
+      },
+      {
+        "start": 8264,
+        "end": 8284,
+        "from": "node:child_process",
+        "to": "./compat/child-process.mjs"
+      },
+      {
+        "start": 8448,
+        "end": 8459,
+        "from": "node:util",
+        "to": "./compat/util.mjs"
+      },
+      {
+        "start": 9125,
+        "end": 9142,
+        "from": "node:perf_hooks",
+        "to": "./compat/perf-hooks.mjs"
+      }
+    ],
+    "compatibilityFiles": {
+      "crypto.mjs": "e73413c8e40c0356177a8b79ea329597714e512bb28e18a9cc73384d549ca00e",
+      "fs.mjs": "9eef1b59ce9191195f33beb9b814bdcec103a9cd718a91f03da66247b6107347",
+      "module.mjs": "0b42e0632916a4922ac9a61537b55502c362c98fc7f2b94aeba1686e9f7d2c5f",
+      "perf-hooks.mjs": "bb1084bd98fb604747b4ce53cebc827a0a2f4c8b4fd7d4e5709e2d7962077d7c",
+      "readline-promises.mjs": "6705c91651cfb9f3a2d81631cb5c041448637f3aa839e76d621aec24f4d7ddc4",
+      "util.mjs": "8fb311c732efcf8f1936ececc0f8f14699442af0b089bb15ceb025428198955a",
+      "async-hooks.mjs": "62f7e3dd394203875115cc73b46c25abc52f484b74eb41ee81ea20f58e3f27df",
+      "child-process.mjs": "a44baff695fba23ddd978f5734d1fef33fb3d05674f1ce7cbe294c479a50259b",
+      "sqlite.mjs": "4c5b5c5623d373172a3cd375a4b584319d7e303b3d59623c1873de16b6b58650",
+      "init.mjs": "f7cecfb8fdfd3197bb3351f259b0c1453411e424d6516f0c6df0e2bee6045571",
+      "text-decoder.mjs": "ba47fd59fa220e984a900afe3e748b2660aa4f18fe5a1d2d1ae94cdc8d2ecaa4",
+      "async-intrinsics.mjs": "7b145fa1054d44ef04ee540e24efdc3c205caaad54da9b3705133dcfbb89179e"
+    },
+    "addedExports": [
+      "runOpenClawCoreTurn"
+    ],
+    "invokesUpstreamInitializer": "init_embedded_agent_runtime"
+  },
+  "diagnostics": {
+    "BENCH_NATIVE_MEMORY": "0",
+    "BENCH_GC_AT_IDLE": "0",
+    "BENCH_PROFILE_CORE": "0",
+    "BENCH_PROFILE_FS": "0",
+    "BENCH_SQL_SCHEMA_MODE": "0",
+    "BENCH_PROFILE_PROCESS": "0",
+    "BENCH_PROFILE_SQL": "0",
+    "CORE_HEAP_MB": null,
+    "CORE_WASM_HEAP_MB": null,
+    "AGENTOS_V8_WARM_ISOLATES": "0",
+    "AGENTOS_WASM_SNAPSHOT_RUNNER": null,
+    "BENCH_WARM_TURNS": "20",
+    "BENCH_WORKLOAD": "core-workload",
+    "BENCH_REVERSE": null,
+    "BENCH_CORE_MOUNT": null,
+    "BENCH_CANONICAL_BATCHING": null
+  },
+  "method": "Linux smaps_rollup RSS/PSS summed across isolated benchmark driver and descendants; compiler runs separately",
+  "environment": {
+    "platform": "Linux-6.18.35-x86_64-with-glibc2.39",
+    "cpuCount": 9,
+    "cpuAffinity": [
+      0,
+      1
+    ],
+    "clockTicksPerSecond": 100,
+    "cpuMax": "800000 100000",
+    "memoryMax": "21474836480"
+  },
+  "exitCode": 0,
+  "measurementValid": true,
+  "missingCheckpoints": [],
+  "wallMs": 18124.14874699607,
+  "driverAndReapedUserSeconds": 5.213805,
+  "driverAndReapedSystemSeconds": 1.603799,
+  "sampledTreeCpuSeconds": 5.02,
+  "accountedTreeCpuSeconds": 6.78,
+  "peakRssBytes": 677412864,
+  "peakPssBytes": 676506624,
+  "events": [
+    {
+      "label": "worker-ready",
+      "atMs": 0.04912400000000616,
+      "instance": 0,
+      "receivedAtMs": 877.8114599990658
+    },
+    {
+      "label": "workload",
+      "atMs": 0.9747199999999339,
+      "instance": 0,
+      "workload": "core-workload",
+      "receivedAtMs": 878.1342660004157
+    },
+    {
+      "label": "workload-stage:start",
+      "atMs": 1.3885440000000244,
+      "instance": 0,
+      "receivedAtMs": 878.5455359975458
+    },
+    {
+      "label": "workload-stage:end",
+      "atMs": 131.96922799999993,
+      "instance": 0,
+      "sourceFiles": 48,
+      "sourceBytes": 16384,
+      "catalogBytes": 1048576,
+      "totalSeedBytes": 1839865,
+      "receivedAtMs": 1009.2671629972756
+    },
+    {
+      "label": "representative:config",
+      "atMs": 132.50888199999997,
+      "instance": 0,
+      "sourceFiles": 48,
+      "sourceBytes": 16384,
+      "catalogBytes": 1048576,
+      "initialHistoryBytes": 103069,
+      "initialMessages": 24,
+      "responseDelayMs": 60,
+      "betweenTurnsMs": 100,
+      "warmTurns": 20,
+      "receivedAtMs": 1011.7241269981605
+    },
+    {
+      "label": "cold-turn:start",
+      "atMs": 132.541241,
+      "instance": 0,
+      "receivedAtMs": 1011.7305169987958
+    },
+    {
+      "label": "cold-turn:end",
+      "atMs": 885.5602769999999,
+      "instance": 0,
+      "durationMs": 752.434124,
+      "calls": 6,
+      "transcriptMessages": 36,
+      "transcriptBytes": 146465,
+      "toolCalls": 5,
+      "streamedDeltas": 4,
+      "receivedAtMs": 1762.819577998016
+    },
+    {
+      "label": "warm-turn-1:start",
+      "atMs": 986.0197589999999,
+      "instance": 0,
+      "receivedAtMs": 1863.3931320000556
+    },
+    {
+      "label": "warm-turn-1:end",
+      "atMs": 1589.9764729999997,
+      "instance": 0,
+      "durationMs": 603.406144,
+      "calls": 6,
+      "transcriptMessages": 48,
+      "transcriptBytes": 189861,
+      "toolCalls": 5,
+      "streamedDeltas": 4,
+      "receivedAtMs": 2467.2133709973423
+    },
+    {
+      "label": "warm-turn-2:start",
+      "atMs": 1690.6424379999999,
+      "instance": 0,
+      "receivedAtMs": 2567.952114994114
+    },
+    {
+      "label": "warm-turn-2:end",
+      "atMs": 2281.2824259999998,
+      "instance": 0,
+      "durationMs": 590.0218070000001,
+      "calls": 6,
+      "transcriptMessages": 60,
+      "transcriptBytes": 233257,
+      "toolCalls": 5,
+      "streamedDeltas": 4,
+      "receivedAtMs": 3158.523679994687
+    },
+    {
+      "label": "warm-turn-3:start",
+      "atMs": 2381.651552,
+      "instance": 0,
+      "receivedAtMs": 3258.957868994912
+    },
+    {
+      "label": "warm-turn-3:end",
+      "atMs": 2991.071161,
+      "instance": 0,
+      "durationMs": 608.524911,
+      "calls": 6,
+      "transcriptMessages": 72,
+      "transcriptBytes": 276653,
+      "toolCalls": 5,
+      "streamedDeltas": 4,
+      "receivedAtMs": 3868.326691997936
+    },
+    {
+      "label": "warm-turn-4:start",
+      "atMs": 3090.889388,
+      "instance": 0,
+      "receivedAtMs": 3968.179229996167
+    },
+    {
+      "label": "warm-turn-4:end",
+      "atMs": 3694.5372299999995,
+      "instance": 0,
+      "durationMs": 602.9570909999998,
+      "calls": 6,
+      "transcriptMessages": 84,
+      "transcriptBytes": 320049,
+      "toolCalls": 5,
+      "streamedDeltas": 4,
+      "receivedAtMs": 4571.761127997888
+    },
+    {
+      "label": "warm-turn-5:start",
+      "atMs": 3794.8982549999996,
+      "instance": 0,
+      "receivedAtMs": 4672.245067995391
+    },
+    {
+      "label": "warm-turn-5:end",
+      "atMs": 4415.289025,
+      "instance": 0,
+      "durationMs": 619.6534179999999,
+      "calls": 6,
+      "transcriptMessages": 96,
+      "transcriptBytes": 363445,
+      "toolCalls": 5,
+      "streamedDeltas": 4,
+      "receivedAtMs": 5292.552257000352
+    },
+    {
+      "label": "warm-turn-6:start",
+      "atMs": 4515.709794,
+      "instance": 0,
+      "receivedAtMs": 5393.018363996816
+    },
+    {
+      "label": "warm-turn-6:end",
+      "atMs": 5145.721205000001,
+      "instance": 0,
+      "durationMs": 629.1488209999998,
+      "calls": 6,
+      "transcriptMessages": 108,
+      "transcriptBytes": 406841,
+      "toolCalls": 5,
+      "streamedDeltas": 4,
+      "receivedAtMs": 6023.039129999233
+    },
+    {
+      "label": "warm-turn-7:start",
+      "atMs": 5246.177969,
+      "instance": 0,
+      "receivedAtMs": 6123.564237001119
+    },
+    {
+      "label": "warm-turn-7:end",
+      "atMs": 5860.554285,
+      "instance": 0,
+      "durationMs": 613.4497289999999,
+      "calls": 6,
+      "transcriptMessages": 120,
+      "transcriptBytes": 450237,
+      "toolCalls": 5,
+      "streamedDeltas": 4,
+      "receivedAtMs": 6737.830998994468
+    },
+    {
+      "label": "warm-turn-8:start",
+      "atMs": 5960.963584,
+      "instance": 0,
+      "receivedAtMs": 6838.347487995634
+    },
+    {
+      "label": "warm-turn-8:end",
+      "atMs": 6590.335809,
+      "instance": 0,
+      "durationMs": 628.297305,
+      "calls": 6,
+      "transcriptMessages": 132,
+      "transcriptBytes": 493633,
+      "toolCalls": 5,
+      "streamedDeltas": 4,
+      "receivedAtMs": 7467.570754000917
+    },
+    {
+      "label": "warm-turn-9:start",
+      "atMs": 6690.702971000001,
+      "instance": 0,
+      "receivedAtMs": 7567.957424995257
+    },
+    {
+      "label": "warm-turn-9:end",
+      "atMs": 7310.349715,
+      "instance": 0,
+      "durationMs": 618.440947,
+      "calls": 6,
+      "transcriptMessages": 144,
+      "transcriptBytes": 537032,
+      "toolCalls": 5,
+      "streamedDeltas": 4,
+      "receivedAtMs": 8187.596928000858
+    },
+    {
+      "label": "warm-turn-10:start",
+      "atMs": 7410.695592000001,
+      "instance": 0,
+      "receivedAtMs": 8287.97246999602
+    },
+    {
+      "label": "warm-turn-10:end",
+      "atMs": 8034.786547000001,
+      "instance": 0,
+      "durationMs": 622.7981359999994,
+      "calls": 6,
+      "transcriptMessages": 156,
+      "transcriptBytes": 580449,
+      "toolCalls": 5,
+      "streamedDeltas": 4,
+      "receivedAtMs": 8912.036673995317
+    },
+    {
+      "label": "warm-turn-11:start",
+      "atMs": 8135.139040000001,
+      "instance": 0,
+      "receivedAtMs": 9012.456484000722
+    },
+    {
+      "label": "warm-turn-11:end",
+      "atMs": 8769.810085,
+      "instance": 0,
+      "durationMs": 633.2809399999987,
+      "calls": 6,
+      "transcriptMessages": 168,
+      "transcriptBytes": 623866,
+      "toolCalls": 5,
+      "streamedDeltas": 4,
+      "receivedAtMs": 9647.061859999667
+    },
+    {
+      "label": "warm-turn-12:start",
+      "atMs": 8870.216585,
+      "instance": 0,
+      "receivedAtMs": 9747.543883000617
+    },
+    {
+      "label": "warm-turn-12:end",
+      "atMs": 9544.280111,
+      "instance": 0,
+      "durationMs": 672.4920070000007,
+      "calls": 6,
+      "transcriptMessages": 180,
+      "transcriptBytes": 667283,
+      "toolCalls": 5,
+      "streamedDeltas": 4,
+      "receivedAtMs": 10421.53113999666
+    },
+    {
+      "label": "warm-turn-13:start",
+      "atMs": 9644.63561,
+      "instance": 0,
+      "receivedAtMs": 10522.096499997133
+    },
+    {
+      "label": "warm-turn-13:end",
+      "atMs": 10267.458590999999,
+      "instance": 0,
+      "durationMs": 621.1534739999988,
+      "calls": 6,
+      "transcriptMessages": 192,
+      "transcriptBytes": 710700,
+      "toolCalls": 5,
+      "streamedDeltas": 4,
+      "receivedAtMs": 11144.769874998019
+    },
+    {
+      "label": "warm-turn-14:start",
+      "atMs": 10367.829910999999,
+      "instance": 0,
+      "receivedAtMs": 11245.13258299703
+    },
+    {
+      "label": "warm-turn-14:end",
+      "atMs": 11024.998558,
+      "instance": 0,
+      "durationMs": 655.629347,
+      "calls": 6,
+      "transcriptMessages": 204,
+      "transcriptBytes": 754117,
+      "toolCalls": 5,
+      "streamedDeltas": 4,
+      "receivedAtMs": 11902.299081993988
+    },
+    {
+      "label": "warm-turn-15:start",
+      "atMs": 11125.393388999999,
+      "instance": 0,
+      "receivedAtMs": 12002.721869997913
+    },
+    {
+      "label": "warm-turn-15:end",
+      "atMs": 11816.374571999999,
+      "instance": 0,
+      "durationMs": 687.0523399999984,
+      "calls": 6,
+      "transcriptMessages": 216,
+      "transcriptBytes": 797534,
+      "toolCalls": 5,
+      "streamedDeltas": 4,
+      "receivedAtMs": 12693.594689000747
+    },
+    {
+      "label": "warm-turn-16:start",
+      "atMs": 11916.842117,
+      "instance": 0,
+      "receivedAtMs": 12794.082123997214
+    },
+    {
+      "label": "warm-turn-16:end",
+      "atMs": 12588.378928,
+      "instance": 0,
+      "durationMs": 669.5530699999999,
+      "calls": 6,
+      "transcriptMessages": 228,
+      "transcriptBytes": 840951,
+      "toolCalls": 5,
+      "streamedDeltas": 4,
+      "receivedAtMs": 13465.6493759976
+    },
+    {
+      "label": "warm-turn-17:start",
+      "atMs": 12688.75824,
+      "instance": 0,
+      "receivedAtMs": 13566.096900998673
+    },
+    {
+      "label": "warm-turn-17:end",
+      "atMs": 13394.643925,
+      "instance": 0,
+      "durationMs": 704.0922009999995,
+      "calls": 6,
+      "transcriptMessages": 240,
+      "transcriptBytes": 884368,
+      "toolCalls": 5,
+      "streamedDeltas": 4,
+      "receivedAtMs": 14271.91732799838
+    },
+    {
+      "label": "warm-turn-18:start",
+      "atMs": 13495.033421999999,
+      "instance": 0,
+      "receivedAtMs": 14372.393113997532
+    },
+    {
+      "label": "warm-turn-18:end",
+      "atMs": 14165.657419,
+      "instance": 0,
+      "durationMs": 668.7708540000003,
+      "calls": 6,
+      "transcriptMessages": 252,
+      "transcriptBytes": 927785,
+      "toolCalls": 5,
+      "streamedDeltas": 4,
+      "receivedAtMs": 15042.911792996165
+    },
+    {
+      "label": "warm-turn-19:start",
+      "atMs": 14266.031992999999,
+      "instance": 0,
+      "receivedAtMs": 15143.371465994278
+    },
+    {
+      "label": "warm-turn-19:end",
+      "atMs": 14950.101992,
+      "instance": 0,
+      "durationMs": 682.0561840000009,
+      "calls": 6,
+      "transcriptMessages": 264,
+      "transcriptBytes": 971202,
+      "toolCalls": 5,
+      "streamedDeltas": 4,
+      "receivedAtMs": 15827.351533996989
+    },
+    {
+      "label": "warm-turn-20:start",
+      "atMs": 15050.494568999999,
+      "instance": 0,
+      "receivedAtMs": 15927.761221995752
+    },
+    {
+      "label": "warm-turn-20:end",
+      "atMs": 15722.640059000001,
+      "instance": 0,
+      "durationMs": 670.3584950000022,
+      "calls": 6,
+      "transcriptMessages": 276,
+      "transcriptBytes": 1014619,
+      "toolCalls": 5,
+      "streamedDeltas": 4,
+      "receivedAtMs": 16599.91735699441
+    },
+    {
+      "label": "representative:complete",
+      "atMs": 15724.427112999998,
+      "instance": 0,
+      "turns": 21,
+      "toolCounts": {
+        "read": 21,
+        "exec": 42,
+        "edit": 21,
+        "write": 21
+      },
+      "transcriptMessages": 276,
+      "transcriptBytes": 1014619,
+      "largestContextBytes": 1046778,
+      "previewEvents": 608,
+      "receivedAtMs": 16601.56468999776
+    },
+    {
+      "label": "sql-roundtrips:start",
+      "atMs": 15724.703238999999,
+      "instance": 0,
+      "receivedAtMs": 16601.792153000133
+    },
+    {
+      "label": "sql-roundtrips:end",
+      "atMs": 15724.804902,
+      "instance": 0,
+      "durationMs": 0.06810300000142888,
+      "roundtrips": 50,
+      "receivedAtMs": 16601.888227996824
+    },
+    {
+      "label": "idle:start",
+      "atMs": 15724.836048999998,
+      "instance": 0,
+      "receivedAtMs": 16601.904201997968
+    },
+    {
+      "label": "idle:end",
+      "atMs": 17226.726599999998,
+      "instance": 0,
+      "receivedAtMs": 18104.020472994307
+    }
+  ],
+  "stderr": [
+    "NATIVE_SDK_COUNTS={\"read\":126,\"stat\":105,\"shell\":42}"
+  ],
+  "samples": [
+    {"atMs":2.4574639974161983,"accountedTreeTicks":0,"rssBytes":1576960,"pssBytes":1145856,"processes":[{"pid":575709,"name":"node","ppid":575708,"ticks":0,"reapedChildTicks":0,"startTicks":3666005,"threads":1,"Rss":1576960,"Pss":1145856,"Private_Clean":901120,"Private_Dirty":180224,"Swap":0}]},
+    {"atMs":103.13384400069481,"accountedTreeTicks":10,"rssBytes":59613184,"pssBytes":58768384,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":10,"reapedChildTicks":0,"startTicks":3666005,"threads":7,"Rss":59613184,"Pss":58768384,"Private_Clean":21745664,"Private_Dirty":36859904,"Swap":0}]},
+    {"atMs":203.91258699964965,"accountedTreeTicks":19,"rssBytes":109920256,"pssBytes":109075456,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":19,"reapedChildTicks":0,"startTicks":3666005,"threads":7,"Rss":109920256,"Pss":109075456,"Private_Clean":22175744,"Private_Dirty":86736896,"Swap":0}]},
+    {"atMs":304.48621200048365,"accountedTreeTicks":30,"rssBytes":143347712,"pssBytes":142502912,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":30,"reapedChildTicks":0,"startTicks":3666005,"threads":7,"Rss":143347712,"Pss":142502912,"Private_Clean":22241280,"Private_Dirty":120098816,"Swap":0}]},
+    {"atMs":404.69298899552086,"accountedTreeTicks":40,"rssBytes":161312768,"pssBytes":160467968,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":40,"reapedChildTicks":0,"startTicks":3666005,"threads":7,"Rss":161312768,"Pss":160467968,"Private_Clean":22249472,"Private_Dirty":138055680,"Swap":0}]},
+    {"atMs":505.72830899909604,"accountedTreeTicks":49,"rssBytes":105758720,"pssBytes":104913920,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":49,"reapedChildTicks":0,"startTicks":3666005,"threads":7,"Rss":105758720,"Pss":104913920,"Private_Clean":22929408,"Private_Dirty":81821696,"Swap":0}]},
+    {"atMs":605.9931889976724,"accountedTreeTicks":63,"rssBytes":105709568,"pssBytes":104853504,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":63,"reapedChildTicks":0,"startTicks":3666005,"threads":7,"Rss":105709568,"Pss":104853504,"Private_Clean":24821760,"Private_Dirty":79867904,"Swap":0}]},
+    {"atMs":707.1600769995712,"accountedTreeTicks":74,"rssBytes":135962624,"pssBytes":135085056,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":74,"reapedChildTicks":0,"startTicks":3666005,"threads":11,"Rss":135962624,"Pss":135085056,"Private_Clean":30715904,"Private_Dirty":104198144,"Swap":0}]},
+    {"atMs":807.8828119978425,"accountedTreeTicks":86,"rssBytes":161542144,"pssBytes":160664576,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":86,"reapedChildTicks":0,"startTicks":3666005,"threads":11,"Rss":161542144,"Pss":160664576,"Private_Clean":30904320,"Private_Dirty":129589248,"Swap":0}]},
+    {"atMs":909.0808479959378,"accountedTreeTicks":101,"rssBytes":166825984,"pssBytes":165948416,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":100,"reapedChildTicks":1,"startTicks":3666005,"threads":11,"Rss":166825984,"Pss":165948416,"Private_Clean":31191040,"Private_Dirty":134586368,"Swap":0}]},
+    {"atMs":1009.2768280010205,"accountedTreeTicks":112,"rssBytes":171393024,"pssBytes":170515456,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":106,"reapedChildTicks":6,"startTicks":3666005,"threads":11,"Rss":171393024,"Pss":170515456,"Private_Clean":31248384,"Private_Dirty":139096064,"Swap":0}]},
+    {"atMs":1109.9490869964939,"accountedTreeTicks":119,"rssBytes":173568000,"pssBytes":172665856,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":113,"reapedChildTicks":6,"startTicks":3666005,"threads":11,"Rss":173568000,"Pss":172665856,"Private_Clean":31666176,"Private_Dirty":140824576,"Swap":0}]},
+    {"atMs":1210.4919039993547,"accountedTreeTicks":122,"rssBytes":174387200,"pssBytes":173485056,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":116,"reapedChildTicks":6,"startTicks":3666005,"threads":11,"Rss":174387200,"Pss":173485056,"Private_Clean":31686656,"Private_Dirty":141623296,"Swap":0}]},
+    {"atMs":1311.0232049948536,"accountedTreeTicks":132,"rssBytes":180420608,"pssBytes":179514368,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":122,"reapedChildTicks":10,"startTicks":3666005,"threads":11,"Rss":180420608,"Pss":179514368,"Private_Clean":32768000,"Private_Dirty":146571264,"Swap":0}]},
+    {"atMs":1411.577414997737,"accountedTreeTicks":135,"rssBytes":181485568,"pssBytes":180579328,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":124,"reapedChildTicks":11,"startTicks":3666005,"threads":11,"Rss":181485568,"Pss":180579328,"Private_Clean":32788480,"Private_Dirty":147615744,"Swap":0}]},
+    {"atMs":1512.7580049957032,"accountedTreeTicks":137,"rssBytes":181817344,"pssBytes":180911104,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":126,"reapedChildTicks":11,"startTicks":3666005,"threads":11,"Rss":181817344,"Pss":180911104,"Private_Clean":32788480,"Private_Dirty":147947520,"Swap":0}]},
+    {"atMs":1613.1282879941864,"accountedTreeTicks":151,"rssBytes":386981888,"pssBytes":386075648,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":136,"reapedChildTicks":15,"startTicks":3666005,"threads":11,"Rss":386981888,"Pss":386075648,"Private_Clean":33058816,"Private_Dirty":352841728,"Swap":0}]},
+    {"atMs":1713.5279909998644,"accountedTreeTicks":162,"rssBytes":677412864,"pssBytes":676506624,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":147,"reapedChildTicks":15,"startTicks":3666005,"threads":11,"Rss":677412864,"Pss":676506624,"Private_Clean":33067008,"Private_Dirty":643264512,"Swap":0}]},
+    {"atMs":1814.030677996925,"accountedTreeTicks":173,"rssBytes":208838656,"pssBytes":207932416,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":158,"reapedChildTicks":15,"startTicks":3666005,"threads":11,"Rss":208838656,"Pss":207932416,"Private_Clean":33402880,"Private_Dirty":174354432,"Swap":0}]},
+    {"atMs":1914.5372819984914,"accountedTreeTicks":181,"rssBytes":183070720,"pssBytes":182164480,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":166,"reapedChildTicks":15,"startTicks":3666005,"threads":11,"Rss":183070720,"Pss":182164480,"Private_Clean":33431552,"Private_Dirty":148557824,"Swap":0}]},
+    {"atMs":2014.8817469962523,"accountedTreeTicks":182,"rssBytes":183324672,"pssBytes":182420480,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":167,"reapedChildTicks":15,"startTicks":3666005,"threads":11,"Rss":183324672,"Pss":182420480,"Private_Clean":33443840,"Private_Dirty":148811776,"Swap":0}]},
+    {"atMs":2115.794672994525,"accountedTreeTicks":189,"rssBytes":183570432,"pssBytes":182670336,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":169,"reapedChildTicks":20,"startTicks":3666005,"threads":11,"Rss":183570432,"Pss":182670336,"Private_Clean":33447936,"Private_Dirty":149053440,"Swap":0}]},
+    {"atMs":2216.1693870002637,"accountedTreeTicks":193,"rssBytes":184082432,"pssBytes":183182336,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":172,"reapedChildTicks":21,"startTicks":3666005,"threads":11,"Rss":184082432,"Pss":183182336,"Private_Clean":33472512,"Private_Dirty":149540864,"Swap":0}]},
+    {"atMs":2316.924365994055,"accountedTreeTicks":195,"rssBytes":214421504,"pssBytes":196092928,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":173,"reapedChildTicks":21,"startTicks":3666005,"threads":11,"Rss":184340480,"Pss":175475712,"Private_Clean":17596416,"Private_Dirty":149798912,"Swap":0},{"pid":575867,"name":"sh","ppid":575709,"ticks":0,"reapedChildTicks":0,"startTicks":3666234,"threads":1,"Rss":786432,"Pss":263168,"Private_Clean":110592,"Private_Dirty":106496,"Swap":0},{"pid":575868,"name":"MainThread","ppid":575867,"ticks":1,"reapedChildTicks":0,"startTicks":3666234,"threads":7,"Rss":29294592,"Pss":20354048,"Private_Clean":110592,"Private_Dirty":12021760,"Swap":0}]},
+    {"atMs":2417.9069609963335,"accountedTreeTicks":198,"rssBytes":183701504,"pssBytes":182801408,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":175,"reapedChildTicks":23,"startTicks":3666005,"threads":11,"Rss":183701504,"Pss":182801408,"Private_Clean":33513472,"Private_Dirty":149118976,"Swap":0}]},
+    {"atMs":2518.3793229953153,"accountedTreeTicks":200,"rssBytes":184307712,"pssBytes":183407616,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":176,"reapedChildTicks":24,"startTicks":3666005,"threads":11,"Rss":184307712,"Pss":183407616,"Private_Clean":33513472,"Private_Dirty":149725184,"Swap":0}]},
+    {"atMs":2619.094663998112,"accountedTreeTicks":200,"rssBytes":184594432,"pssBytes":183694336,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":176,"reapedChildTicks":24,"startTicks":3666005,"threads":11,"Rss":184594432,"Pss":183694336,"Private_Clean":33517568,"Private_Dirty":150007808,"Swap":0}]},
+    {"atMs":2719.472520999261,"accountedTreeTicks":203,"rssBytes":184930304,"pssBytes":183996416,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":179,"reapedChildTicks":24,"startTicks":3666005,"threads":11,"Rss":184930304,"Pss":183996416,"Private_Clean":33472512,"Private_Dirty":150339584,"Swap":0}]},
+    {"atMs":2820.329802998458,"accountedTreeTicks":208,"rssBytes":185155584,"pssBytes":179903488,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":181,"reapedChildTicks":27,"startTicks":3666005,"threads":11,"Rss":185155584,"Pss":179903488,"Private_Clean":33509376,"Private_Dirty":141873152,"Swap":0}]},
+    {"atMs":2921.2481770009617,"accountedTreeTicks":211,"rssBytes":184655872,"pssBytes":183755776,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":183,"reapedChildTicks":28,"startTicks":3666005,"threads":11,"Rss":184655872,"Pss":183755776,"Private_Clean":33521664,"Private_Dirty":150065152,"Swap":0}]},
+    {"atMs":3022.2575789957773,"accountedTreeTicks":216,"rssBytes":185028608,"pssBytes":175864832,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":185,"reapedChildTicks":31,"startTicks":3666005,"threads":11,"Rss":185028608,"Pss":175864832,"Private_Clean":17039360,"Private_Dirty":150437888,"Swap":0}]},
+    {"atMs":3123.3486639976036,"accountedTreeTicks":216,"rssBytes":185163776,"pssBytes":184263680,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":185,"reapedChildTicks":31,"startTicks":3666005,"threads":11,"Rss":185163776,"Pss":184263680,"Private_Clean":33521664,"Private_Dirty":150573056,"Swap":0}]},
+    {"atMs":3223.7558019987773,"accountedTreeTicks":219,"rssBytes":185864192,"pssBytes":184964096,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":187,"reapedChildTicks":32,"startTicks":3666005,"threads":11,"Rss":185864192,"Pss":184964096,"Private_Clean":33521664,"Private_Dirty":151273472,"Swap":0}]},
+    {"atMs":3324.1337849976844,"accountedTreeTicks":220,"rssBytes":186138624,"pssBytes":185238528,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":188,"reapedChildTicks":32,"startTicks":3666005,"threads":11,"Rss":186138624,"Pss":185238528,"Private_Clean":33521664,"Private_Dirty":151547904,"Swap":0}]},
+    {"atMs":3424.70850799873,"accountedTreeTicks":222,"rssBytes":204709888,"pssBytes":192663552,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":190,"reapedChildTicks":32,"startTicks":3666005,"threads":11,"Rss":185221120,"Pss":179643392,"Private_Clean":24219648,"Private_Dirty":150630400,"Swap":0},{"pid":575928,"name":"sh","ppid":575709,"ticks":0,"reapedChildTicks":0,"startTicks":3666346,"threads":1,"Rss":786432,"Pss":263168,"Private_Clean":110592,"Private_Dirty":106496,"Swap":0},{"pid":575929,"name":"MainThread","ppid":575928,"ticks":0,"reapedChildTicks":0,"startTicks":3666347,"threads":6,"Rss":18702336,"Pss":12756992,"Private_Clean":4096,"Private_Dirty":7520256,"Swap":0}]},
+    {"atMs":3525.430301000597,"accountedTreeTicks":227,"rssBytes":185487360,"pssBytes":180231168,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":192,"reapedChildTicks":35,"startTicks":3666005,"threads":11,"Rss":185487360,"Pss":180231168,"Private_Clean":33509376,"Private_Dirty":142196736,"Swap":0}]},
+    {"atMs":3626.5948169966578,"accountedTreeTicks":232,"rssBytes":186056704,"pssBytes":185156608,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":195,"reapedChildTicks":37,"startTicks":3666005,"threads":11,"Rss":186056704,"Pss":185156608,"Private_Clean":33521664,"Private_Dirty":151465984,"Swap":0}]},
+    {"atMs":3726.940337000997,"accountedTreeTicks":235,"rssBytes":186118144,"pssBytes":185218048,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":196,"reapedChildTicks":39,"startTicks":3666005,"threads":11,"Rss":186118144,"Pss":185218048,"Private_Clean":33579008,"Private_Dirty":151470080,"Swap":0}]},
+    {"atMs":3827.2180299973115,"accountedTreeTicks":235,"rssBytes":186118144,"pssBytes":185218048,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":196,"reapedChildTicks":39,"startTicks":3666005,"threads":11,"Rss":186118144,"Pss":185218048,"Private_Clean":33579008,"Private_Dirty":151470080,"Swap":0}]},
+    {"atMs":3928.478981993976,"accountedTreeTicks":248,"rssBytes":185987072,"pssBytes":185086976,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":209,"reapedChildTicks":39,"startTicks":3666005,"threads":11,"Rss":185987072,"Pss":185086976,"Private_Clean":33591296,"Private_Dirty":151326720,"Swap":0}]},
+    {"atMs":4029.34485199512,"accountedTreeTicks":250,"rssBytes":186359808,"pssBytes":185459712,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":211,"reapedChildTicks":39,"startTicks":3666005,"threads":11,"Rss":186359808,"Pss":185459712,"Private_Clean":33591296,"Private_Dirty":151699456,"Swap":0}]},
+    {"atMs":4130.058076996647,"accountedTreeTicks":252,"rssBytes":202350592,"pssBytes":191273984,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":213,"reapedChildTicks":39,"startTicks":3666005,"threads":11,"Rss":186675200,"Pss":181345280,"Private_Clean":24797184,"Private_Dirty":152014848,"Swap":0},{"pid":575978,"name":"sh","ppid":575709,"ticks":0,"reapedChildTicks":0,"startTicks":3666417,"threads":1,"Rss":786432,"Pss":261120,"Private_Clean":110592,"Private_Dirty":106496,"Swap":0},{"pid":575979,"name":"MainThread","ppid":575978,"ticks":0,"reapedChildTicks":0,"startTicks":3666417,"threads":6,"Rss":14888960,"Pss":9667584,"Private_Clean":4096,"Private_Dirty":5165056,"Swap":0}]},
+    {"atMs":4230.893535997893,"accountedTreeTicks":259,"rssBytes":187019264,"pssBytes":186110976,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":215,"reapedChildTicks":44,"startTicks":3666005,"threads":11,"Rss":187019264,"Pss":186110976,"Private_Clean":33574912,"Private_Dirty":152358912,"Swap":0}]},
+    {"atMs":4331.132872997841,"accountedTreeTicks":263,"rssBytes":186486784,"pssBytes":185586688,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":218,"reapedChildTicks":45,"startTicks":3666005,"threads":11,"Rss":186486784,"Pss":185586688,"Private_Clean":33591296,"Private_Dirty":151826432,"Swap":0}]},
+    {"atMs":4432.294644997455,"accountedTreeTicks":268,"rssBytes":186675200,"pssBytes":177509376,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":220,"reapedChildTicks":48,"startTicks":3666005,"threads":11,"Rss":186675200,"Pss":177509376,"Private_Clean":17104896,"Private_Dirty":152014848,"Swap":0}]},
+    {"atMs":4533.431183997891,"accountedTreeTicks":269,"rssBytes":187031552,"pssBytes":186131456,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":221,"reapedChildTicks":48,"startTicks":3666005,"threads":11,"Rss":187031552,"Pss":186131456,"Private_Clean":33591296,"Private_Dirty":152371200,"Swap":0}]},
+    {"atMs":4634.077033995709,"accountedTreeTicks":269,"rssBytes":188010496,"pssBytes":187110400,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":221,"reapedChildTicks":48,"startTicks":3666005,"threads":11,"Rss":188010496,"Pss":187110400,"Private_Clean":33591296,"Private_Dirty":153350144,"Swap":0}]},
+    {"atMs":4734.394948995032,"accountedTreeTicks":270,"rssBytes":186212352,"pssBytes":185312256,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":222,"reapedChildTicks":48,"startTicks":3666005,"threads":11,"Rss":186212352,"Pss":185312256,"Private_Clean":33591296,"Private_Dirty":151552000,"Swap":0}]},
+    {"atMs":4834.861663999618,"accountedTreeTicks":273,"rssBytes":202227712,"pssBytes":192198656,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":225,"reapedChildTicks":48,"startTicks":3666005,"threads":11,"Rss":186552320,"Pss":182262784,"Private_Clean":26865664,"Private_Dirty":151891968,"Swap":0},{"pid":576026,"name":"sh","ppid":575709,"ticks":0,"reapedChildTicks":0,"startTicks":3666488,"threads":1,"Rss":786432,"Pss":263168,"Private_Clean":110592,"Private_Dirty":106496,"Swap":0},{"pid":576027,"name":"MainThread","ppid":576026,"ticks":0,"reapedChildTicks":0,"startTicks":3666488,"threads":6,"Rss":14888960,"Pss":9672704,"Private_Clean":4096,"Private_Dirty":5165056,"Swap":0}]},
+    {"atMs":4935.486466994917,"accountedTreeTicks":279,"rssBytes":186892288,"pssBytes":185992192,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":226,"reapedChildTicks":53,"startTicks":3666005,"threads":11,"Rss":186892288,"Pss":185992192,"Private_Clean":33595392,"Private_Dirty":152227840,"Swap":0}]},
+    {"atMs":5036.125255996012,"accountedTreeTicks":282,"rssBytes":187256832,"pssBytes":186356736,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":229,"reapedChildTicks":53,"startTicks":3666005,"threads":11,"Rss":187256832,"Pss":186356736,"Private_Clean":33595392,"Private_Dirty":152592384,"Swap":0}]},
+    {"atMs":5137.183251994429,"accountedTreeTicks":286,"rssBytes":215654400,"pssBytes":197655552,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":231,"reapedChildTicks":53,"startTicks":3666005,"threads":11,"Rss":186273792,"Pss":177560576,"Private_Clean":18042880,"Private_Dirty":151588864,"Swap":0},{"pid":576045,"name":"sh","ppid":575709,"ticks":0,"reapedChildTicks":0,"startTicks":3666516,"threads":1,"Rss":782336,"Pss":259072,"Private_Clean":110592,"Private_Dirty":102400,"Swap":0},{"pid":576046,"name":"MainThread","ppid":576045,"ticks":2,"reapedChildTicks":0,"startTicks":3666516,"threads":7,"Rss":28598272,"Pss":19835904,"Private_Clean":94208,"Private_Dirty":11694080,"Swap":0}]},
+    {"atMs":5238.151057994401,"accountedTreeTicks":290,"rssBytes":186855424,"pssBytes":185955328,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":233,"reapedChildTicks":57,"startTicks":3666005,"threads":11,"Rss":186855424,"Pss":185955328,"Private_Clean":33615872,"Private_Dirty":152170496,"Swap":0}]},
+    {"atMs":5338.752120995196,"accountedTreeTicks":290,"rssBytes":187957248,"pssBytes":187057152,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":233,"reapedChildTicks":57,"startTicks":3666005,"threads":11,"Rss":187957248,"Pss":187057152,"Private_Clean":33615872,"Private_Dirty":153272320,"Swap":0}]},
+    {"atMs":5439.1608929945505,"accountedTreeTicks":292,"rssBytes":188334080,"pssBytes":187433984,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":235,"reapedChildTicks":57,"startTicks":3666005,"threads":11,"Rss":188334080,"Pss":187433984,"Private_Clean":33615872,"Private_Dirty":153649152,"Swap":0}]},
+    {"atMs":5539.648865000345,"accountedTreeTicks":294,"rssBytes":186302464,"pssBytes":185402368,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":237,"reapedChildTicks":57,"startTicks":3666005,"threads":11,"Rss":186302464,"Pss":185402368,"Private_Clean":33615872,"Private_Dirty":151617536,"Swap":0}]},
+    {"atMs":5640.162986994255,"accountedTreeTicks":300,"rssBytes":186699776,"pssBytes":185799680,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":239,"reapedChildTicks":61,"startTicks":3666005,"threads":11,"Rss":186699776,"Pss":185799680,"Private_Clean":33615872,"Private_Dirty":152014848,"Swap":0}]},
+    {"atMs":5741.084141998726,"accountedTreeTicks":303,"rssBytes":187113472,"pssBytes":186213376,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":241,"reapedChildTicks":62,"startTicks":3666005,"threads":11,"Rss":187113472,"Pss":186213376,"Private_Clean":33615872,"Private_Dirty":152428544,"Swap":0}]},
+    {"atMs":5841.580306994729,"accountedTreeTicks":307,"rssBytes":196218880,"pssBytes":190406656,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":244,"reapedChildTicks":63,"startTicks":3666005,"threads":11,"Rss":187539456,"Pss":185423872,"Private_Clean":31227904,"Private_Dirty":152854528,"Swap":0},{"pid":576093,"name":"sh","ppid":575709,"ticks":0,"reapedChildTicks":0,"startTicks":3666589,"threads":1,"Rss":790528,"Pss":268288,"Private_Clean":110592,"Private_Dirty":110592,"Swap":0},{"pid":576094,"name":"node","ppid":576093,"ticks":0,"reapedChildTicks":0,"startTicks":3666589,"threads":1,"Rss":7888896,"Pss":4714496,"Private_Clean":36864,"Private_Dirty":2138112,"Swap":0}]},
+    {"atMs":5941.936589995748,"accountedTreeTicks":310,"rssBytes":186818560,"pssBytes":185918464,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":245,"reapedChildTicks":65,"startTicks":3666005,"threads":11,"Rss":186818560,"Pss":185918464,"Private_Clean":33615872,"Private_Dirty":152133632,"Swap":0}]},
+    {"atMs":6042.174324997177,"accountedTreeTicks":312,"rssBytes":188047360,"pssBytes":187147264,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":247,"reapedChildTicks":65,"startTicks":3666005,"threads":11,"Rss":188047360,"Pss":187147264,"Private_Clean":33615872,"Private_Dirty":153362432,"Swap":0}]},
+    {"atMs":6142.70621399919,"accountedTreeTicks":314,"rssBytes":188477440,"pssBytes":187577344,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":249,"reapedChildTicks":65,"startTicks":3666005,"threads":11,"Rss":188477440,"Pss":187577344,"Private_Clean":33615872,"Private_Dirty":153792512,"Swap":0}]},
+    {"atMs":6243.761405996338,"accountedTreeTicks":317,"rssBytes":186400768,"pssBytes":185500672,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":250,"reapedChildTicks":67,"startTicks":3666005,"threads":11,"Rss":186400768,"Pss":185500672,"Private_Clean":33615872,"Private_Dirty":151715840,"Swap":0}]},
+    {"atMs":6344.450340999174,"accountedTreeTicks":323,"rssBytes":186863616,"pssBytes":185963520,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":253,"reapedChildTicks":70,"startTicks":3666005,"threads":11,"Rss":186863616,"Pss":185963520,"Private_Clean":33615872,"Private_Dirty":152178688,"Swap":0}]},
+    {"atMs":6444.883539996226,"accountedTreeTicks":325,"rssBytes":187289600,"pssBytes":186389504,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":254,"reapedChildTicks":71,"startTicks":3666005,"threads":11,"Rss":187289600,"Pss":186389504,"Private_Clean":33615872,"Private_Dirty":152604672,"Swap":0}]},
+    {"atMs":6545.870404996094,"accountedTreeTicks":328,"rssBytes":187740160,"pssBytes":186840064,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":257,"reapedChildTicks":71,"startTicks":3666005,"threads":11,"Rss":187740160,"Pss":186840064,"Private_Clean":33615872,"Private_Dirty":153055232,"Swap":0}]},
+    {"atMs":6646.6107870001,"accountedTreeTicks":333,"rssBytes":187854848,"pssBytes":186954752,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":259,"reapedChildTicks":74,"startTicks":3666005,"threads":11,"Rss":187854848,"Pss":186954752,"Private_Clean":33615872,"Private_Dirty":153169920,"Swap":0}]},
+    {"atMs":6747.939376000431,"accountedTreeTicks":334,"rssBytes":189206528,"pssBytes":188298240,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":260,"reapedChildTicks":74,"startTicks":3666005,"threads":11,"Rss":189206528,"Pss":188298240,"Private_Clean":33615872,"Private_Dirty":154521600,"Swap":0}]},
+    {"atMs":6848.519270999532,"accountedTreeTicks":335,"rssBytes":189399040,"pssBytes":188498944,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":261,"reapedChildTicks":74,"startTicks":3666005,"threads":11,"Rss":189399040,"Pss":188498944,"Private_Clean":33615872,"Private_Dirty":154714112,"Swap":0}]},
+    {"atMs":6949.536412997986,"accountedTreeTicks":339,"rssBytes":188129280,"pssBytes":187229184,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":264,"reapedChildTicks":75,"startTicks":3666005,"threads":11,"Rss":188129280,"Pss":187229184,"Private_Clean":33673216,"Private_Dirty":153387008,"Swap":0}]},
+    {"atMs":7049.875238000823,"accountedTreeTicks":345,"rssBytes":188186624,"pssBytes":176827392,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":266,"reapedChildTicks":79,"startTicks":3666005,"threads":11,"Rss":188186624,"Pss":176827392,"Private_Clean":12804096,"Private_Dirty":153444352,"Swap":0}]},
+    {"atMs":7150.20730499964,"accountedTreeTicks":347,"rssBytes":189140992,"pssBytes":188240896,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":268,"reapedChildTicks":79,"startTicks":3666005,"threads":11,"Rss":189140992,"Pss":188240896,"Private_Clean":33673216,"Private_Dirty":154398720,"Swap":0}]},
+    {"atMs":7251.31436099764,"accountedTreeTicks":351,"rssBytes":188706816,"pssBytes":187806720,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":271,"reapedChildTicks":80,"startTicks":3666005,"threads":11,"Rss":188706816,"Pss":187806720,"Private_Clean":33673216,"Private_Dirty":153964544,"Swap":0}]},
+    {"atMs":7352.122374999453,"accountedTreeTicks":356,"rssBytes":189448192,"pssBytes":188548096,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":273,"reapedChildTicks":83,"startTicks":3666005,"threads":11,"Rss":189448192,"Pss":188548096,"Private_Clean":33673216,"Private_Dirty":154705920,"Swap":0}]},
+    {"atMs":7452.964675998373,"accountedTreeTicks":356,"rssBytes":189448192,"pssBytes":188548096,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":273,"reapedChildTicks":83,"startTicks":3666005,"threads":11,"Rss":189448192,"Pss":188548096,"Private_Clean":33673216,"Private_Dirty":154705920,"Swap":0}]},
+    {"atMs":7553.7820370009285,"accountedTreeTicks":358,"rssBytes":190976000,"pssBytes":190075904,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":274,"reapedChildTicks":84,"startTicks":3666005,"threads":11,"Rss":190976000,"Pss":190075904,"Private_Clean":33673216,"Private_Dirty":156233728,"Swap":0}]},
+    {"atMs":7654.124257998774,"accountedTreeTicks":360,"rssBytes":189009920,"pssBytes":188109824,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":276,"reapedChildTicks":84,"startTicks":3666005,"threads":11,"Rss":189009920,"Pss":188109824,"Private_Clean":33673216,"Private_Dirty":154267648,"Swap":0}]},
+    {"atMs":7754.473709996091,"accountedTreeTicks":364,"rssBytes":220782592,"pssBytes":201563136,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":279,"reapedChildTicks":84,"startTicks":3666005,"threads":11,"Rss":189534208,"Pss":180483072,"Private_Clean":17432576,"Private_Dirty":154791936,"Swap":0},{"pid":576186,"name":"sh","ppid":575709,"ticks":0,"reapedChildTicks":0,"startTicks":3666778,"threads":1,"Rss":786432,"Pss":194560,"Private_Clean":0,"Private_Dirty":106496,"Swap":0},{"pid":576187,"name":"MainThread","ppid":576186,"ticks":1,"reapedChildTicks":0,"startTicks":3666778,"threads":7,"Rss":30461952,"Pss":20885504,"Private_Clean":118784,"Private_Dirty":11935744,"Swap":0}]},
+    {"atMs":7855.480253994756,"accountedTreeTicks":369,"rssBytes":190562304,"pssBytes":189662208,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":281,"reapedChildTicks":88,"startTicks":3666005,"threads":11,"Rss":190562304,"Pss":189662208,"Private_Clean":33673216,"Private_Dirty":155820032,"Swap":0}]},
+    {"atMs":7956.059953998192,"accountedTreeTicks":372,"rssBytes":190701568,"pssBytes":189801472,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":284,"reapedChildTicks":88,"startTicks":3666005,"threads":11,"Rss":190701568,"Pss":189801472,"Private_Clean":33673216,"Private_Dirty":155959296,"Swap":0}]},
+    {"atMs":8056.83554999996,"accountedTreeTicks":377,"rssBytes":191467520,"pssBytes":190567424,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":286,"reapedChildTicks":91,"startTicks":3666005,"threads":11,"Rss":191467520,"Pss":190567424,"Private_Clean":33673216,"Private_Dirty":156725248,"Swap":0}]},
+    {"atMs":8157.203951996053,"accountedTreeTicks":377,"rssBytes":191467520,"pssBytes":190567424,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":286,"reapedChildTicks":91,"startTicks":3666005,"threads":11,"Rss":191467520,"Pss":190567424,"Private_Clean":33673216,"Private_Dirty":156725248,"Swap":0}]},
+    {"atMs":8257.76872899587,"accountedTreeTicks":379,"rssBytes":193089536,"pssBytes":192189440,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":287,"reapedChildTicks":92,"startTicks":3666005,"threads":11,"Rss":193089536,"Pss":192189440,"Private_Clean":33673216,"Private_Dirty":158347264,"Swap":0}]},
+    {"atMs":8358.148741994228,"accountedTreeTicks":382,"rssBytes":190976000,"pssBytes":190075904,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":290,"reapedChildTicks":92,"startTicks":3666005,"threads":11,"Rss":190976000,"Pss":190075904,"Private_Clean":33673216,"Private_Dirty":156233728,"Swap":0}]},
+    {"atMs":8459.291156999825,"accountedTreeTicks":384,"rssBytes":205815808,"pssBytes":196976640,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":292,"reapedChildTicks":92,"startTicks":3666005,"threads":11,"Rss":191533056,"Pss":188060672,"Private_Clean":28581888,"Private_Dirty":156790784,"Swap":0},{"pid":576234,"name":"sh","ppid":575709,"ticks":0,"reapedChildTicks":0,"startTicks":3666850,"threads":1,"Rss":786432,"Pss":263168,"Private_Clean":110592,"Private_Dirty":106496,"Swap":0},{"pid":576235,"name":"MainThread","ppid":576234,"ticks":0,"reapedChildTicks":0,"startTicks":3666851,"threads":2,"Rss":13496320,"Pss":8652800,"Private_Clean":4096,"Private_Dirty":4517888,"Swap":0}]},
+    {"atMs":8559.640950996254,"accountedTreeTicks":390,"rssBytes":192106496,"pssBytes":173560832,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":294,"reapedChildTicks":96,"startTicks":3666005,"threads":11,"Rss":192106496,"Pss":173560832,"Private_Clean":33673216,"Private_Dirty":122077184,"Swap":0}]},
+    {"atMs":8660.198489000322,"accountedTreeTicks":393,"rssBytes":191750144,"pssBytes":190850048,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":297,"reapedChildTicks":96,"startTicks":3666005,"threads":11,"Rss":191750144,"Pss":190850048,"Private_Clean":33673216,"Private_Dirty":157007872,"Swap":0}]},
+    {"atMs":8760.470153996721,"accountedTreeTicks":395,"rssBytes":192516096,"pssBytes":183446528,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":298,"reapedChildTicks":97,"startTicks":3666005,"threads":11,"Rss":192516096,"Pss":183446528,"Private_Clean":17379328,"Private_Dirty":157773824,"Swap":0}]},
+    {"atMs":8861.117606000334,"accountedTreeTicks":400,"rssBytes":193187840,"pssBytes":192287744,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":301,"reapedChildTicks":99,"startTicks":3666005,"threads":11,"Rss":193187840,"Pss":192287744,"Private_Clean":33681408,"Private_Dirty":158437376,"Swap":0}]},
+    {"atMs":8962.171840998053,"accountedTreeTicks":400,"rssBytes":194936832,"pssBytes":194036736,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":301,"reapedChildTicks":99,"startTicks":3666005,"threads":11,"Rss":194936832,"Pss":194036736,"Private_Clean":33681408,"Private_Dirty":160186368,"Swap":0}]},
+    {"atMs":9062.59923199832,"accountedTreeTicks":405,"rssBytes":192528384,"pssBytes":191628288,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":306,"reapedChildTicks":99,"startTicks":3666005,"threads":11,"Rss":192528384,"Pss":191628288,"Private_Clean":33697792,"Private_Dirty":157761536,"Swap":0}]},
+    {"atMs":9163.367967994418,"accountedTreeTicks":406,"rssBytes":193048576,"pssBytes":192148480,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":307,"reapedChildTicks":99,"startTicks":3666005,"threads":11,"Rss":193048576,"Pss":192148480,"Private_Clean":33697792,"Private_Dirty":158281728,"Swap":0}]},
+    {"atMs":9264.1853669993,"accountedTreeTicks":413,"rssBytes":193138688,"pssBytes":192238592,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":310,"reapedChildTicks":103,"startTicks":3666005,"threads":11,"Rss":193138688,"Pss":192238592,"Private_Clean":33697792,"Private_Dirty":158371840,"Swap":0}]},
+    {"atMs":9365.001944999676,"accountedTreeTicks":416,"rssBytes":193753088,"pssBytes":192852992,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":312,"reapedChildTicks":104,"startTicks":3666005,"threads":11,"Rss":193753088,"Pss":192852992,"Private_Clean":33697792,"Private_Dirty":158986240,"Swap":0}]},
+    {"atMs":9465.787394998188,"accountedTreeTicks":419,"rssBytes":194416640,"pssBytes":188877824,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":315,"reapedChildTicks":104,"startTicks":3666005,"threads":11,"Rss":194416640,"Pss":188877824,"Private_Clean":33697792,"Private_Dirty":150372352,"Swap":0}]},
+    {"atMs":9566.816081998695,"accountedTreeTicks":424,"rssBytes":193376256,"pssBytes":192476160,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":317,"reapedChildTicks":107,"startTicks":3666005,"threads":11,"Rss":193376256,"Pss":192476160,"Private_Clean":33697792,"Private_Dirty":158609408,"Swap":0}]},
+    {"atMs":9667.185565995169,"accountedTreeTicks":426,"rssBytes":195256320,"pssBytes":194356224,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":319,"reapedChildTicks":107,"startTicks":3666005,"threads":11,"Rss":195256320,"Pss":194356224,"Private_Clean":33697792,"Private_Dirty":160489472,"Swap":0}]},
+    {"atMs":9767.703732999507,"accountedTreeTicks":428,"rssBytes":195883008,"pssBytes":194982912,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":321,"reapedChildTicks":107,"startTicks":3666005,"threads":11,"Rss":195883008,"Pss":194982912,"Private_Clean":33701888,"Private_Dirty":161112064,"Swap":0}]},
+    {"atMs":9868.266478995793,"accountedTreeTicks":430,"rssBytes":193531904,"pssBytes":192631808,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":323,"reapedChildTicks":107,"startTicks":3666005,"threads":11,"Rss":193531904,"Pss":192631808,"Private_Clean":33701888,"Private_Dirty":158760960,"Swap":0}]},
+    {"atMs":9968.928176996997,"accountedTreeTicks":436,"rssBytes":228728832,"pssBytes":206602240,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":324,"reapedChildTicks":108,"startTicks":3666005,"threads":11,"Rss":193531904,"Pss":183163904,"Private_Clean":14823424,"Private_Dirty":158760960,"Swap":0},{"pid":576330,"name":"sh","ppid":575709,"ticks":0,"reapedChildTicks":0,"startTicks":3666997,"threads":1,"Rss":786432,"Pss":263168,"Private_Clean":110592,"Private_Dirty":106496,"Swap":0},{"pid":576331,"name":"MainThread","ppid":576330,"ticks":4,"reapedChildTicks":0,"startTicks":3666997,"threads":7,"Rss":34410496,"Pss":23175168,"Private_Clean":135168,"Private_Dirty":12546048,"Swap":0}]},
+    {"atMs":10069.997549995605,"accountedTreeTicks":441,"rssBytes":194170880,"pssBytes":193270784,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":327,"reapedChildTicks":114,"startTicks":3666005,"threads":11,"Rss":194170880,"Pss":193270784,"Private_Clean":33701888,"Private_Dirty":159399936,"Swap":0}]},
+    {"atMs":10170.25314700004,"accountedTreeTicks":446,"rssBytes":195469312,"pssBytes":194569216,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":331,"reapedChildTicks":115,"startTicks":3666005,"threads":11,"Rss":195469312,"Pss":194569216,"Private_Clean":33705984,"Private_Dirty":160694272,"Swap":0}]},
+    {"atMs":10271.186524994846,"accountedTreeTicks":451,"rssBytes":195268608,"pssBytes":186096640,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":333,"reapedChildTicks":118,"startTicks":3666005,"threads":11,"Rss":195268608,"Pss":186096640,"Private_Clean":17207296,"Private_Dirty":160493568,"Swap":0}]},
+    {"atMs":10372.290999999677,"accountedTreeTicks":452,"rssBytes":195993600,"pssBytes":195093504,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":334,"reapedChildTicks":118,"startTicks":3666005,"threads":11,"Rss":195993600,"Pss":195093504,"Private_Clean":33705984,"Private_Dirty":161218560,"Swap":0}]},
+    {"atMs":10472.6708149974,"accountedTreeTicks":453,"rssBytes":198021120,"pssBytes":197121024,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":335,"reapedChildTicks":118,"startTicks":3666005,"threads":11,"Rss":198021120,"Pss":197121024,"Private_Clean":33705984,"Private_Dirty":163246080,"Swap":0}]},
+    {"atMs":10573.25951099483,"accountedTreeTicks":456,"rssBytes":195870720,"pssBytes":194970624,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":338,"reapedChildTicks":118,"startTicks":3666005,"threads":11,"Rss":195870720,"Pss":194970624,"Private_Clean":33705984,"Private_Dirty":161095680,"Swap":0}]},
+    {"atMs":10673.807058999955,"accountedTreeTicks":458,"rssBytes":196558848,"pssBytes":195658752,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":340,"reapedChildTicks":118,"startTicks":3666005,"threads":11,"Rss":196558848,"Pss":195658752,"Private_Clean":33705984,"Private_Dirty":161783808,"Swap":0}]},
+    {"atMs":10774.565642997914,"accountedTreeTicks":464,"rssBytes":197292032,"pssBytes":196391936,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":342,"reapedChildTicks":122,"startTicks":3666005,"threads":11,"Rss":197292032,"Pss":196391936,"Private_Clean":33705984,"Private_Dirty":162516992,"Swap":0}]},
+    {"atMs":10875.092162998044,"accountedTreeTicks":465,"rssBytes":196800512,"pssBytes":195900416,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":343,"reapedChildTicks":122,"startTicks":3666005,"threads":11,"Rss":196800512,"Pss":195900416,"Private_Clean":33705984,"Private_Dirty":162025472,"Swap":0}]},
+    {"atMs":10975.601491998532,"accountedTreeTicks":470,"rssBytes":213229568,"pssBytes":202876928,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":347,"reapedChildTicks":123,"startTicks":3666005,"threads":11,"Rss":197566464,"Pss":192953344,"Private_Clean":26333184,"Private_Dirty":162791424,"Swap":0},{"pid":576397,"name":"sh","ppid":575709,"ticks":0,"reapedChildTicks":0,"startTicks":3667102,"threads":1,"Rss":786432,"Pss":263168,"Private_Clean":110592,"Private_Dirty":106496,"Swap":0},{"pid":576398,"name":"MainThread","ppid":576397,"ticks":0,"reapedChildTicks":0,"startTicks":3667102,"threads":6,"Rss":14876672,"Pss":9660416,"Private_Clean":4096,"Private_Dirty":5152768,"Swap":0}]},
+    {"atMs":11076.05537699419,"accountedTreeTicks":473,"rssBytes":198561792,"pssBytes":197661696,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":348,"reapedChildTicks":125,"startTicks":3666005,"threads":11,"Rss":198561792,"Pss":197661696,"Private_Clean":33705984,"Private_Dirty":163786752,"Swap":0}]},
+    {"atMs":11176.886691995605,"accountedTreeTicks":474,"rssBytes":200740864,"pssBytes":199840768,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":349,"reapedChildTicks":125,"startTicks":3666005,"threads":11,"Rss":200740864,"Pss":199840768,"Private_Clean":33705984,"Private_Dirty":165965824,"Swap":0}]},
+    {"atMs":11277.27604899701,"accountedTreeTicks":476,"rssBytes":197763072,"pssBytes":196862976,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":351,"reapedChildTicks":125,"startTicks":3666005,"threads":11,"Rss":197763072,"Pss":196862976,"Private_Clean":33705984,"Private_Dirty":162988032,"Swap":0}]},
+    {"atMs":11377.671702000953,"accountedTreeTicks":478,"rssBytes":198492160,"pssBytes":197592064,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":353,"reapedChildTicks":125,"startTicks":3666005,"threads":11,"Rss":198492160,"Pss":197592064,"Private_Clean":33705984,"Private_Dirty":163717120,"Swap":0}]},
+    {"atMs":11478.446750996227,"accountedTreeTicks":486,"rssBytes":198496256,"pssBytes":197596160,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":356,"reapedChildTicks":130,"startTicks":3666005,"threads":11,"Rss":198496256,"Pss":197596160,"Private_Clean":33705984,"Private_Dirty":163721216,"Swap":0}]},
+    {"atMs":11579.047537998122,"accountedTreeTicks":489,"rssBytes":199352320,"pssBytes":198452224,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":358,"reapedChildTicks":131,"startTicks":3666005,"threads":11,"Rss":199352320,"Pss":198452224,"Private_Clean":33705984,"Private_Dirty":164577280,"Swap":0}]},
+    {"atMs":11679.58163399453,"accountedTreeTicks":492,"rssBytes":200159232,"pssBytes":199259136,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":361,"reapedChildTicks":131,"startTicks":3666005,"threads":11,"Rss":200159232,"Pss":199259136,"Private_Clean":33705984,"Private_Dirty":165384192,"Swap":0}]},
+    {"atMs":11780.621492995124,"accountedTreeTicks":498,"rssBytes":198975488,"pssBytes":198075392,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":364,"reapedChildTicks":134,"startTicks":3666005,"threads":11,"Rss":198975488,"Pss":198075392,"Private_Clean":33705984,"Private_Dirty":164200448,"Swap":0}]},
+    {"atMs":11881.465134996688,"accountedTreeTicks":498,"rssBytes":198975488,"pssBytes":198075392,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":364,"reapedChildTicks":134,"startTicks":3666005,"threads":11,"Rss":198975488,"Pss":198075392,"Private_Clean":33705984,"Private_Dirty":164200448,"Swap":0}]},
+    {"atMs":11982.486623994191,"accountedTreeTicks":500,"rssBytes":201293824,"pssBytes":200393728,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":365,"reapedChildTicks":135,"startTicks":3666005,"threads":11,"Rss":201293824,"Pss":200393728,"Private_Clean":33718272,"Private_Dirty":166506496,"Swap":0}]},
+    {"atMs":12082.905768998899,"accountedTreeTicks":502,"rssBytes":202092544,"pssBytes":201192448,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":367,"reapedChildTicks":135,"startTicks":3666005,"threads":11,"Rss":202092544,"Pss":201192448,"Private_Clean":33718272,"Private_Dirty":167305216,"Swap":0}]},
+    {"atMs":12183.705224997539,"accountedTreeTicks":506,"rssBytes":201912320,"pssBytes":201012224,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":371,"reapedChildTicks":135,"startTicks":3666005,"threads":11,"Rss":201912320,"Pss":201012224,"Private_Clean":33755136,"Private_Dirty":167088128,"Swap":0}]},
+    {"atMs":12284.536008999567,"accountedTreeTicks":515,"rssBytes":200200192,"pssBytes":199300096,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":377,"reapedChildTicks":138,"startTicks":3666005,"threads":11,"Rss":200200192,"Pss":199300096,"Private_Clean":33767424,"Private_Dirty":165363712,"Swap":0}]},
+    {"atMs":12385.492301997147,"accountedTreeTicks":519,"rssBytes":200957952,"pssBytes":200057856,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":380,"reapedChildTicks":139,"startTicks":3666005,"threads":11,"Rss":200957952,"Pss":200057856,"Private_Clean":33783808,"Private_Dirty":166105088,"Swap":0}]},
+    {"atMs":12485.847667994676,"accountedTreeTicks":524,"rssBytes":202055680,"pssBytes":201155584,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":384,"reapedChildTicks":140,"startTicks":3666005,"threads":11,"Rss":202055680,"Pss":201155584,"Private_Clean":33783808,"Private_Dirty":167202816,"Swap":0}]},
+    {"atMs":12587.020758001017,"accountedTreeTicks":529,"rssBytes":203206656,"pssBytes":202306560,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":386,"reapedChildTicks":143,"startTicks":3666005,"threads":11,"Rss":203206656,"Pss":202306560,"Private_Clean":33783808,"Private_Dirty":168353792,"Swap":0}]},
+    {"atMs":12687.342694000108,"accountedTreeTicks":532,"rssBytes":204808192,"pssBytes":203908096,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":388,"reapedChildTicks":144,"startTicks":3666005,"threads":11,"Rss":204808192,"Pss":203908096,"Private_Clean":33783808,"Private_Dirty":169955328,"Swap":0}]},
+    {"atMs":12787.788276000356,"accountedTreeTicks":532,"rssBytes":205615104,"pssBytes":204715008,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":388,"reapedChildTicks":144,"startTicks":3666005,"threads":11,"Rss":205615104,"Pss":204715008,"Private_Clean":33783808,"Private_Dirty":170762240,"Swap":0}]},
+    {"atMs":12888.333768998564,"accountedTreeTicks":535,"rssBytes":202309632,"pssBytes":201409536,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":391,"reapedChildTicks":144,"startTicks":3666005,"threads":11,"Rss":202309632,"Pss":201409536,"Private_Clean":33783808,"Private_Dirty":167456768,"Swap":0}]},
+    {"atMs":12989.35647199687,"accountedTreeTicks":538,"rssBytes":228962304,"pssBytes":213857280,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":394,"reapedChildTicks":144,"startTicks":3666005,"threads":11,"Rss":202887168,"Pss":196174848,"Private_Clean":22212608,"Private_Dirty":168034304,"Swap":0},{"pid":576506,"name":"sh","ppid":575709,"ticks":0,"reapedChildTicks":0,"startTicks":3667302,"threads":1,"Rss":782336,"Pss":259072,"Private_Clean":110592,"Private_Dirty":102400,"Swap":0},{"pid":576507,"name":"MainThread","ppid":576506,"ticks":0,"reapedChildTicks":0,"startTicks":3667302,"threads":6,"Rss":25292800,"Pss":17423360,"Private_Clean":4096,"Private_Dirty":10264576,"Swap":0}]},
+    {"atMs":13089.60747099627,"accountedTreeTicks":543,"rssBytes":203714560,"pssBytes":197925888,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":396,"reapedChildTicks":147,"startTicks":3666005,"threads":11,"Rss":203714560,"Pss":197925888,"Private_Clean":33783808,"Private_Dirty":159084544,"Swap":0}]},
+    {"atMs":13190.049557000748,"accountedTreeTicks":548,"rssBytes":204619776,"pssBytes":203719680,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":400,"reapedChildTicks":148,"startTicks":3666005,"threads":11,"Rss":204619776,"Pss":203719680,"Private_Clean":33783808,"Private_Dirty":169766912,"Swap":0}]},
+    {"atMs":13290.930404997198,"accountedTreeTicks":550,"rssBytes":221151232,"pssBytes":209715200,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":402,"reapedChildTicks":148,"startTicks":3666005,"threads":11,"Rss":203485184,"Pss":198165504,"Private_Clean":24997888,"Private_Dirty":168632320,"Swap":0},{"pid":576525,"name":"sh","ppid":575709,"ticks":0,"reapedChildTicks":0,"startTicks":3667333,"threads":1,"Rss":786432,"Pss":263168,"Private_Clean":110592,"Private_Dirty":106496,"Swap":0},{"pid":576526,"name":"MainThread","ppid":576525,"ticks":0,"reapedChildTicks":0,"startTicks":3667333,"threads":6,"Rss":16879616,"Pss":11286528,"Private_Clean":4096,"Private_Dirty":6402048,"Swap":0}]},
+    {"atMs":13391.251688997727,"accountedTreeTicks":555,"rssBytes":204656640,"pssBytes":203756544,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":404,"reapedChildTicks":151,"startTicks":3666005,"threads":11,"Rss":204656640,"Pss":203756544,"Private_Clean":33783808,"Private_Dirty":169803776,"Swap":0}]},
+    {"atMs":13492.773467994994,"accountedTreeTicks":557,"rssBytes":207212544,"pssBytes":206312448,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":406,"reapedChildTicks":151,"startTicks":3666005,"threads":11,"Rss":207212544,"Pss":206312448,"Private_Clean":33783808,"Private_Dirty":172359680,"Swap":0}]},
+    {"atMs":13593.248823999602,"accountedTreeTicks":559,"rssBytes":203853824,"pssBytes":202953728,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":408,"reapedChildTicks":151,"startTicks":3666005,"threads":11,"Rss":203853824,"Pss":202953728,"Private_Clean":33783808,"Private_Dirty":169000960,"Swap":0}]},
+    {"atMs":13694.174929994915,"accountedTreeTicks":564,"rssBytes":205430784,"pssBytes":204530688,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":412,"reapedChildTicks":152,"startTicks":3666005,"threads":11,"Rss":205430784,"Pss":204530688,"Private_Clean":33783808,"Private_Dirty":170577920,"Swap":0}]},
+    {"atMs":13795.02778499591,"accountedTreeTicks":566,"rssBytes":233766912,"pssBytes":216534016,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":412,"reapedChildTicks":152,"startTicks":3666005,"threads":11,"Rss":205430784,"Pss":197514240,"Private_Clean":19804160,"Private_Dirty":170577920,"Swap":0},{"pid":576538,"name":"sh","ppid":575709,"ticks":0,"reapedChildTicks":0,"startTicks":3667381,"threads":1,"Rss":786432,"Pss":263168,"Private_Clean":110592,"Private_Dirty":106496,"Swap":0},{"pid":576539,"name":"MainThread","ppid":576538,"ticks":2,"reapedChildTicks":0,"startTicks":3667381,"threads":7,"Rss":27549696,"Pss":18756608,"Private_Clean":81920,"Private_Dirty":10604544,"Swap":0}]},
+    {"atMs":13895.934331994795,"accountedTreeTicks":572,"rssBytes":205619200,"pssBytes":204719104,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":415,"reapedChildTicks":157,"startTicks":3666005,"threads":11,"Rss":205619200,"Pss":204719104,"Private_Clean":33783808,"Private_Dirty":170766336,"Swap":0}]},
+    {"atMs":13996.805144000973,"accountedTreeTicks":576,"rssBytes":206508032,"pssBytes":205601792,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":418,"reapedChildTicks":158,"startTicks":3666005,"threads":11,"Rss":206508032,"Pss":205601792,"Private_Clean":33771520,"Private_Dirty":171655168,"Swap":0}]},
+    {"atMs":14097.572800994385,"accountedTreeTicks":579,"rssBytes":223105024,"pssBytes":212045824,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":421,"reapedChildTicks":158,"startTicks":3666005,"threads":11,"Rss":207437824,"Pss":202118144,"Private_Clean":24997888,"Private_Dirty":172584960,"Swap":0},{"pid":576573,"name":"sh","ppid":575709,"ticks":0,"reapedChildTicks":0,"startTicks":3667414,"threads":1,"Rss":786432,"Pss":263168,"Private_Clean":110592,"Private_Dirty":106496,"Swap":0},{"pid":576574,"name":"MainThread","ppid":576573,"ticks":0,"reapedChildTicks":0,"startTicks":3667414,"threads":6,"Rss":14880768,"Pss":9664512,"Private_Clean":4096,"Private_Dirty":5156864,"Swap":0}]},
+    {"atMs":14198.162720000255,"accountedTreeTicks":585,"rssBytes":205799424,"pssBytes":204899328,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":423,"reapedChildTicks":162,"startTicks":3666005,"threads":11,"Rss":205799424,"Pss":204899328,"Private_Clean":33783808,"Private_Dirty":170946560,"Swap":0}]},
+    {"atMs":14299.069196000346,"accountedTreeTicks":587,"rssBytes":208478208,"pssBytes":207578112,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":425,"reapedChildTicks":162,"startTicks":3666005,"threads":11,"Rss":208478208,"Pss":207578112,"Private_Clean":33783808,"Private_Dirty":173625344,"Swap":0}]},
+    {"atMs":14399.528467998607,"accountedTreeTicks":590,"rssBytes":206008320,"pssBytes":205108224,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":428,"reapedChildTicks":162,"startTicks":3666005,"threads":11,"Rss":206008320,"Pss":205108224,"Private_Clean":33783808,"Private_Dirty":171155456,"Swap":0}]},
+    {"atMs":14500.013979995856,"accountedTreeTicks":592,"rssBytes":206917632,"pssBytes":206017536,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":430,"reapedChildTicks":162,"startTicks":3666005,"threads":11,"Rss":206917632,"Pss":206017536,"Private_Clean":33783808,"Private_Dirty":172064768,"Swap":0}]},
+    {"atMs":14600.620643999719,"accountedTreeTicks":598,"rssBytes":206929920,"pssBytes":195554304,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":432,"reapedChildTicks":166,"startTicks":3666005,"threads":11,"Rss":206929920,"Pss":195554304,"Private_Clean":12881920,"Private_Dirty":172077056,"Swap":0}]},
+    {"atMs":14701.570455996261,"accountedTreeTicks":602,"rssBytes":208846848,"pssBytes":207946752,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":436,"reapedChildTicks":166,"startTicks":3666005,"threads":11,"Rss":208846848,"Pss":207946752,"Private_Clean":33783808,"Private_Dirty":173993984,"Swap":0}]},
+    {"atMs":14802.329909995024,"accountedTreeTicks":606,"rssBytes":209825792,"pssBytes":208925696,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":439,"reapedChildTicks":167,"startTicks":3666005,"threads":11,"Rss":209825792,"Pss":208925696,"Private_Clean":33783808,"Private_Dirty":174972928,"Swap":0}]},
+    {"atMs":14902.87888799503,"accountedTreeTicks":611,"rssBytes":210071552,"pssBytes":201387008,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":441,"reapedChildTicks":170,"startTicks":3666005,"threads":11,"Rss":210071552,"Pss":201387008,"Private_Clean":18214912,"Private_Dirty":175218688,"Swap":0}]},
+    {"atMs":15003.578140996979,"accountedTreeTicks":612,"rssBytes":209027072,"pssBytes":208126976,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":442,"reapedChildTicks":170,"startTicks":3666005,"threads":11,"Rss":209027072,"Pss":208126976,"Private_Clean":33783808,"Private_Dirty":174174208,"Swap":0}]},
+    {"atMs":15104.069380999135,"accountedTreeTicks":613,"rssBytes":211845120,"pssBytes":210945024,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":443,"reapedChildTicks":170,"startTicks":3666005,"threads":11,"Rss":211845120,"Pss":210945024,"Private_Clean":33783808,"Private_Dirty":176992256,"Swap":0}]},
+    {"atMs":15204.529185000865,"accountedTreeTicks":616,"rssBytes":208248832,"pssBytes":207348736,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":446,"reapedChildTicks":170,"startTicks":3666005,"threads":11,"Rss":208248832,"Pss":207348736,"Private_Clean":33783808,"Private_Dirty":173395968,"Swap":0}]},
+    {"atMs":15305.347848996462,"accountedTreeTicks":617,"rssBytes":209195008,"pssBytes":208294912,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":447,"reapedChildTicks":170,"startTicks":3666005,"threads":11,"Rss":209195008,"Pss":208294912,"Private_Clean":33783808,"Private_Dirty":174342144,"Swap":0}]},
+    {"atMs":15406.443269996089,"accountedTreeTicks":630,"rssBytes":211046400,"pssBytes":210146304,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":456,"reapedChildTicks":174,"startTicks":3666005,"threads":11,"Rss":211046400,"Pss":210146304,"Private_Clean":33783808,"Private_Dirty":176193536,"Swap":0}]},
+    {"atMs":15507.101852999767,"accountedTreeTicks":641,"rssBytes":211292160,"pssBytes":210392064,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":466,"reapedChildTicks":175,"startTicks":3666005,"threads":11,"Rss":211292160,"Pss":210392064,"Private_Clean":33783808,"Private_Dirty":176439296,"Swap":0}]},
+    {"atMs":15607.930382000632,"accountedTreeTicks":645,"rssBytes":212262912,"pssBytes":211362816,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":470,"reapedChildTicks":175,"startTicks":3666005,"threads":11,"Rss":212262912,"Pss":211362816,"Private_Clean":33783808,"Private_Dirty":177410048,"Swap":0}]},
+    {"atMs":15708.927679996123,"accountedTreeTicks":650,"rssBytes":211349504,"pssBytes":210434048,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":472,"reapedChildTicks":178,"startTicks":3666005,"threads":11,"Rss":211349504,"Pss":210434048,"Private_Clean":33783808,"Private_Dirty":176496640,"Swap":0}]},
+    {"atMs":15809.95732199517,"accountedTreeTicks":650,"rssBytes":211349504,"pssBytes":192759808,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":472,"reapedChildTicks":178,"startTicks":3666005,"threads":11,"Rss":211349504,"Pss":192759808,"Private_Clean":33771520,"Private_Dirty":141131776,"Swap":0}]},
+    {"atMs":15910.549444997741,"accountedTreeTicks":652,"rssBytes":214274048,"pssBytes":213367808,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":474,"reapedChildTicks":178,"startTicks":3666005,"threads":11,"Rss":214274048,"Pss":213367808,"Private_Clean":33771520,"Private_Dirty":179421184,"Swap":0}]},
+    {"atMs":16010.935727994365,"accountedTreeTicks":655,"rssBytes":211329024,"pssBytes":210422784,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":477,"reapedChildTicks":178,"startTicks":3666005,"threads":11,"Rss":211329024,"Pss":210422784,"Private_Clean":33771520,"Private_Dirty":176476160,"Swap":0}]},
+    {"atMs":16111.802804996842,"accountedTreeTicks":658,"rssBytes":227975168,"pssBytes":218202112,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":479,"reapedChildTicks":179,"startTicks":3666005,"threads":11,"Rss":212312064,"Pss":208278528,"Private_Clean":27574272,"Private_Dirty":177459200,"Swap":0},{"pid":576699,"name":"sh","ppid":575709,"ticks":0,"reapedChildTicks":0,"startTicks":3667616,"threads":1,"Rss":782336,"Pss":259072,"Private_Clean":110592,"Private_Dirty":102400,"Swap":0},{"pid":576700,"name":"MainThread","ppid":576699,"ticks":0,"reapedChildTicks":0,"startTicks":3667616,"threads":6,"Rss":14880768,"Pss":9664512,"Private_Clean":4096,"Private_Dirty":5160960,"Swap":0}]},
+    {"atMs":16212.31414599606,"accountedTreeTicks":664,"rssBytes":210354176,"pssBytes":209447936,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":481,"reapedChildTicks":183,"startTicks":3666005,"threads":11,"Rss":210354176,"Pss":209447936,"Private_Clean":33771520,"Private_Dirty":175501312,"Swap":0}]},
+    {"atMs":16313.10127100005,"accountedTreeTicks":667,"rssBytes":211341312,"pssBytes":210435072,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":484,"reapedChildTicks":183,"startTicks":3666005,"threads":11,"Rss":211341312,"Pss":210435072,"Private_Clean":33771520,"Private_Dirty":176488448,"Swap":0}]},
+    {"atMs":16414.08069899626,"accountedTreeTicks":672,"rssBytes":213143552,"pssBytes":211186688,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":488,"reapedChildTicks":184,"startTicks":3666005,"threads":11,"Rss":212357120,"Pss":210922496,"Private_Clean":32751616,"Private_Dirty":177504256,"Swap":0},{"pid":576718,"name":"sh","ppid":575709,"ticks":0,"reapedChildTicks":0,"startTicks":3667646,"threads":1,"Rss":786432,"Pss":264192,"Private_Clean":110592,"Private_Dirty":106496,"Swap":0}]},
+    {"atMs":16514.479429999483,"accountedTreeTicks":676,"rssBytes":211402752,"pssBytes":210496512,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":490,"reapedChildTicks":186,"startTicks":3666005,"threads":11,"Rss":211402752,"Pss":210496512,"Private_Clean":33771520,"Private_Dirty":176549888,"Swap":0}]},
+    {"atMs":16616.000242000155,"accountedTreeTicks":678,"rssBytes":215465984,"pssBytes":214559744,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":492,"reapedChildTicks":186,"startTicks":3666005,"threads":11,"Rss":215465984,"Pss":214559744,"Private_Clean":33771520,"Private_Dirty":180613120,"Swap":0}]},
+    {"atMs":16717.078408000816,"accountedTreeTicks":678,"rssBytes":215465984,"pssBytes":214559744,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":492,"reapedChildTicks":186,"startTicks":3666005,"threads":11,"Rss":215465984,"Pss":214559744,"Private_Clean":33771520,"Private_Dirty":180613120,"Swap":0}]},
+    {"atMs":16818.034899995837,"accountedTreeTicks":678,"rssBytes":215465984,"pssBytes":214559744,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":492,"reapedChildTicks":186,"startTicks":3666005,"threads":11,"Rss":215465984,"Pss":214559744,"Private_Clean":33771520,"Private_Dirty":180613120,"Swap":0}]},
+    {"atMs":16918.977620996884,"accountedTreeTicks":678,"rssBytes":215465984,"pssBytes":214559744,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":492,"reapedChildTicks":186,"startTicks":3666005,"threads":11,"Rss":215465984,"Pss":214559744,"Private_Clean":33771520,"Private_Dirty":180613120,"Swap":0}]},
+    {"atMs":17019.913871998142,"accountedTreeTicks":678,"rssBytes":215465984,"pssBytes":214559744,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":492,"reapedChildTicks":186,"startTicks":3666005,"threads":11,"Rss":215465984,"Pss":214559744,"Private_Clean":33771520,"Private_Dirty":180613120,"Swap":0}]},
+    {"atMs":17120.896770997206,"accountedTreeTicks":678,"rssBytes":215465984,"pssBytes":214559744,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":492,"reapedChildTicks":186,"startTicks":3666005,"threads":11,"Rss":215465984,"Pss":214559744,"Private_Clean":33771520,"Private_Dirty":180613120,"Swap":0}]},
+    {"atMs":17221.78617499594,"accountedTreeTicks":678,"rssBytes":215465984,"pssBytes":214559744,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":492,"reapedChildTicks":186,"startTicks":3666005,"threads":11,"Rss":215465984,"Pss":214559744,"Private_Clean":33771520,"Private_Dirty":180613120,"Swap":0}]},
+    {"atMs":17322.75772599678,"accountedTreeTicks":678,"rssBytes":215465984,"pssBytes":214559744,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":492,"reapedChildTicks":186,"startTicks":3666005,"threads":11,"Rss":215465984,"Pss":214559744,"Private_Clean":33771520,"Private_Dirty":180613120,"Swap":0}]},
+    {"atMs":17423.895775995334,"accountedTreeTicks":678,"rssBytes":215465984,"pssBytes":214559744,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":492,"reapedChildTicks":186,"startTicks":3666005,"threads":11,"Rss":215465984,"Pss":214559744,"Private_Clean":33771520,"Private_Dirty":180613120,"Swap":0}]},
+    {"atMs":17524.86267299537,"accountedTreeTicks":678,"rssBytes":215465984,"pssBytes":214559744,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":492,"reapedChildTicks":186,"startTicks":3666005,"threads":11,"Rss":215465984,"Pss":214559744,"Private_Clean":33771520,"Private_Dirty":180613120,"Swap":0}]},
+    {"atMs":17625.832255995192,"accountedTreeTicks":678,"rssBytes":215465984,"pssBytes":214559744,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":492,"reapedChildTicks":186,"startTicks":3666005,"threads":11,"Rss":215465984,"Pss":214559744,"Private_Clean":33771520,"Private_Dirty":180613120,"Swap":0}]},
+    {"atMs":17726.897129999998,"accountedTreeTicks":678,"rssBytes":215465984,"pssBytes":214559744,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":492,"reapedChildTicks":186,"startTicks":3666005,"threads":11,"Rss":215465984,"Pss":214559744,"Private_Clean":33771520,"Private_Dirty":180613120,"Swap":0}]},
+    {"atMs":17827.883376994578,"accountedTreeTicks":678,"rssBytes":215465984,"pssBytes":214561792,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":492,"reapedChildTicks":186,"startTicks":3666005,"threads":11,"Rss":215465984,"Pss":214561792,"Private_Clean":33783808,"Private_Dirty":180613120,"Swap":0}]},
+    {"atMs":17928.82206200011,"accountedTreeTicks":678,"rssBytes":215465984,"pssBytes":214565888,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":492,"reapedChildTicks":186,"startTicks":3666005,"threads":11,"Rss":215465984,"Pss":214565888,"Private_Clean":33783808,"Private_Dirty":180613120,"Swap":0}]},
+    {"atMs":18029.655417994945,"accountedTreeTicks":678,"rssBytes":215465984,"pssBytes":214565888,"processes":[{"pid":575709,"name":"MainThread","ppid":575708,"ticks":492,"reapedChildTicks":186,"startTicks":3666005,"threads":11,"Rss":215465984,"Pss":214565888,"Private_Clean":33783808,"Private_Dirty":180613120,"Swap":0}]}
+  ]
+}

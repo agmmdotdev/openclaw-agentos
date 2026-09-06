@@ -27,16 +27,46 @@ test('SDK openat2 file API returns bytes, metadata, batch results and explicit c
   assert.deepEqual([...batch[0].content], [0, 255]); assert.equal(batch[1].content, null);
   await vm.dispose(); assert.equal(await readFile(join(root, 'file'), 'utf8'), 'hello 🐈');
 });
-test('SDK openat2 selection rejects escapes and unsupported operations without fallback', async t => {
+test('SDK openat2 selection rejects escapes and workspace-root mutations without fallback', async t => {
   const { vm, root } = await fixture(t);
   await writeFile(join(root, 'own'), 'safe'); await symlink('own', join(root, 'link'));
   await assert.rejects(vm.filesystem.readFile('link'), { code: 'ELOOP' });
   await assert.rejects(vm.filesystem.readFile('../outside'), { code: 'EXDEV' });
   await assert.rejects(vm.filesystem.readFile(join(root, 'own')), { code: 'INVALID_PATH' });
-  assert.throws(() => vm.filesystem.mkdir('new'), { code: 'UNSUPPORTED_CAPABILITY' });
-  assert.throws(() => vm.filesystem.remove('own'), { code: 'UNSUPPORTED_CAPABILITY' });
+  await assert.rejects(vm.filesystem.remove('.'), { code: 'EINVAL' });
+  await assert.rejects(vm.filesystem.move('own', '.'), { code: 'EINVAL' });
   assert.equal(await readFile(join(root, 'own'), 'utf8'), 'safe');
   await assert.rejects(readFile(join(root, 'new')), { code: 'ENOENT' });
+});
+test('SDK openat2 directory CRUD preserves Unicode names and handles recursion and empty directories', async t => {
+  const { vm, root } = await fixture(t);
+  await vm.filesystem.mkdir('a/🐈/deep', { recursive: true });
+  await vm.filesystem.writeFile('a/🐈/hello\n.txt', 'hello');
+  await vm.filesystem.writeFile('a/🐈/deep/file', 'world');
+  assert.deepEqual((await vm.filesystem.readdir('a')).sort(), ['🐈']);
+  assert.equal((await vm.filesystem.readdirEntries('a'))[0].isDirectory, true);
+  assert.equal((await vm.filesystem.readdirRecursive('a', { maxDepth: 0 })).length, 1);
+  assert.equal((await vm.filesystem.readdirRecursive('a')).length, 4);
+  assert.deepEqual(await vm.filesystem.readdirRecursive('a', { exclude: ['🐈'] }), []);
+  await vm.filesystem.move('a/🐈/hello\n.txt', 'a/moved');
+  assert.equal(await readFile(join(root, 'a/moved'), 'utf8'), 'hello');
+  await assert.rejects(vm.filesystem.remove('a'), { code: 'ENOTEMPTY' });
+  await vm.filesystem.remove('a', { recursive: true });
+  assert.equal(await vm.filesystem.exists('a'), false);
+  await vm.filesystem.mkdir('empty'); await vm.filesystem.remove('empty');
+});
+test('SDK directory operations never follow final or intermediate symlinks', async t => {
+  const { vm, root } = await fixture(t);
+  const outside = await mkdtemp(join(tmpdir(), 'agentos-directory-outside-'));
+  t.after(() => rm(outside, { recursive: true, force: true }));
+  await writeFile(join(outside, 'canary'), 'outside');
+  await vm.filesystem.mkdir('tree'); await symlink(outside, join(root, 'tree/link'));
+  assert.equal((await vm.filesystem.readdirEntries('tree'))[0].isSymbolicLink, true);
+  assert.equal((await vm.filesystem.readdirRecursive('tree'))[0].type, 'symlink');
+  await assert.rejects(vm.filesystem.mkdir('tree/link/child'), e => ['ELOOP', 'ENOTDIR'].includes(e.code));
+  await assert.rejects(vm.filesystem.move('tree/link/canary', 'bad'), e => ['ELOOP', 'ENOTDIR'].includes(e.code));
+  await vm.filesystem.remove('tree', { recursive: true });
+  assert.equal(await readFile(join(outside, 'canary'), 'utf8'), 'outside');
 });
 test('SDK openat2 handle follows pinned workspace identity after a trusted parent rename', async t => {
   const { vm, root } = await fixture(t);

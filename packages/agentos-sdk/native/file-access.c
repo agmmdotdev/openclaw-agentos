@@ -3,6 +3,8 @@
 #define _GNU_SOURCE
 #include <errno.h>
 #include <fcntl.h>
+#include <dirent.h>
+#include <limits.h>
 #include <linux/openat2.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -15,13 +17,69 @@ static _Noreturn void fail(const char *stage) {
   fprintf(stderr, "{\"stage\":\"%s\",\"errno\":%d}\n", stage, errno);
   exit(1);
 }
-static int beneath(const char *path, int flags, unsigned mode) {
+static int at_beneath(int directory, const char *path, int flags, unsigned mode) {
   struct open_how how = {.flags = (unsigned)flags | O_CLOEXEC | O_NOFOLLOW,
     .mode = mode, .resolve = RESOLVE_BENEATH | RESOLVE_NO_MAGICLINKS |
       RESOLVE_NO_SYMLINKS | RESOLVE_NO_XDEV};
-  int fd = syscall(SYS_openat2, 3, path, &how, sizeof(how));
+  int fd = syscall(SYS_openat2, directory, path, &how, sizeof(how));
   if (fd < 0) fail("openat2");
   return fd;
+}
+static int beneath(const char *path, int flags, unsigned mode) { return at_beneath(3, path, flags, mode); }
+static void mutation_path(const char *path) {
+  if (!*path || *path == '/' || strlen(path) >= PATH_MAX) { errno = EINVAL; fail("mutation-path"); }
+  const char *p = path;
+  while (*p) {
+    size_t n = strcspn(p, "/");
+    if (!n || (n == 1 && p[0] == '.') || (n == 2 && p[0] == '.' && p[1] == '.')) { errno = EINVAL; fail("mutation-component"); }
+    p += n;
+    if (*p && !*++p) { errno = EINVAL; fail("mutation-component"); }
+  }
+}
+static int parent(const char *path, char **storage, char **leaf) {
+  mutation_path(path);
+  *storage = strdup(path); if (!*storage) fail("allocate");
+  char *slash = strrchr(*storage, '/');
+  if (!slash) { *leaf = *storage; return beneath(".", O_RDONLY | O_DIRECTORY, 0); }
+  *slash = 0; *leaf = slash + 1;
+  return beneath(*storage, O_RDONLY | O_DIRECTORY, 0);
+}
+static void remove_entry(int directory, const char *name, int recursive, unsigned depth, unsigned *budget) {
+  if (!(*budget)--) { errno = E2BIG; fail("entry-limit"); }
+  struct stat s;
+  if (fstatat(directory, name, &s, AT_SYMLINK_NOFOLLOW)) fail("remove-stat");
+  if (S_ISDIR(s.st_mode) && recursive) {
+    if (depth >= 64) { errno = E2BIG; fail("depth-limit"); }
+    int fd = at_beneath(directory, name, O_RDONLY | O_DIRECTORY, 0);
+    DIR *dir = fdopendir(fd); if (!dir) fail("remove-directory");
+    struct dirent *e;
+    for (;;) {
+      errno = 0; e = readdir(dir); if (!e) { if (errno) fail("remove-readdir"); break; }
+      if (!strcmp(e->d_name, ".") || !strcmp(e->d_name, "..")) continue;
+      remove_entry(fd, e->d_name, 1, depth + 1, budget);
+    }
+    if (closedir(dir)) fail("remove-close");
+  }
+  // Unlink final symlinks themselves. Parent opens never follow symlinks.
+  if (unlinkat(directory, name, S_ISDIR(s.st_mode) ? AT_REMOVEDIR : 0)) fail("unlinkat");
+}
+static void list(const char *path) {
+  int fd = beneath(path, O_RDONLY | O_DIRECTORY, 0);
+  DIR *dir = fdopendir(fd); if (!dir) fail("list-directory");
+  unsigned count = 0; size_t bytes = 0;
+  for (;;) {
+    errno = 0; struct dirent *e = readdir(dir); if (!e) { if (errno) fail("readdir"); break; }
+    if (!strcmp(e->d_name, ".") || !strcmp(e->d_name, "..")) continue;
+    struct stat s;
+    if (fstatat(fd, e->d_name, &s, AT_SYMLINK_NOFOLLOW)) fail("entry-stat");
+    // Hex names preserve arbitrary directory bytes. The SDK explicitly rejects
+    // non-UTF-8 names instead of returning lossy paths for subsequent mutations.
+    bytes += strlen(e->d_name) * 2 + 32;
+    if (++count > 10000 || bytes > 1048576) { errno = E2BIG; fail("directory-limit"); }
+    for (const unsigned char *p = (const unsigned char *)e->d_name; *p; p++) printf("%02x", *p);
+    printf("\t%c\t%lld\n", S_ISDIR(s.st_mode) ? 'd' : S_ISLNK(s.st_mode) ? 'l' : 'f', (long long)s.st_size);
+  }
+  if (closedir(dir)) fail("directory-close");
 }
 static void write_all(int fd, const char *data, size_t size) {
   while (size) {
@@ -32,7 +90,7 @@ static void write_all(int fd, const char *data, size_t size) {
   }
 }
 int main(int argc, char **argv) {
-  if (argc != 4) { errno = EINVAL; fail("arguments"); }
+  if (argc != 4 && argc != 5) { errno = EINVAL; fail("arguments"); }
   char *end;
   errno = 0;
   unsigned long limit = strtoul(argv[3], &end, 10);
@@ -42,7 +100,37 @@ int main(int argc, char **argv) {
   struct stat root;
   if (fstat(3, &root) || !S_ISDIR(root.st_mode)) { errno = ENOTDIR; fail("root-fd"); }
   const char *op = argv[1], *path = argv[2];
+  if ((argc == 5) != !strcmp(op, "move")) { errno = EINVAL; fail("arguments"); }
   if (!*path || path[0] == '/') { errno = EINVAL; fail("relative-path"); }
+  if (!strcmp(op, "list")) { list(path); return 0; }
+  if (!strcmp(op, "mkdir") || !strcmp(op, "mkdir-recursive")) {
+    if (!strcmp(op, "mkdir-recursive") && !strcmp(path, ".")) return 0;
+    mutation_path(path);
+    if (!strcmp(op, "mkdir-recursive")) {
+      char *parts = strdup(path), *save = NULL; if (!parts) fail("allocate");
+      int fd = beneath(".", O_RDONLY | O_DIRECTORY, 0);
+      for (char *part = strtok_r(parts, "/", &save); part; part = strtok_r(NULL, "/", &save)) {
+        if (mkdirat(fd, part, 0700) && errno != EEXIST) fail("mkdirat");
+        int next = at_beneath(fd, part, O_RDONLY | O_DIRECTORY, 0); close(fd); fd = next;
+      }
+      close(fd); free(parts); return 0;
+    }
+    char *storage, *leaf; int fd = parent(path, &storage, &leaf);
+    if (mkdirat(fd, leaf, 0700)) fail("mkdirat");
+    close(fd); free(storage); return 0;
+  }
+  if (!strcmp(op, "move")) {
+    char *a, *b, *from, *to;
+    int first = parent(path, &a, &from), second = parent(argv[4], &b, &to);
+    if (renameat(first, from, second, to)) fail("renameat");
+    close(first); close(second); free(a); free(b); return 0;
+  }
+  if (!strcmp(op, "remove") || !strcmp(op, "remove-recursive")) {
+    char *storage, *leaf; int fd = parent(path, &storage, &leaf);
+    unsigned budget = 10000;
+    remove_entry(fd, leaf, !strcmp(op, "remove-recursive"), 0, &budget);
+    close(fd); free(storage); return 0;
+  }
   if (!strcmp(op, "stat")) {
     int fd = beneath(path, O_PATH, 0);
     struct stat s;

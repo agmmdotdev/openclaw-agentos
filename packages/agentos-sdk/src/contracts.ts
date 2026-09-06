@@ -14,6 +14,7 @@ export interface Capabilities {
  processTreeLimits: false; filesystemQuota: false; virtualRoot: false;
  detachedDescendantContainment: false; sidecar: false;
  filesystemBackend: 'node' | 'linux-openat2';
+ experimentalEnforcement?: 'unverified-linux';
 }
 export interface NativeOptions {
  backend: 'native-node';
@@ -29,7 +30,7 @@ export interface NativeOptions {
  env?: Record<string,string>;
 }
 export interface NativeExit extends ProcessExit { error?: { code: string; message: string }; }
-export interface NativeDescriptor extends ProcessDescriptor { hostPid?: number; }
+export interface NativeDescriptor extends ProcessDescriptor { hostPid?: number; supervisorPid?: number; cgroup?: string; }
 export type Event = ProcessOutputEvent;
 export class SdkError extends Error {
  constructor(public readonly code: string, message: string, public readonly details?: unknown) { super(message); this.name='SdkError'; }

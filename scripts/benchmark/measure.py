@@ -19,6 +19,7 @@ parser.add_argument('--core', action='store_true', help='Use the smaller native 
 parser.add_argument('--allocator', choices=['default', 'compact'], default='default', help='compact: glibc arena/trim settings, applied equally to host and descendants')
 args = parser.parse_args()
 if args.native_sdk and (not (args.native and args.core) or args.hybrid or args.wasmer): parser.error('--native-sdk requires --native --core without another backend')
+if args.native_sdk and os.environ.get('AGENTOS_LINUX_EXPERIMENT') == '1': parser.error('Experimental Linux execution is a host correctness probe, not an accepted performance configuration')
 if args.wasmer and (not (args.native and args.core) or args.hybrid): parser.error('--wasmer requires --native --core without --hybrid')
 if args.hybrid and not (args.native and args.core): parser.error('--hybrid requires --native --core')
 if args.core and (not args.native or args.compiled): parser.error('--core requires --native without --compiled')
@@ -175,7 +176,7 @@ report = {
     'recordedAt': time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime()),
     'instances': args.instances, 'trial': args.trial, 'sampleIntervalMs': args.interval * 1000,
     'nodeSemiSpaceMiB': args.node_semi_space_mb, 'nodeMaxOpt': args.node_max_opt,
-    'nativeSdk': {'security':'trusted-only', 'sandboxed':False, 'processTreeLimits':False} if args.native_sdk else None,
+    'nativeSdk': {'security':'trusted-only', 'sandboxed':False, 'processTreeLimits':False, 'filesystemBackend':os.environ.get('AGENTOS_SDK_FILESYSTEM','node')} if args.native_sdk else None,
     'wasmer': {'sdkVersion': '0.11.0', 'package': 'wasmer/edgejs@0.2.0', 'parallelism': 2, 'experimentalWasmJspi': True, 'filesystem': 'in-memory', 'cacheDirectory': env.get('WASMER_CACHE_DIR', '/tmp/openclaw-wasmer-cache')} if args.wasmer else None,
     'runtime': native_label if args.native else 'agentos', 'splitInitializer': env.get('BENCH_SPLIT_INIT') == '1',
     'sqlStatementCacheSize': int(env.get('BENCH_SQL_STATEMENT_CACHE', '0')),

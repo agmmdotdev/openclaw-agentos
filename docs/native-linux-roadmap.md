@@ -15,10 +15,12 @@ including 20 create/run/dispose cycles, and the real OpenClaw tool probe pass.
 
 This advances M1 and the functional portions of M3/M4. M2 now has an
 [experimental launcher, openat2 primitive and host acceptance runner](native-linux-enforcement-prototype.md).
-The optional `filesystemBackend: 'linux-openat2'` now integrates pinned-descriptor
-read/write/stat/exists/batches with bounded helper admission and lifecycle cleanup.
-Directory operations remain unsupported on that selection. Thirty-one SDK/primitive
-tests pass, including actual seccomp/Node compatibility and descriptor retention;
+The optional `filesystemBackend: 'linux-openat2'` now implements the extracted
+filesystem slice including directory operations. An explicitly experimental SDK
+process path connects the native launcher to a C monitor with manager-death
+detection and child reaping. See [the supervision report](native-linux-sdk-supervision.md).
+Thirty-eight SDK/primitive tests pass, including actual seccomp/Node compatibility,
+descriptor retention and monitor-loop crash tests with test process-group controls;
 Landlock/cgroup acceptance remains blocked, and protected SDK execution is disabled.
 M5 protected-performance acceptance is not passed by the trusted-only
 benchmark. Broader SDK/session/storage APIs remain deferred, with explicit errors.
@@ -62,7 +64,7 @@ supported slice. Test doubles are allowed here but are never labeled sandboxes.
 ## M2 — Establish the Linux execution boundary
 
 Candidate implementation: single-threaded C launcher, strict setup ordering,
-Landlock ABI 6 policy, syscall allowlist, verified cgroup limits, and host test
+  Landlock ABI 6 policy, syscall allowlist, checked cgroup limits, and host test
 orchestration. Available primitive/Node tests pass. The checkboxes below still
 require real host acceptance and final launcher/supervisor selection; source code
 and a seccomp-only diagnostic do not satisfy the complete boundary gate.

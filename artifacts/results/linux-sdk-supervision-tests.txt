@@ -1,0 +1,54 @@
+
+> @agmmdotdev/openclaw-agentos@0.1.0 test:sdk
+> npm run sdk:build && node --test --test-concurrency=1 packages/agentos-sdk/test/*.test.mjs
+
+
+> @agmmdotdev/openclaw-agentos@0.1.0 sdk:build
+> npm exec -- tsc -p packages/agentos-sdk/tsconfig.json && node packages/agentos-sdk/scripts/build-native.mjs
+
+✔ SDK openat2 file API returns bytes, metadata, batch results and explicit capabilities (25.736653ms)
+✔ SDK openat2 selection rejects escapes and workspace-root mutations without fallback (12.965503ms)
+✔ SDK openat2 directory CRUD preserves Unicode names and handles recursion and empty directories (25.654449ms)
+✔ SDK directory operations never follow final or intermediate symlinks (14.482821ms)
+✔ SDK openat2 handle follows pinned workspace identity after a trusted parent rename (9.845711ms)
+✔ SDK openat2 enforces file, aggregate batch and active-helper limits (11.387785ms)
+✔ SDK openat2 disposal stops admission and settles in-flight helpers (7.841009ms)
+✔ SDK openat2 repeated create/dispose and failed construction close pinned descriptors (71.73439ms)
+✔ openat2 read/write/stat use the pinned directory descriptor after root rename (15.065709ms)
+✔ openat2 rejects traversal, absolute paths and every symlink component (30.598211ms)
+✔ special files and hardlinks cannot be read or truncated by file helper (13.69962ms)
+✔ bounded file operations reject excess data without publishing partial reads or truncating on excess input (8.816138ms)
+✔ concurrent directory/symlink replacement cannot redirect helper reads or writes outside root (318.242459ms)
+✔ fixed seccomp self-test installs a filter and checks denied and permitted calls (2.117452ms)
+✔ actual syscall filter permits native Node files, threads and child processes (no Landlock/cgroup claim) (223.393936ms)
+✔ incomplete launcher enforcement fails before executing payload (3.939359ms)
+✔ protected mode fails before creating workspace; never falls back (15.813538ms)
+✔ unknown options and implicit trust are rejected (3.962803ms)
+✔ filesystem CRUD, batches, metadata, recursive listings and persistence (12.238017ms)
+✔ direct traversal and symlink outside workspace rejected (not a race-proof sandbox test) (2.75919ms)
+✔ native process argv, cwd, environment, stdin, Unicode output, exit and replay (69.537457ms)
+✔ nonzero, missing executable, capture modes and invalid options (6.56793ms)
+✔ timeout and AbortSignal terminate commands (106.314559ms)
+✔ output and input bounds; callback failure cannot crash the host (34.094344ms)
+✔ managed admission limits, bounded history and stale handles (19.375942ms)
+✔ dispose racing with spawn settles and never launches after disposal (5.882147ms)
+✔ same-process-group descendants are stopped when shell exits (4.548842ms)
+✔ JavaScript module, CommonJS and file execution use native Node (87.676704ms)
+✔ 20 create/run/dispose lifecycles leave no managed children; files reopen (59.885322ms)
+✔ unsupported SDK surfaces fail explicitly (4.989531ms)
+✔ oversized initial stdin is rejected before a child launches (1.110655ms)
+✔ shared extracted contract: native-node (56.937829ms)
+✔ shared extracted contract: agentos (1582.259495ms)
+✔ production supervisor rejects ordinary directories before running a payload (11.848871ms)
+✔ supervisor loop preserves stdout and root exit and reaps adopted children (test process-group controls) (198.099667ms)
+✔ supervisor loop detects explicit cancellation and manager pipe EOF (test process-group controls) (145.486887ms)
+✔ supervisor survives an actual manager SIGKILL and reaps its job (test process-group controls) (175.158976ms)
+✔ experimental SDK rejects absent acknowledgement and unavailable enforcement before opening a workspace (8.151207ms)
+ℹ tests 38
+ℹ suites 0
+ℹ pass 38
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 3790.203099

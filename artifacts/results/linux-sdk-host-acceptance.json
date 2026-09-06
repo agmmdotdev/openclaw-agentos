@@ -1,0 +1,40 @@
+{
+  "date": "2026-09-06T14:21:13.584Z",
+  "kind": "experimental-linux-sdk-host",
+  "status": "blocked",
+  "sandboxEnforcementVerified": false,
+  "host": {
+    "platform": "linux",
+    "kernel": "6.18.35",
+    "architecture": "x64",
+    "landlock": {
+      "landlockAbi": -1,
+      "landlockErrno": 38
+    },
+    "cgroupControllers": "cpuset cpu io memory hugetlb pids",
+    "cgroupSubtreeControl": "",
+    "cgroupWritable": false,
+    "processSecurity": [
+      "CapEff:\t0000000000000000",
+      "CapBnd:\t0000000000000000",
+      "NoNewPrivs:\t1",
+      "Seccomp:\t2"
+    ],
+    "launcherImplemented": false,
+    "sandboxEnforcementVerified": false,
+    "experimentalLauncher": {
+      "implemented": true,
+      "sdkIntegrated": true,
+      "productionModeEnabled": false,
+      "supervisorImplemented": true,
+      "minimumLandlockAbi": 6,
+      "architecture": "x64",
+      "acceptance": "unverified"
+    }
+  },
+  "blockers": [
+    "Usable Landlock ABI >=6 is required",
+    "AGENTOS_TEST_CGROUP delegation is required"
+  ],
+  "tests": []
+}

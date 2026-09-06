@@ -8,7 +8,8 @@ import type { SpawnOptions, LanguageExecutionOptions, CodeExecutionResult, Execu
 import { createFileApi } from './filesystem.js';
 import { inspectLinuxCapabilities } from './preflight.js';
 import type { LinuxFileAccess } from './linux-filesystem.js';
-type RecordEntry={ descriptor:NativeDescriptor; child:ChildProcessWithoutNullStreams; done:Promise<NativeExit>; exit?:NativeExit; events:Event[]; sequence:number; bytes:number; failure?:{code:string,message:string}; timeout:boolean; };
+import type { LinuxExperimentOptions, LinuxProcessDriver, LinuxJob } from './linux-process-driver.js';
+type RecordEntry={ descriptor:NativeDescriptor; child:ChildProcessWithoutNullStreams; job?:LinuxJob; done:Promise<NativeExit>; exit?:NativeExit; events:Event[]; sequence:number; bytes:number; failure?:{code:string,message:string}; timeout:boolean; };
 const allowedSpawn=['cwd','env','stdin','timeoutMs','signal','onStdout','onStderr','output'];
 const signals=new Set<ExecutionSignal>(['SIGHUP','SIGINT','SIGQUIT','SIGTERM','SIGKILL','SIGSTOP','SIGCONT','SIGUSR1','SIGUSR2']);
 export class NativeAgentOs implements Backend {
@@ -27,8 +28,8 @@ export class NativeAgentOs implements Backend {
  #maxOutput:number;
  #maxRetained:number;
  #inFlight=0;
- private constructor(root:string,options:NativeOptions,private fileAccess?:LinuxFileAccess){
-  this.capabilities=Object.freeze({backend:'native-node',sandboxed:false,security:'trusted-only',processTreeLimits:false,filesystemQuota:false,virtualRoot:false,detachedDescendantContainment:false,sidecar:false,filesystemBackend:options.filesystemBackend??'node'});
+ private constructor(root:string,options:NativeOptions,private fileAccess?:LinuxFileAccess,private linuxDriver?:LinuxProcessDriver){
+  this.capabilities=Object.freeze({backend:'native-node',sandboxed:false,security:'trusted-only',processTreeLimits:false,filesystemQuota:false,virtualRoot:false,detachedDescendantContainment:false,sidecar:false,filesystemBackend:options.filesystemBackend??'node',...(linuxDriver?{experimentalEnforcement:'unverified-linux' as const}:{})});
   this.workspaceDir=root;
   this.#maxActive=positive(options.managedProcessLimit??32,'managedProcessLimit');
   this.#maxOutput=positive(options.outputLimitBytes??1048576,'outputLimitBytes');
@@ -71,6 +72,14 @@ export class NativeAgentOs implements Backend {
  get cron():never { return unsupported('cron'); }
  get sidecar():never { return unsupported('sidecar'); }
  static async create(options:NativeOptions){
+  return NativeAgentOs.#create(options);
+ }
+ static async createLinuxExperiment(options:LinuxExperimentOptions){
+  const {LinuxProcessDriver,nativeOptions}=await import('./linux-process-driver.js');
+  const driver=await LinuxProcessDriver.create(options);
+  return NativeAgentOs.#create(nativeOptions(options),driver);
+ }
+ static async #create(options:NativeOptions,driver?:LinuxProcessDriver){
   rejectUnknown(options,['backend','workspaceDir','security','managedProcessLimit','outputLimitBytes','retainedProcessLimit','maxFileBytes','filesystemBackend','env'],'create');
   if(process.platform!=='linux')throw new SdkError('UNSUPPORTED_PLATFORM','This backend is currently tested only on Linux');
   if(options.security!=='trusted-only')throw new SdkError('SANDBOX_UNAVAILABLE','Linux sandbox execution is unavailable: no verified enforcement launcher is implemented. Trusted-only execution requires explicit opt-in.',await inspectLinuxCapabilities());
@@ -83,13 +92,14 @@ export class NativeAgentOs implements Backend {
     const {LinuxFileAccess}=await import('./linux-filesystem.js');
     files=await LinuxFileAccess.create(root,options.maxFileBytes??16777216);
    }
-   return new NativeAgentOs(root,options,files);
+   return new NativeAgentOs(root,options,files,driver);
   } catch(e) {await files?.dispose();throw e;}
  }
  #assertOpen(){if(this.#closed)throw new SdkError('DISPOSED','Workspace handle is disposed');}
  #get(pid:number){this.#assertOpen();const r=this.#records.get(pid);if(!r)throw new SdkError('PROCESS_NOT_FOUND','Unknown or evicted process handle');return r;}
  #kill(r:RecordEntry,signal:ExecutionSignal){
   if(r.exit||r.descriptor.state==='exited')return;
+  if(r.job){r.job.signal(signal);return;}
   try{process.kill(-r.child.pid!,signal);}catch(e){if((e as NodeJS.ErrnoException).code!=='ESRCH')throw e;}
  }
  async #spawn(command:string,args:string[],options:SpawnOptions):Promise<NativeDescriptor>{
@@ -106,10 +116,17 @@ export class NativeAgentOs implements Backend {
    if(!(await stat(cwd)).isDirectory())throw new SdkError('INVALID_CWD','cwd must be a directory');
    this.#assertOpen();if(options.signal?.aborted)throw new SdkError('ABORTED','Execution aborted before spawn');
    const env={...this.#env,...options.env};for(const [k,v] of Object.entries(env))if(typeof v!=='string'||v.includes('\0')||k.includes('=')||k.includes('\0'))throw new SdkError('INVALID_ENV','Invalid environment entry');
-   const child=spawnChild(command,args,{cwd,env,detached:true,stdio:['pipe','pipe','pipe']});
+   let job:LinuxJob|undefined;
+   if(this.linuxDriver){
+    if(options.env&&Object.keys(options.env).length)throw new SdkError('UNSUPPORTED_OPTION','Custom environment is not supported in the Linux experiment');
+    const prepared=await this.linuxDriver.prepare(command,args,cwd);
+    try {this.#assertOpen();if(options.signal?.aborted)throw new SdkError('ABORTED','Aborted during cgroup setup');job=prepared();}
+    catch(e){await prepared.cancel();throw e;}
+   }
+   const child=job?.child??spawnChild(command,args,{cwd,env,detached:true,stdio:['pipe','pipe','pipe']});
    const pid=this.#next++;let complete!:(exit:NativeExit)=>void;
    const done=new Promise<NativeExit>(r=>complete=r);
-   const r:RecordEntry={descriptor:{pid,state:'running',command,startedAtMs:Date.now(),hostPid:child.pid},child,done,events:[],sequence:0,bytes:0,timeout:false};
+   const r:RecordEntry={descriptor:{pid,state:'running',command,startedAtMs:Date.now(),hostPid:child.pid},child,job,done,events:[],sequence:0,bytes:0,timeout:false};
    this.#records.set(pid,r);
    let timer:ReturnType<typeof setTimeout>|undefined;
    const abort=()=>{r.failure={code:'ABORTED',message:'Execution aborted'};this.#kill(r,'SIGKILL');};
@@ -133,14 +150,19 @@ export class NativeAgentOs implements Backend {
    child.stdout.on('data',b=>collect('stdout',b));child.stderr.on('data',b=>collect('stderr',b));
    // EPIPE is exposed through writes; an unused stream error must not crash the manager.
    child.stdin.on('error',e=>{if((e as NodeJS.ErrnoException).code!=='EPIPE'&&!r.exit)r.failure={code:'STDIN_ERROR',message:e.message};});
-   child.once('exit',()=>{this.#kill(r,'SIGKILL');}); // close same-group descendants holding pipes
-   child.once('close',(code,signal)=>{finish(code,signal);child.stdout.removeAllListeners('data');child.stderr.removeAllListeners('data');child.removeAllListeners('error');});
+   if(!job)child.once('exit',()=>{this.#kill(r,'SIGKILL');}); // native diagnostic process-group cleanup
+   child.once('close',(code,signal)=>{
+    if(job)void job.finish().then(result=>finish(result.code,result.signal),error=>finish(null,null,error));
+    else finish(code,signal);
+    child.stdout.removeAllListeners('data');child.stderr.removeAllListeners('data');child.removeAllListeners('error');
+   });
    child.once('error',error=>finish(null,null,error));
    const started=new Promise<void>((ok,no)=>{child.once('spawn',ok);child.once('error',no);});
    if(options.timeoutMs)timer=setTimeout(()=>{r.timeout=true;this.#kill(r,'SIGKILL');},options.timeoutMs);
    options.signal?.addEventListener('abort',abort,{once:true});
    if(options.signal?.aborted)abort();
-   await started;
+   await (job?Promise.all([started,job.ready]):started);
+   if(job){r.descriptor.supervisorPid=child.pid;r.descriptor.hostPid=job.rootPid;r.descriptor.cgroup=job.cgroup;}
    if(this.#closed)this.#kill(r,'SIGKILL');
    if(options.stdin!==undefined){try{await this.process.writeStdin(pid,options.stdin);await this.process.closeStdin(pid);}catch(e){this.#kill(r,'SIGKILL');throw e;}}
    return {...r.descriptor};
@@ -179,7 +201,7 @@ export class NativeAgentOs implements Backend {
    // Trusted diagnostics cannot contain setsid() escapees: bound teardown instead
    // of claiming an entire hostile descendant tree is controlled.
    let timer:ReturnType<typeof setTimeout>|undefined;
-   try{await Promise.race([Promise.all(records.map(r=>r.done)),new Promise<void>((_,no)=>{timer=setTimeout(()=>no(new SdkError('CLEANUP_TIMEOUT','A descendant may have escaped the managed process group')),3000);})]);}
+   try{await Promise.race([Promise.all(records.map(r=>r.done)),new Promise<void>((_,no)=>{timer=setTimeout(()=>no(new SdkError('CLEANUP_TIMEOUT','Process cleanup did not finish within the configured bound')),this.linuxDriver?6000:3000);})]);}
    finally{clearTimeout(timer);for(const r of records){r.child.stdin.destroy();r.child.stdout.destroy();r.child.stderr.destroy();}this.#records.clear();const fileError=await fileResult;if(fileError)throw fileError;}
   })();return this.#dispose;
  }
