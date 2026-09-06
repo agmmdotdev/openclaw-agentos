@@ -39,6 +39,8 @@
     "probe:async-context": "node scripts/probe-async-context.mjs",
     "core:report": "node scripts/summarize-core-results.mjs",
     "bench:build": "node scripts/benchmark/build.mjs",
+    "bench:wasmer:prewarm": "node scripts/benchmark/prewarm-wasmer.mjs",
+    "test:wasmer": "python3 scripts/benchmark/probe-hybrid.py --wasmer --node-memory-profile",
     "test:hybrid:memory": "python3 scripts/benchmark/probe-hybrid.py --node-memory-profile",
     "test:hybrid": "python3 scripts/benchmark/probe-hybrid.py",
     "bench:core": "python3 scripts/benchmark/measure.py",
@@ -58,6 +60,7 @@
   },
   "devDependencies": {
     "@types/node": "^24.0.0",
+    "@wasmer/sdk": "0.11.0",
     "esbuild": "0.28.2",
     "openclaw": "2026.8.1",
     "tsx": "^4.21.0",

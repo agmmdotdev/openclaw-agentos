@@ -67,6 +67,7 @@ for path in sorted(folder.glob('benchmark-*.json')):
         'idleMs':report.get('idleMs',1500),
         'representativeConfig':event('representative:config'),
         'representativeResult':event('representative:complete'),
+        'wasmer':report.get('wasmer'),
         'activeMedianPssMiB':median_memory(event('cold-turn:start')['receivedAtMs'],event(last_warm)['receivedAtMs']) if event('cold-turn:start') and event(last_warm) else None,
         'workload':report.get('diagnostics',{}).get('BENCH_WORKLOAD') or 'core-shell',
         'profile':report.get('coreManifest',{}).get('profile','full'),
@@ -99,9 +100,9 @@ for path in sorted(folder.glob('benchmark-*.json')):
         'baselinePssMiB':checkpoint_memory('baseline'),'emptyVmsPssMiB':checkpoint_memory('empty-vms'),
         'stagedPssMiB':checkpoint_memory('staged'),'disposedVmsPssMiB':checkpoint_memory('disposed-host-gc'),
         'disposedSidecarsPssMiB':checkpoint_memory('sidecars-disposed')})
-result={'method':{'memory':'MiB; sampled process-tree PSS includes Node driver and native sidecars; RSS also retained',
+result={'method':{'memory':'MiB; sampled process-tree PSS includes Node, its worker threads, and native sidecars/children where present; RSS also retained',
     'cpu':'Sum of maximum sampled CPU ticks per PID/start-time identity; phases align event clocks, include reaped children where indicated, and use nearest 100 ms samples and are emitted only for one VM. Approximate, may miss CPU between the last sample and exit',
-    'latency':'Same read + shell exec turn, synthetic inference, six turns per guest by default (BENCH_WARM_TURNS extends the run); cold means fresh process/storage with warm host file cache',
+    'latency':'See each run workload and representativeConfig: identical fixtures within a comparison, synthetic inference; BENCH_WARM_TURNS selects repeat count; cold means fresh process/storage with warm host file cache',
     'scope':'Small local experiment, not production capacity or cloud billing'},'runs':rows}
 (folder/args.output).write_text(json.dumps(result,indent=2)+'\n')
 for row in rows:
