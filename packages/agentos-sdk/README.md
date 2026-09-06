@@ -13,7 +13,8 @@ capability report, before opening a workspace or launching workload code. No
 verified Linux enforcement launcher is integrated. An experimental C launcher,
 openat2 file helper and host acceptance runner now exist; see
 [the enforcement report](../../docs/native-linux-enforcement-prototype.md).
-They are separate from ordinary SDK execution. This cannot be fixed merely
+The process launcher remains separate from SDK execution. The file helper can be
+selected explicitly as described below. This cannot be fixed merely
 by selecting a flag or installing the SDK on another host.
 
 ## Build and use from this repository
@@ -131,10 +132,52 @@ caller is trusted; hostile caller allocations/callbacks are outside this model.
 Unknown create and execution options are rejected rather than silently treating
 unsupported permissions or resource limits as enforced.
 
-## Unsupported native APIs
+## Explicit openat2 filesystem selection
+
+Set `filesystemBackend: 'linux-openat2'` when creating a **trusted-only** native
+handle to use the native file helper through the SDK. This does not sandbox
+`process` or `javascript` calls. `capabilities.sandboxed` remains false, and
+`security: 'linux-sandbox'` still rejects.
+
+```js
+const vm = await AgentOs.create({
+  backend: 'native-node',
+  workspaceDir: '/absolute/path/to/existing/workspace',
+  security: 'trusted-only',
+  filesystemBackend: 'linux-openat2',
+});
+try {
+  await vm.filesystem.writeFile('hello.txt', 'hello');
+  console.log(await vm.filesystem.readFile('hello.txt'));
+} finally {
+  await vm.dispose();
+}
+```
+
+This selection supports `readFile`, `writeFile`, `stat`, `exists`, `readFiles`, and
+`writeFiles`. Other file methods throw `UNSUPPORTED_CAPABILITY`; there is no Node
+filesystem fallback. Paths must be relative, all symlinks and nested mounts are
+rejected, and read/write targets must be regular files with one link. The workspace
+descriptor is pinned until disposal; only the file API follows that identity after
+a trusted parent renames it. Native process cwd handling still uses `workspaceDir`.
+
+At most four helpers run per handle. Files/read batches are bounded by
+`maxFileBytes` (maximum 16 MiB for this selection). Excess concurrency rejects
+with `FILE_OPERATION_LIMIT`; helpers have a five-second timeout. Disposal stops
+admission, kills active helpers, waits up to three seconds, and closes the pinned
+directory. A kernel I/O stall may still produce `CLEANUP_TIMEOUT`. No helper is
+kept running while the handle is idle. Unsupported helper/kernel capability fails
+at creation, with no fallback. `stat` supplies exact bigint size/inode/link fields;
+birth time is unavailable and reported as zero. Writes are not transactional.
+
+The default `filesystemBackend: 'node'` retains the original trusted filesystem
+surface. It does not use these stronger resolution checks. The original PR8 RAM
+measurements predate this integration and are historical, not new measurements.
+
+## Remaining unsupported native APIs
 
 Linux sandbox enforcement, hard process-tree limits, filesystem quotas,
-race-resistant host file brokering, bindings, sessions/ACP, persistent contexts,
+complete host file brokering (including directory mutation), bindings, sessions/ACP, persistent contexts,
 PTY/terminal, Python and TypeScript convenience APIs, npm installation helpers,
 network services, software catalog projection, cron, virtual/custom mounts,
 snapshots, and arbitrary SDK compatibility are not implemented. Accessing the

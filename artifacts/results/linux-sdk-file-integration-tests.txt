@@ -1,0 +1,47 @@
+
+> @agmmdotdev/openclaw-agentos@0.1.0 test:sdk
+> npm run sdk:build && node --test --test-concurrency=1 packages/agentos-sdk/test/*.test.mjs
+
+
+> @agmmdotdev/openclaw-agentos@0.1.0 sdk:build
+> npm exec -- tsc -p packages/agentos-sdk/tsconfig.json && node packages/agentos-sdk/scripts/build-native.mjs
+
+✔ SDK openat2 file API returns bytes, metadata, batch results and explicit capabilities (20.496324ms)
+✔ SDK openat2 selection rejects escapes and unsupported operations without fallback (7.378492ms)
+✔ SDK openat2 handle follows pinned workspace identity after a trusted parent rename (8.53825ms)
+✔ SDK openat2 enforces file, aggregate batch and active-helper limits (11.787698ms)
+✔ SDK openat2 disposal stops admission and settles in-flight helpers (9.068609ms)
+✔ SDK openat2 repeated create/dispose and failed construction close pinned descriptors (70.450903ms)
+✔ openat2 read/write/stat use the pinned directory descriptor after root rename (14.908091ms)
+✔ openat2 rejects traversal, absolute paths and every symlink component (23.06731ms)
+✔ special files and hardlinks cannot be read or truncated by file helper (12.863049ms)
+✔ bounded file operations reject excess data without publishing partial reads or truncating on excess input (8.178447ms)
+✔ concurrent directory/symlink replacement cannot redirect helper reads or writes outside root (324.192299ms)
+✔ fixed seccomp self-test installs a filter and checks denied and permitted calls (2.646499ms)
+✔ actual syscall filter permits native Node files, threads and child processes (no Landlock/cgroup claim) (216.498745ms)
+✔ incomplete launcher enforcement fails before executing payload (4.120191ms)
+✔ protected mode fails before creating workspace; never falls back (17.917818ms)
+✔ unknown options and implicit trust are rejected (3.858707ms)
+✔ filesystem CRUD, batches, metadata, recursive listings and persistence (10.570854ms)
+✔ direct traversal and symlink outside workspace rejected (not a race-proof sandbox test) (2.821313ms)
+✔ native process argv, cwd, environment, stdin, Unicode output, exit and replay (63.339924ms)
+✔ nonzero, missing executable, capture modes and invalid options (5.883068ms)
+✔ timeout and AbortSignal terminate commands (105.590627ms)
+✔ output and input bounds; callback failure cannot crash the host (31.972245ms)
+✔ managed admission limits, bounded history and stale handles (15.463484ms)
+✔ dispose racing with spawn settles and never launches after disposal (1.452048ms)
+✔ same-process-group descendants are stopped when shell exits (2.854112ms)
+✔ JavaScript module, CommonJS and file execution use native Node (82.997324ms)
+✔ 20 create/run/dispose lifecycles leave no managed children; files reopen (49.253506ms)
+✔ unsupported SDK surfaces fail explicitly (1.480842ms)
+✔ oversized initial stdin is rejected before a child launches (2.269461ms)
+✔ shared extracted contract: native-node (46.059508ms)
+✔ shared extracted contract: agentos (1439.907223ms)
+ℹ tests 31
+ℹ suites 0
+ℹ pass 31
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2893.643436

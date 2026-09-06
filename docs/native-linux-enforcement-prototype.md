@@ -3,7 +3,11 @@
 Recorded 2026-09-06. This is an **experimental host-acceptance candidate**, not an
 enabled SDK sandbox. The native SDK still requires `security: 'trusted-only'`;
 `security: 'linux-sandbox'` still fails before workspace access or execution.
-The new helpers are not invoked by ordinary SDK file/process calls.
+The process launcher is not integrated into SDK execution. A subsequent SDK
+integration now selects the file helper with `filesystemBackend: 'linux-openat2'`
+for six file methods; see the package README. Default SDK file calls remain on
+the trusted Node implementation. The evidence below records the initial PR9
+prototype; the subsequent integration passes 31 tests.
 
 ## Implemented and tested here
 

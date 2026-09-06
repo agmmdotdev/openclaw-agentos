@@ -15,7 +15,10 @@ including 20 create/run/dispose cycles, and the real OpenClaw tool probe pass.
 
 This advances M1 and the functional portions of M3/M4. M2 now has an
 [experimental launcher, openat2 primitive and host acceptance runner](native-linux-enforcement-prototype.md).
-Twenty-five SDK/primitive tests pass, including actual seccomp/Node compatibility;
+The optional `filesystemBackend: 'linux-openat2'` now integrates pinned-descriptor
+read/write/stat/exists/batches with bounded helper admission and lifecycle cleanup.
+Directory operations remain unsupported on that selection. Thirty-one SDK/primitive
+tests pass, including actual seccomp/Node compatibility and descriptor retention;
 Landlock/cgroup acceptance remains blocked, and protected SDK execution is disabled.
 M5 protected-performance acceptance is not passed by the trusted-only
 benchmark. Broader SDK/session/storage APIs remain deferred, with explicit errors.
