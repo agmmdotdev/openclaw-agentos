@@ -16,7 +16,8 @@ if (!['upload', 'host_dir'].includes(artifactMode)) throw new Error('Unknown COR
 let artifactStore;
 const sqliteRoot = await mkdtemp(join(tmpdir(), 'openclaw-agentos-sqlite-'));
 await mkdir(join(sqliteRoot, 'databases'));
-const sqlite = await createCoreHostSqlite(join(sqliteRoot, 'databases'));
+const statementCacheSize = Number(process.env.CORE_SQL_STATEMENT_CACHE ?? 0);
+const sqlite = await createCoreHostSqlite(join(sqliteRoot, 'databases'), { statementCacheSize });
 const options = {
   // Concurrent VMs with different bindings cannot share agentOS 0.2.19's host
   // callback handler. Retain this pool across recreation of this one tenant.
@@ -112,6 +113,6 @@ try {
 } finally {
   await mkdir('artifacts/results', { recursive: true });
   const validationPassed = completed && reports.length === 3 && reports.every(report => report.result.exitCode === 0 && report.result.outcome === 'succeeded');
-  await writeFile('artifacts/results/core-probe.json', JSON.stringify({ recordedAt: new Date().toISOString(), node: process.version, artifactMode, canonicalBatching: process.env.CORE_CANONICAL_BATCHING === '1', validationPassed, openclaw: '2026.8.1', agentos: '0.2.19', runtimeEnvironment: Object.fromEntries(['MALLOC_ARENA_MAX', 'MALLOC_TRIM_THRESHOLD_', 'MALLOC_MMAP_THRESHOLD_', 'AGENTOS_V8_WARM_ISOLATES'].map(key => [key, process.env[key] ?? null])), sqlite: sqlite.stats, reports }, null, 2) + '\n');
+  await writeFile(statementCacheSize ? `artifacts/results/core-probe-statement-cache-${statementCacheSize}.json` : 'artifacts/results/core-probe.json', JSON.stringify({ statementCacheSize, recordedAt: new Date().toISOString(), node: process.version, artifactMode, canonicalBatching: process.env.CORE_CANONICAL_BATCHING === '1', validationPassed, openclaw: '2026.8.1', agentos: '0.2.19', runtimeEnvironment: Object.fromEntries(['MALLOC_ARENA_MAX', 'MALLOC_TRIM_THRESHOLD_', 'MALLOC_MMAP_THRESHOLD_', 'AGENTOS_V8_WARM_ISOLATES'].map(key => [key, process.env[key] ?? null])), sqlite: sqlite.stats, reports }, null, 2) + '\n');
   await vm?.dispose(); sqlite.dispose(); await vm?.sidecar.dispose(); await artifactStore?.dispose(); await rm(sqliteRoot, { recursive: true, force: true });
 }

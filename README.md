@@ -98,6 +98,11 @@ listener-table representation. See the report for these compatibility limits.
 
 ## Performance and placement
 
+The [statement reuse experiment](docs/sqlite-statement-reuse.md) reduces host
+statement prepares by **18%**, but repeated full-core runs do not establish a
+warm CPU, latency or memory gain. It remains disabled by default. Enable it
+with `CORE_SQL_STATEMENT_CACHE=32 npm run test:core:economy`.
+
 The [canonical table experiment](docs/runtime-canonical-pass.md) reduces cold
 SQLite calls from **1,373 to 961** and launch-to-first-result from **3.36 to
 2.90 s** across three runs per configuration. It stays **opt-in**: warm CPU
