@@ -21,6 +21,11 @@ const markerStart = nativeFixture.indexOf('function mark('), markerEnd = nativeF
 if (markerStart < 0 || markerEnd < 0) throw new Error('Native fixture marker boundary changed');
 nativeFixture = nativeFixture.slice(0, markerStart) + `
 const memoryCheckpoint = process.env.BENCH_NATIVE_MEMORY === "1" ? (await import("../../scripts/benchmark/native-memory.mjs")).nativeMemoryCheckpoint : () => ({});
+if (process.env.BENCH_REQUEST_TURN !== undefined) {
+  if (process.env.BENCH_WORKLOAD !== 'core-workload') throw new Error('Request mode requires representative workload');
+  const { beginRequest } = await import('../../scripts/core/request-state.mjs');
+  globalThis.__benchmarkRequestState = await beginRequest(process.env.BENCH_ROOT + "/state", Number(process.env.BENCH_REQUEST_TURN));
+}
 const benchStart = performance.now();
 const benchWorkspace = process.env.BENCH_ROOT + "/workspace", benchState = process.env.BENCH_ROOT + "/state";
 function mark(label, data = {}) { console.log('BENCH_EVENT=' + JSON.stringify({ label, atMs: performance.now() - benchStart, instance: 0, ...data, ...memoryCheckpoint(label) })); }
@@ -78,7 +83,7 @@ await writeFile('artifacts/core/native-sdk-probe.mjs', nativeCore + '\n' + nativ
 
 // Capture the actual fixture/build/adapter inputs and generated entries in reports.
 const benchmarkHashes = {};
-for (const path of ['packages/agentos-sdk/dist/linux-filesystem.js', 'packages/agentos-sdk/dist/linux-process-driver.js', 'packages/agentos-sdk/dist/linux-file-access', 'packages/agentos-sdk/dist/linux-launcher-experimental', 'packages/agentos-sdk/dist/linux-supervisor-experimental', 'scripts/benchmark/native-sdk-adapter.mjs', 'packages/agentos-sdk/dist/native.js', 'packages/agentos-sdk/dist/filesystem.js', 'packages/agentos-sdk/dist/native-entry.js', 'artifacts/core/native-sdk-core-benchmark.mjs', 'scripts/benchmark/wasmer-adapter.mjs', 'artifacts/core/wasmer-core-benchmark.mjs', 'scripts/benchmark/build.mjs', 'scripts/benchmark/hybrid-adapter.mjs', 'test/fixtures/core-benchmark.mjs', 'test/fixtures/core-workload-benchmark.mjs', 'artifacts/core/benchmark.mjs', 'artifacts/core/native-core-benchmark.mjs', 'artifacts/core/hybrid-core-benchmark.mjs']) {
+for (const path of ['scripts/core/request-state.mjs', 'packages/agentos-sdk/dist/linux-filesystem.js', 'packages/agentos-sdk/dist/linux-process-driver.js', 'packages/agentos-sdk/dist/linux-file-access', 'packages/agentos-sdk/dist/linux-launcher-experimental', 'packages/agentos-sdk/dist/linux-supervisor-experimental', 'scripts/benchmark/native-sdk-adapter.mjs', 'packages/agentos-sdk/dist/native.js', 'packages/agentos-sdk/dist/filesystem.js', 'packages/agentos-sdk/dist/native-entry.js', 'artifacts/core/native-sdk-core-benchmark.mjs', 'scripts/benchmark/wasmer-adapter.mjs', 'artifacts/core/wasmer-core-benchmark.mjs', 'scripts/benchmark/build.mjs', 'scripts/benchmark/hybrid-adapter.mjs', 'test/fixtures/core-benchmark.mjs', 'test/fixtures/core-workload-benchmark.mjs', 'artifacts/core/benchmark.mjs', 'artifacts/core/native-core-benchmark.mjs', 'artifacts/core/hybrid-core-benchmark.mjs']) {
   benchmarkHashes[path] = createHash('sha256').update(await readFile(path)).digest('hex');
 }
 await writeFile('artifacts/core/benchmark-manifest.json', JSON.stringify({ fixtureSourceSha256: createHash('sha256').update(fixtureSource).digest('hex'), hashes: benchmarkHashes }, null, 2) + '\n');

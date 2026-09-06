@@ -1,0 +1,40 @@
+{
+  "baseCommit": "7bc2a119761111f071a007650cf0bbd58b204d3c",
+  "sdkTests": {
+    "passed": 48,
+    "failed": 0,
+    "skipped": 0,
+    "knownLimitationAssertions": 1
+  },
+  "checkpointTests": {
+    "passed": 3,
+    "failed": 0
+  },
+  "comparisonRuns": 24,
+  "longRequestFollowup": {
+    "processes": 21,
+    "toolCalls": 105,
+    "passed": true
+  },
+  "finalCheckpointSmoke": "lifecycle-sdk-request-cache-1641.json",
+  "protectedExecution": false,
+  "sourceHashes": {
+    "packages/agentos-sdk/src/filesystem.ts": "6228ebf44ac8b21546ae9e2b429e1e13a0f5dda257ba23606d82a118986dfa88",
+    "packages/agentos-sdk/dist/filesystem.js": "e8a93ab7965f537c6613ba9f0f030f209028b8e840e6dd609d50a1e35a6f04e2",
+    "scripts/core/request-state.mjs": "f73f61cc0bce226027c2689af2e6efd4ebac22e2b381cc5001a07a52007db792",
+    "scripts/benchmark/build.mjs": "4d4209103b79c1ffc7af37914188decc5fc6468af863bec313019d05d81dbaf9",
+    "scripts/benchmark/request-lifecycle.py": "f01d9cf021f253ba17424c69937530bce7bc0d409cbe5bd7deb9d43c6b631535",
+    "scripts/benchmark/process_metrics.py": "6adef052767d2cbe9f8090a2c99077b9960d16455089dd092c829b0b21c56663",
+    "scripts/benchmark/build-supervisor-control.mjs": "2f7b4982f60f35bdc749c1decd0c451542e73e5386342a7c7ad0ac5a92f73269",
+    "test/fixtures/core-benchmark.mjs": "d8b1bb3d8b7c94ee707e1cdf603cb2554d0561f41c7bddb14f9819158775db21",
+    "test/fixtures/core-workload-benchmark.mjs": "9da04aa063442ec0ad7e63d86f378002d23d5b4fb0fd389b9818824fde9ffc6e",
+    "packages/agentos-sdk/test/native.test.mjs": "1db4d32a75f9c76f162d418e43bccfa9e360104a6da6c3b73fabfb75f863541e",
+    "packages/agentos-sdk/test/shared-contract.test.mjs": "171ff2f984beaea9c8ddf737aaa188912aec808b3d6d88cb28c37ee1c31c3d84",
+    "test/request-state.test.mjs": "7eba63a2c4a255f40ae5d4db9afe2f5525c6a498624569b1fa5538de0d87a7aa"
+  },
+  "notes": [
+    "Known upstream 0.2.19 cat/stdin EOF timeout is tracked explicitly, not claimed to work.",
+    "Comparison trials use the checkpoint helper archived in request-checkpoint-measured-source.json; final source additionally rejects JSON primitives/null.",
+    "One 40.99 second startup outlier retained; root cause and protected sandbox performance unresolved."
+  ]
+}

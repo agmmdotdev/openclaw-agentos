@@ -99,6 +99,7 @@ for (let turn = 0; turn <= warmTurns; turn++) {
   mark(`${label}:end`, { durationMs: performance.now() - start, calls, transcriptMessages: history.length });
 }
 }
+if (!globalThis.__benchmarkRequestState) {
 const sqlDatabase = new BenchDatabase(':memory:');
 const sqlStatement = sqlDatabase.prepare('SELECT 1 AS value');
 mark('sql-roundtrips:start');
@@ -111,6 +112,7 @@ const idleMs = Number(process.env.BENCH_IDLE_MS ?? 1500);
 check(Number.isSafeInteger(idleMs) && idleMs >= 1500 && idleMs <= 60000, 'Invalid BENCH_IDLE_MS');
 await new Promise(resolve => setTimeout(resolve, idleMs));
 mark('idle:end');
+} else mark('request:complete');
 
 
 // Isolate primitive runtime costs from OpenClaw orchestration. These variants

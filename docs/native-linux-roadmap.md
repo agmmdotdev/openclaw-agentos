@@ -175,3 +175,10 @@ complete supervision and SDK filesystem/process integration, and run adversarial
 checks before enabling protected execution. The current
 package explicitly rejects protected mode; moving it to a VPS alone does not
 complete this implementation. See the implementation report for exact remaining gaps.
+
+
+## Core work while protected-host acceptance is blocked (2026-09-06)
+
+Implemented request-based native-core experiments and a bounded filesystem allocation optimization. See [core-request-lifecycle.md](core-request-lifecycle.md) for the compatibility matrix, checkpoint recovery rules, 24 comparison runs, supervisor control, retained startup outlier, and 21-request continuity followup. Forty-eight SDK tests and three checkpoint tests pass; the upstream stdin/EOF limitation is explicitly recorded.
+
+The SDK can release all core process memory between requests in the tested workload, at a substantial startup CPU cost. Compile caching improves the repeated-start cost; peak RAM and cold-start tail latency remain unresolved. Next priorities are module/parser startup profiling and broader skill/package compatibility. Gateway, scheduling and protected Linux acceptance remain separate gates.
