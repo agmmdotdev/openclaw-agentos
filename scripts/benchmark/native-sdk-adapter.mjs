@@ -4,20 +4,24 @@ import { join, resolve, relative, sep } from 'node:path';
 import { StringDecoder } from 'node:string_decoder';
 export async function createNativeSdkAdapter(root) {
  const workspace=join(root,'workspace');
- const vm=await AgentOs.create({backend:'native-node',workspaceDir:workspace,security:'trusted-only'});
+ const experiment=process.env.AGENTOS_LINUX_EXPERIMENT==='1';
+ const vm=experiment
+  ?await AgentOs.createLinuxExperiment({acknowledgement:process.env.AGENTOS_LINUX_ACK,workspaceDir:workspace,cgroupDir:process.env.AGENTOS_TEST_CGROUP,runtimeManifest:process.env.AGENTOS_RUNTIME_MANIFEST})
+  :await AgentOs.create({backend:'native-node',workspaceDir:workspace,security:'trusted-only',filesystemBackend:process.env.AGENTOS_SDK_FILESYSTEM??'node'});
  const counts={read:0,stat:0,shell:0};
  function path(file,cwd=workspace){const p=resolve(cwd,file);const r=relative(workspace,p);if(r==='..'||r.startsWith('..'+sep)||r.startsWith(sep))throw new Error('Outside workspace');return p;}
+ const sdkPath=(file,cwd)=>vm.capabilities.filesystemBackend==='linux-openat2'?(relative(workspace,path(file,cwd))||'.'):path(file,cwd);
  const bridge={
   resolvePath:({filePath,cwd})=>({containerPath:path(filePath,cwd)}),
-  async readFile({filePath,cwd}){counts.read++;return Buffer.from(await vm.filesystem.readFile(path(filePath,cwd)));},
-  async writeFile({filePath,cwd,data}){await vm.filesystem.writeFile(path(filePath,cwd),data);},
-  async stat({filePath,cwd}){counts.stat++;const s=await vm.filesystem.stat(path(filePath,cwd));return {...s,type:s.isDirectory?'directory':'file'};},
-  async mkdirp({filePath,cwd}){await vm.filesystem.mkdir(path(filePath,cwd),{recursive:true});},
+  async readFile({filePath,cwd}){counts.read++;return Buffer.from(await vm.filesystem.readFile(sdkPath(filePath,cwd)));},
+  async writeFile({filePath,cwd,data}){await vm.filesystem.writeFile(sdkPath(filePath,cwd),data);},
+  async stat({filePath,cwd}){counts.stat++;const s=await vm.filesystem.stat(sdkPath(filePath,cwd));return {...s,type:s.isDirectory?'directory':'file'};},
+  async mkdirp({filePath,cwd}){await vm.filesystem.mkdir(sdkPath(filePath,cwd),{recursive:true});},
  };
  // OpenClaw calls this interface "sandbox"; capabilities below describe the actual boundary.
- const sandbox={required:true,workspaceDir:workspace,agentWorkspaceDir:workspace,workspaceAccess:'rw',containerName:'native-sdk-trusted-only',containerWorkdir:workspace,fsBridge:bridge,
-  backend:{workdirValidation:'backend',env:{HOME:workspace,PATH:process.env.PATH},
-   async validateWorkdir(cwd){const p=path(cwd);if(!(await vm.filesystem.stat(p)).isDirectory)throw new Error('Invalid cwd');return p;},
+ const sandbox={required:true,workspaceDir:workspace,agentWorkspaceDir:workspace,workspaceAccess:'rw',containerName:experiment?'native-sdk-linux-unverified':'native-sdk-trusted-only',containerWorkdir:workspace,fsBridge:bridge,
+  backend:{workdirValidation:'backend',env:experiment?{}:{HOME:workspace,PATH:process.env.PATH},
+   async validateWorkdir(cwd){const p=path(cwd);if(!(await vm.filesystem.stat(sdkPath(p))).isDirectory)throw new Error('Invalid cwd');return p;},
    async buildExecSpec({command,workdir,env,usePty}){if(usePty)throw new Error('PTY unsupported');return {argv:['native-sdk-shell',path(workdir),command],env,stdinMode:'pipe'};},
   },
  };

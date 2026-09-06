@@ -7,6 +7,7 @@
 #include <linux/capability.h>
 #include <linux/filter.h>
 #include <linux/landlock.h>
+#include <linux/openat2.h>
 #include <linux/magic.h>
 #include <linux/sched.h>
 #include <linux/seccomp.h>
@@ -198,6 +199,7 @@ static int self_test_seccomp(void) {
 int main(int argc, char **argv) {
   if (argc == 2 && !strcmp(argv[1], "--self-test-seccomp")) return self_test_seccomp();
   const char *workspace = NULL, *cgroup = NULL, *memory = NULL, *pids = NULL, *cpu = NULL;
+  const char *cwd = ".", *search_path = "/nonexistent";
   const char *runtime[256]; int count = 0, command = 0;
   for (int i = 1; i < argc; i++) {
     if (!strcmp(argv[i], "--")) { command = i + 1; break; }
@@ -208,6 +210,8 @@ int main(int argc, char **argv) {
     else if (!strcmp(key, "--memory")) { require(!memory, "duplicate-option"); memory = value; }
     else if (!strcmp(key, "--pids")) { require(!pids, "duplicate-option"); pids = value; }
     else if (!strcmp(key, "--cpu")) { require(!cpu, "duplicate-option"); cpu = value; }
+    else if (!strcmp(key, "--cwd")) cwd = value;
+    else if (!strcmp(key, "--path")) search_path = value;
     else if (!strcmp(key, "--runtime-file")) { require(count < 256, "runtime-count"); runtime[count++] = value; }
     else { errno = EINVAL; fail("unknown-option"); }
   }
@@ -235,9 +239,11 @@ int main(int argc, char **argv) {
   require(fs.f_type == CGROUP2_SUPER_MAGIC, "cgroup-v2-required");
   control_equals(cg, "memory.max", memory); control_equals(cg, "memory.swap.max", "0");
   control_equals(cg, "memory.oom.group", "1"); control_equals(cg, "pids.max", pids);
-  control_equals(cg, "cpu.max", cpu); control_equals(cg, "cgroup.procs", "");
+  control_equals(cg, "cpu.max", cpu);
   int procs = openat(cg, "cgroup.procs", O_WRONLY | O_CLOEXEC | O_NOFOLLOW);
   if (procs < 0) fail("cgroup-procs");
+  // The supervisor enrolls the gated child before exec. Joining self again is
+  // idempotent; the subsequent exact membership check rejects other occupants.
   write_exact(procs, "0", "cgroup-join"); close(procs);
   char pid[32]; snprintf(pid, sizeof(pid), "%ld", (long)getpid());
   control_equals(cg, "cgroup.procs", pid); close(cg);
@@ -252,7 +258,13 @@ int main(int argc, char **argv) {
     require(runtime[i][0] == '/', "absolute-runtime-file");
     rule(ruleset, runtime[i], LANDLOCK_ACCESS_FS_READ_FILE | LANDLOCK_ACCESS_FS_EXECUTE, 0);
   }
-  if (chdir(workspace)) fail("workspace-cwd");
+  int workspace_fd = open(workspace, O_PATH | O_DIRECTORY | O_CLOEXEC | O_NOFOLLOW);
+  if (workspace_fd < 0) fail("workspace-open");
+  struct open_how cwd_how = {.flags = O_PATH | O_DIRECTORY | O_CLOEXEC,
+    .resolve = RESOLVE_BENEATH | RESOLVE_NO_SYMLINKS | RESOLVE_NO_MAGICLINKS | RESOLVE_NO_XDEV};
+  int cwd_fd = syscall(SYS_openat2, workspace_fd, cwd, &cwd_how, sizeof(cwd_how));
+  if (cwd_fd < 0 || fchdir(cwd_fd)) fail("workspace-cwd");
+  close(workspace_fd); close(cwd_fd);
   struct rlimit core = {0, 0};
   if (setrlimit(RLIMIT_CORE, &core)) fail("core-limit");
   umask(0077);
@@ -260,9 +272,9 @@ int main(int argc, char **argv) {
   if (syscall(SYS_landlock_restrict_self, ruleset, 0)) fail("landlock-restrict");
   close(ruleset);
   if (syscall(SYS_close_range, 4, ~0U, 0)) fail("close-inherited-fds");
-  char *home, *tmp;
-  if (asprintf(&home, "HOME=%s", workspace) < 0 || asprintf(&tmp, "TMPDIR=%s", workspace) < 0) fail("environment");
-  char *env[] = {home, tmp, "LANG=C.UTF-8", "PATH=/nonexistent", NULL};
+  char *home, *tmp, *path_env;
+  if (asprintf(&home, "HOME=%s", workspace) < 0 || asprintf(&tmp, "TMPDIR=%s", workspace) < 0 || asprintf(&path_env, "PATH=%s", search_path) < 0) fail("environment");
+  char *env[] = {home, tmp, "LANG=C.UTF-8", path_env, NULL};
   filter();
   write_exact(3, "{\"stage\":\"restricted-before-exec\",\"experimental\":true}\n", "status-ready");
   execve(argv[command], &argv[command], env);

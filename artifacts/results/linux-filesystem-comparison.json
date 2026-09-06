@@ -1,0 +1,59 @@
+{
+  "scope": "Trusted process execution only; comparison of host SDK file access, not protected Linux execution",
+  "allRunsPassed": true,
+  "medians": {
+    "direct-node": {
+      "trials": 3,
+      "activePssMiB": 191.41015625,
+      "idlePssMiB": 197.162109375,
+      "warmCpuSeconds": 6.01,
+      "warmMedianMs": 682.9231619999991,
+      "peakRangeMiB": [
+        503.568359375,
+        679.7421875
+      ],
+      "wholeCpuSeconds": 7.93,
+      "files": [
+        "benchmark-native-core-1501.json",
+        "benchmark-native-core-1511.json",
+        "benchmark-native-core-1521.json"
+      ]
+    },
+    "sdk-node": {
+      "trials": 3,
+      "activePssMiB": 182.9150390625,
+      "idlePssMiB": 193.3876953125,
+      "warmCpuSeconds": 4.28,
+      "warmMedianMs": 608.9040635000001,
+      "peakRangeMiB": [
+        522.7998046875,
+        675.8310546875
+      ],
+      "wholeCpuSeconds": 5.81,
+      "files": [
+        "benchmark-native-sdk-trusted-core-1502.json",
+        "benchmark-native-sdk-trusted-core-1512.json",
+        "benchmark-native-sdk-trusted-core-1522.json"
+      ]
+    },
+    "sdk-openat2": {
+      "trials": 3,
+      "activePssMiB": 185.8642578125,
+      "idlePssMiB": 204.6201171875,
+      "warmCpuSeconds": 5.050000000000001,
+      "warmMedianMs": 644.8424570000002,
+      "peakRangeMiB": [
+        511.6591796875,
+        645.1669921875
+      ],
+      "wholeCpuSeconds": 6.93,
+      "files": [
+        "benchmark-native-sdk-trusted-core-1503.json",
+        "benchmark-native-sdk-trusted-core-1513.json",
+        "benchmark-native-sdk-trusted-core-1523.json"
+      ]
+    }
+  },
+  "method": "3 serial rounds with rotated backend order, 21 representative turns each, 2 CPUs, Node semi-space 8 MiB, 100 ms process-tree sampling; no gateway or real model inference. Short-lived helper peaks may be missed.",
+  "preflightMetadataSha256AtMeasurement": "baa87b1fc794c80a83f78fbaab7294a1669450997dc3638c1373af254d1676da"
+}

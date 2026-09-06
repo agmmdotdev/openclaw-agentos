@@ -13,8 +13,8 @@ capability report, before opening a workspace or launching workload code. No
 verified Linux enforcement launcher is integrated. An experimental C launcher,
 openat2 file helper and host acceptance runner now exist; see
 [the enforcement report](../../docs/native-linux-enforcement-prototype.md).
-The process launcher remains separate from SDK execution. The file helper can be
-selected explicitly as described below. This cannot be fixed merely
+The file helper and experimental process launcher can be selected explicitly as
+described below. Production protected mode remains disabled. This cannot be fixed merely
 by selecting a flag or installing the SDK on another host.
 
 ## Build and use from this repository
@@ -154,10 +154,13 @@ try {
 }
 ```
 
-This selection supports `readFile`, `writeFile`, `stat`, `exists`, `readFiles`, and
-`writeFiles`. Other file methods throw `UNSUPPORTED_CAPABILITY`; there is no Node
-filesystem fallback. Paths must be relative, all symlinks and nested mounts are
-rejected, and read/write targets must be regular files with one link. The workspace
+This selection implements every method in the extracted `FileApi`, including
+directory creation/listing, recursive walks/removal and rename. There is no Node
+filesystem fallback. Mutation paths must be canonical relative paths: no empty,
+`.` or `..` components, trailing slashes, or workspace-root mutation. Recursive
+`mkdir('.')` is an allowed no-op. Directory listings return symlink metadata;
+recursive removal unlinks a final symlink itself and never follows its target. Paths must be relative, all symlinks and nested mounts are
+rejected when opening targets/parents, and read/write targets must be regular files with one link. The workspace
 descriptor is pinned until disposal; only the file API follows that identity after
 a trusted parent renames it. Native process cwd handling still uses `workspaceDir`.
 
@@ -174,10 +177,20 @@ The default `filesystemBackend: 'node'` retains the original trusted filesystem
 surface. It does not use these stronger resolution checks. The original PR8 RAM
 measurements predate this integration and are historical, not new measurements.
 
+## Experimental Linux process integration
+
+The separate `./linux-experimental` entrypoint exports `createLinuxExperiment()`.
+It requires `acknowledgement: 'unverified-test-only'`, a workspace, an existing
+cgroup delegation and a reviewed runtime manifest. It connects the same SDK
+process/JavaScript APIs to the native supervisor and launcher. There is no
+unrestricted fallback. See [the integration report](../../docs/native-linux-sdk-supervision.md)
+for exact setup, remaining limitations and host tests. `sandboxed` remains false
+and `experimentalEnforcement` reports `unverified-linux`; those fields deliberately
+do not certify unvalidated security. No supervisor runs for an idle handle.
+
 ## Remaining unsupported native APIs
 
-Linux sandbox enforcement, hard process-tree limits, filesystem quotas,
-complete host file brokering (including directory mutation), bindings, sessions/ACP, persistent contexts,
+Verified production Linux enforcement, filesystem quotas, bindings, sessions/ACP, persistent contexts,
 PTY/terminal, Python and TypeScript convenience APIs, npm installation helpers,
 network services, software catalog projection, cron, virtual/custom mounts,
 snapshots, and arbitrary SDK compatibility are not implemented. Accessing the
@@ -185,9 +198,8 @@ exposed unsupported namespace/method paths throws `UNSUPPORTED_CAPABILITY`.
 Some options rejected here are valid on the original backend.
 
 Native Node may itself run JavaScript packages or native programs; that does not
-implement the omitted agentOS orchestration APIs. The native result must not be
-used for untrusted tenant code until a real enforcement backend and its tests
-exist. No performance measurement in this milestone establishes sandbox safety.
+implement the omitted agentOS orchestration APIs. The experimental result must not be used for production tenants until its
+enforcement, host supervision and deployment acceptance gates pass. No performance measurement in this milestone establishes sandbox safety.
 
 ## Extraction maintenance
 

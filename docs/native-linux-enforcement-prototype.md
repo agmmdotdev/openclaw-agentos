@@ -3,11 +3,11 @@
 Recorded 2026-09-06. This is an **experimental host-acceptance candidate**, not an
 enabled SDK sandbox. The native SDK still requires `security: 'trusted-only'`;
 `security: 'linux-sandbox'` still fails before workspace access or execution.
-The process launcher is not integrated into SDK execution. A subsequent SDK
-integration now selects the file helper with `filesystemBackend: 'linux-openat2'`
-for six file methods; see the package README. Default SDK file calls remain on
-the trusted Node implementation. The evidence below records the initial PR9
-prototype; the subsequent integration passes 31 tests.
+This document records the initial PR9 prototype. PR10 connected six file methods;
+the [subsequent supervision integration](native-linux-sdk-supervision.md) implements
+the extracted filesystem slice and an explicitly experimental SDK process path.
+Default SDK calls remain trusted-only and production protected mode is disabled.
+See that report for current tests, host acceptance and filesystem measurements.
 
 ## Implemented and tested here
 

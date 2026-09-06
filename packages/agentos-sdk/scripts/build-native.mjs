@@ -6,6 +6,7 @@ mkdirSync(`${root}dist`, { recursive: true });
 for (const [source, output] of [
   ['preflight', 'linux-preflight'], ['file-access', 'linux-file-access'],
   ['launcher', 'linux-launcher-experimental'],
+  ['supervisor', 'linux-supervisor-experimental'],
 ]) {
   const result = spawnSync('cc', ['-std=gnu11', '-O2', '-Wall', '-Wextra', '-Werror',
     '-fstack-protector-strong', '-D_FORTIFY_SOURCE=2', `native/${source}.c`,

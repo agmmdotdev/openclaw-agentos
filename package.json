@@ -53,7 +53,8 @@
     "sdk:build": "npm exec -- tsc -p packages/agentos-sdk/tsconfig.json && node packages/agentos-sdk/scripts/build-native.mjs",
     "test:sdk": "npm run sdk:build && node --test --test-concurrency=1 packages/agentos-sdk/test/*.test.mjs",
     "test:native-sdk": "python3 scripts/benchmark/probe-hybrid.py --native-sdk --node-memory-profile",
-    "test:linux-host": "npm run sdk:build && node scripts/linux-host/acceptance.mjs"
+    "test:linux-host": "npm run sdk:build && node scripts/linux-host/acceptance.mjs",
+    "test:linux-sdk-host": "npm run sdk:build && node scripts/linux-host/sdk-acceptance.mjs"
   },
   "dependencies": {
     "@rivet-dev/agentos-core": "0.2.19",

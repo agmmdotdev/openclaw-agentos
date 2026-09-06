@@ -1,0 +1,46 @@
+{
+  "date": "2026-09-06T14:26:50.154612+00:00",
+  "localParentCommit": "25a17462a8dd16ddbe5a6edd97f025adfc5fb1c8",
+  "tests": {
+    "passed": 38,
+    "failed": 0,
+    "skipped": 0,
+    "command": "npm run test:sdk"
+  },
+  "supervisorTestControls": "Compile-only process-group control fixture; production cgroup controls are not verified here",
+  "managerCrashTest": "Actual synthetic Node manager SIGKILL; native monitor observes EOF and reaps fixture job",
+  "openClawProbe": {
+    "passed": true,
+    "command": "AGENTOS_SDK_FILESYSTEM=linux-openat2 npm run test:native-sdk",
+    "processSecurity": "trusted-only"
+  },
+  "hostGates": {
+    "directLauncher": "blocked",
+    "integratedSdk": "blocked",
+    "protectedCasesExecuted": 0,
+    "exitCode": 77
+  },
+  "benchmarks": {
+    "passed": 9,
+    "configurations": 3,
+    "trialsPerConfiguration": 3,
+    "protectedProcesses": false,
+    "comparison": "artifacts/results/linux-filesystem-comparison.json"
+  },
+  "productionSandboxEnabled": false,
+  "sha256": {
+    "packages/agentos-sdk/native/file-access.c": "26c70d3b47e081bf942b78efca3ba9f9ea197715129b348b691eaac500619566",
+    "packages/agentos-sdk/native/launcher.c": "f016ebadf4ee6963ce98bace8f997d39e94666ce455def9bdaff57eafbe2f3ba",
+    "packages/agentos-sdk/native/supervisor.c": "667d289b84be87611af0fc09aa770ebefd4c7a0ae51507c3a21c063518a0c67e",
+    "packages/agentos-sdk/src/linux-filesystem.ts": "ec772aa64c2a2c9f64787cec8c0df7a13ea406d8c774923490a3abea84c4c2b6",
+    "packages/agentos-sdk/src/linux-process-driver.ts": "801e3f36c8730704fd45a6b4b5dae544eec786b10a114562947fca307da488c6",
+    "packages/agentos-sdk/src/native.ts": "ab46d47f98e1c9c732393fa05e98d1e1e6371ff856b3936e017e22e55172bab2",
+    "packages/agentos-sdk/src/preflight.ts": "1e75cce2131ab76d27ad34f9e1129d6b67e2d9a1ffad6fb7842edb34f34210c4",
+    "packages/agentos-sdk/test/supervisor.test.mjs": "c479a1c0f6ba27efa917d08bb8d6249cfa38a0c2034759b96ad4fd52f4715962",
+    "scripts/linux-host/sdk-acceptance.mjs": "08104882452bba83dda737003e6eec06f461818ec71553e003700c1d1407050f",
+    "scripts/benchmark/native-sdk-adapter.mjs": "126bcee03fc079a5de7e24418418a93c1683f499c60cdf2f9d0f15e1523292b3",
+    "packages/agentos-sdk/dist/linux-file-access": "3994e4c2ac0c809d4d9ef63469b1b61ef423488a008e21691caff9212a3ade38",
+    "packages/agentos-sdk/dist/linux-launcher-experimental": "3db7c2c43b64e1bfb13f358235c402c7bc3d44a130c4f43cc0393552da168878",
+    "packages/agentos-sdk/dist/linux-supervisor-experimental": "59b185c6a6c2d84c47b07b0c86f95c5d6026d8f582df909a4c8708fbcd5564f4"
+  }
+}
