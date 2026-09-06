@@ -214,3 +214,8 @@ experiments: [preflight](docs/native-linux-preflight.md),
 [implementation roadmap](docs/native-linux-roadmap.md). The first implementation
 milestone is a backend contract preserving the agentOS API. Linux enforcement
 requires host capabilities that are not available for validation in this environment.
+
+The [extracted native Node SDK](packages/agentos-sdk/README.md) now implements the
+filesystem/process/JavaScript slice and has a [test and benchmark report](docs/native-node-sdk-implementation.md).
+Its native backend requires explicit trusted-only mode; Linux sandbox enforcement
+is not implemented and protected execution fails closed.

@@ -1,0 +1,32 @@
+{
+  "name": "@agmmdotdev/agentos-sdk",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">=24"
+  },
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./native": {
+      "types": "./dist/native-entry.d.ts",
+      "import": "./dist/native-entry.js"
+    }
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json && cc -O2 -Wall -Wextra native/preflight.c -o dist/linux-preflight",
+    "test": "node --test --test-concurrency=1 test/*.test.mjs"
+  },
+  "peerDependencies": {
+    "@rivet-dev/agentos-core": "0.2.19"
+  },
+  "peerDependenciesMeta": {
+    "@rivet-dev/agentos-core": {
+      "optional": true
+    }
+  }
+}

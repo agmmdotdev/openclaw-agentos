@@ -5,34 +5,47 @@ Node efficiency with a measured Linux security boundary. Read the
 [preflight](native-linux-preflight.md) and [architecture](native-linux-architecture.md)
 before implementation. Checkboxes represent completed evidence, not intention.
 
+## Implementation update — 2026-09-06
+
+The [native SDK extraction](native-node-sdk-implementation.md) now implements a
+trusted-only filesystem/process/JavaScript slice in `packages/agentos-sdk`.
+Source commit and API types are pinned; native and original backends pass shared
+contract tests. Native-only imports avoid the original runtime. Seventeen tests,
+including 20 create/run/dispose cycles, and the real OpenClaw tool probe pass.
+
+This advances M1 and the functional portions of M3/M4. M2 is still blocked and
+unimplemented: the compiled helper only probes capability; it does not enforce a
+sandbox. M5 protected-performance acceptance is not passed by the trusted-only
+benchmark. Broader SDK/session/storage APIs remain deferred, with explicit errors.
+
 ## Milestones
 
 | Milestone | Status | Depends on | Reviewable result |
 |---|---|---|---|
 | M0 — Preflight and design | Complete for available environment | — | These three documents; explicit host limitations |
-| M1 — SDK source and backend contract | Next | M0 | Pinned source/fork base, API contract tests, backend seam |
+| M1 — SDK source and backend contract | Implemented for extracted slice | M0 | Pinned source/fork base, API contract tests, backend seam |
 | M2 — Linux launcher and host gate | Pending; host validation blocked here | M0 | Capability report and verified enforcement on suitable Linux |
-| M3 — Native SDK slice | Pending | M1, M2 | Filesystem/process lifecycle APIs with supported capability report |
-| M4 — OpenClaw parity and security gate | Pending | M3 | Real-tool and adversarial test results |
-| M5 — Matched RAM/CPU comparison | Pending | M4 | Reproducible raw samples and comparison report |
+| M3 — Native SDK slice | Trusted functionality implemented; enforcement blocked | M1, M2 | Filesystem/process lifecycle APIs with supported capability report |
+| M4 — OpenClaw parity and security gate | Functional probe passes; security blocked | M3 | Real-tool and adversarial test results |
+| M5 — Matched RAM/CPU comparison | Trusted comparison recorded; protected gate blocked | M4 | Reproducible raw samples and comparison report |
 | M6 — Request lifecycle and retention | Deferred until M5 | M5 | Repeated create/run/dispose and crash-recovery evidence |
 | M7 — Broader APIs and multitenant service | Deferred | M6 and separate scope | Explicit follow-on decisions |
 
 ## M1 — Start with the contract, not a sidecar rewrite
 
-- [ ] Locate the upstream source corresponding to npm SDK 0.2.19; record commit,
+- [x] Locate the upstream source corresponding to npm SDK 0.2.19; record commit,
   package integrity, license/notice obligations, and a reproducible SDK build.
 - [ ] Establish a focused SDK fork/workspace without changing OpenClaw source or
   rebuilding/forking the Rust runtime. Record its maintenance and upstream-update
   policy. Repository creation has not happened in this documentation milestone.
-- [ ] Inventory the hybrid adapter's public calls and direct SDK sidecar coupling.
+- [x] Inventory the hybrid adapter's public calls and direct SDK sidecar coupling.
   Specify create/dispose, filesystem, process, event, cancellation, and error types.
-- [ ] Resolve native path semantics: use the exposed native workspace cwd first;
+- [x] Resolve native path semantics: use the exposed native workspace cwd first;
   document deviations from a virtual `/workspace`. Resolve supported limits and
   reject unsupported storage/permission options before execution.
 - [ ] Extract the backend interface and keep the current backend behind it.
   Make native imports avoid original runtime initialization and heavy eager imports.
-- [ ] Run shared contract tests against the current agentOS backend and the new
+- [x] Run shared contract tests against the current agentOS backend and the new
   interface. Record existing behavior gaps instead of treating them as desired
   semantics or quietly hiding them.
 
@@ -140,7 +153,9 @@ estimate tenant capacity by dividing RAM by the single-instance active median.
 
 ## Immediate next deliverable
 
-M1: a pinned SDK source map, supported API contract, and a backend-interface PR.
-M2 requires a suitable Linux host before its enforcement gate can be accepted.
-The documentation and SDK refactor can advance independently of that host access;
-no sandbox implementation or benchmark success is implied by this roadmap.
+The initial extracted SDK slice and trusted benchmarks are now implemented.
+The next boundary milestone is M2: select and integrate a Linux launcher on a
+suitable test host, implement race-resistant host filesystem access and process-tree
+control, and run adversarial checks before enabling protected execution. The current
+package explicitly rejects protected mode; moving it to a VPS alone does not
+complete this implementation. See the implementation report for exact remaining gaps.
