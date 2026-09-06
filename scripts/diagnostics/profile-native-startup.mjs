@@ -8,10 +8,13 @@ const trial = process.argv[2];
 if (!/^\d+$/.test(trial ?? '')) throw new Error('Usage: node scripts/diagnostics/profile-native-startup.mjs TRIAL');
 const output = `artifacts/results/startup-initializers-${trial}.json`;
 const eager = process.argv.includes('--eager');
-const core = await readFile(eager ? 'artifacts/core/eager-native-core.mjs' : 'artifacts/core/native-core.mjs', 'utf8');
+const bundled = process.argv.includes('--bundled');
+if (eager && bundled) throw new Error('Choose at most one initialization control');
+const core = await readFile(eager ? 'artifacts/core/eager-native-core.mjs' : bundled ? 'artifacts/core/bundled-native-core.mjs' : 'artifacts/core/native-core.mjs', 'utf8');
 const manifest = JSON.parse(await readFile('artifacts/core/manifest.json', 'utf8'));
 const hash = value => createHash('sha256').update(value).digest('hex');
-if (hash(core) !== (eager ? manifest.eagerNativeCoreSha256 : manifest.nativeCoreSha256)) throw new Error('Native core differs from manifest');
+if (hash(core) !== (eager ? manifest.eagerNativeCoreSha256 : bundled ? manifest.bundledNativeCoreSha256 : manifest.nativeCoreSha256)) throw new Error('Native core differs from manifest');
+if (!eager && !bundled && manifest.nativeLayout?.mode === 'split' && hash(await readFile('artifacts/core/native-highlight.cjs')) !== manifest.nativeLayout.highlight.moduleSha256) throw new Error('Highlighter differs from manifest');
 const prefix = `
 const __startupRows=[], __startupStack=[], __startupEvaluationStart=performance.now();
 function __startupWrap(helper,name,fn) { return helper(function(...args) {
@@ -63,5 +66,5 @@ for (const profile of ['default', 'request']) {
   if (payload.length !== 1) throw new Error('Unexpected diagnostic output');
   runs.push({ profile, wallMs: performance.now() - start, ...JSON.parse(payload[0]), engineTrace: lines.filter(line => !line.startsWith('{')), stderr: result.stderr });
 }
-await writeFile(output, JSON.stringify({ instrumented: true, eager, deferredUse: process.argv.includes('--deferred-use'), initializerCount: count, coreSha256: hash(core), generatedSha256: hash(prefix + instrumented + suffix), runs }, null, 2) + '\n', { flag: 'wx' });
+await writeFile(output, JSON.stringify({ instrumented: true, eager, bundled, nativeLayout: manifest.nativeLayout, deferredUse: process.argv.includes('--deferred-use'), initializerCount: count, coreSha256: hash(core), generatedSha256: hash(prefix + instrumented + suffix), runs }, null, 2) + '\n', { flag: 'wx' });
 console.log(output);

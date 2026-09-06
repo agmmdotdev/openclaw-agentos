@@ -234,3 +234,8 @@ Matched cached-request CPU falls another 8.5%, request latency 5.1%, and residen
 idle PSS from 235 to 224 MiB. Fifty SDK tests pass, including real npm package
 workflows. A separate parser-heavy benchmark documents the baseline-Wasm profile's
 54% higher warm parsing time; that compiler profile remains opt-in.
+
+The [highlighter module experiment](docs/native-highlight-module.md) removes
+1.03 MiB from the native entry and saves 3.6 MiB of resident idle PSS. Eighteen
+matched trials pass, but CPU/latency results are mixed, so `NATIVE_CORE_LAYOUT=split`
+remains opt-in and the bundled lazy core remains the default.

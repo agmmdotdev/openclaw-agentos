@@ -205,3 +205,13 @@ real npm packages with mocked network transports. Parser-heavy throughput now
 quantifies the opt-in baseline-Wasm tradeoff: 54% more warm parsing time.
 The next CPU target is source loading/compilation and additional safe deferral;
 protected-host acceptance is still blocked.
+
+### Separately loaded highlighter experiment
+
+[Native highlighter module](native-highlight-module.md) extracts 195 original
+declarations behind the synchronous getter and preserves per-core library state.
+The entry shrinks 7.4%; resident idle PSS falls 3.6 MiB in 18 matched trials with
+630 real tool calls. Cached CPU/latency do not improve, so the layout remains
+opt-in. A new 5.7-second cached startup outlier is retained in the report.
+Next: capture CPU profiles for delays before `worker-ready`, rather than assuming
+further source splitting will improve end-to-end performance.
