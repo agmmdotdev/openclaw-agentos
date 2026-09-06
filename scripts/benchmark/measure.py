@@ -160,6 +160,9 @@ if env.get('BENCH_WORKLOAD') == 'boundaries':
     required_labels.update(f'boundary:{name}:warm:end' for name in ['js-cpu', 'fs-read', 'fs-read-root', 'direct-cat', 'shell-cat', 'shell-builtin', 'child-node'])
 else:
     required_labels.update(['cold-turn:end', f'warm-turn-{warm_turns}:end'])
+if env.get('BENCH_WORKLOAD') == 'core-workload':
+    required_labels.add('representative:complete')
+    required_labels.update(f'warm-turn-{turn}:end' for turn in range(1, warm_turns + 1))
 missing_labels = sorted(required_labels - {e['label'] for e in events})
 report = {
     'recordedAt': time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime()),
@@ -170,6 +173,7 @@ report = {
     'dataMount': env.get('BENCH_DATA_MOUNT', 'chunked_local'),
     'idleMs': int(env.get('BENCH_IDLE_MS', '1500')),
     'allocatorEnvironment': {k: env.get(k) for k in ['MALLOC_ARENA_MAX', 'MALLOC_TRIM_THRESHOLD_', 'MALLOC_MMAP_THRESHOLD_', 'MALLOC_TOP_PAD_', 'GLIBC_TUNABLES']},
+    'benchmarkManifest': json.loads((root / 'artifacts/core/benchmark-manifest.json').read_text()) if (root / 'artifacts/core/benchmark-manifest.json').exists() else None,
     'coreManifest': json.loads((root / 'artifacts/core/manifest.json').read_text()),
     'diagnostics': {k: env.get(k, '0') for k in ['BENCH_NATIVE_MEMORY', 'BENCH_GC_AT_IDLE', 'BENCH_PROFILE_CORE', 'BENCH_PROFILE_FS', 'BENCH_SQL_SCHEMA_MODE', 'BENCH_PROFILE_PROCESS', 'BENCH_PROFILE_SQL']} | {k: env.get(k) for k in ['CORE_HEAP_MB', 'CORE_WASM_HEAP_MB', 'AGENTOS_V8_WARM_ISOLATES', 'AGENTOS_WASM_SNAPSHOT_RUNNER', 'BENCH_WARM_TURNS', 'BENCH_WORKLOAD', 'BENCH_REVERSE', 'BENCH_CORE_MOUNT', 'BENCH_CANONICAL_BATCHING']},
     'method': 'Linux smaps_rollup RSS/PSS summed across isolated benchmark driver and descendants; compiler runs separately',

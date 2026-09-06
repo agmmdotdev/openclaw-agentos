@@ -51,10 +51,12 @@ if (process.env.BENCH_SPLIT_INIT === '1') {
   mark('module-init:end', { durationMs: performance.now() - moduleStart });
 }
 const workload = process.env.BENCH_WORKLOAD ?? 'core-shell';
-check(['core-shell', 'core-read', 'core-read-ready', 'core-none', 'boundaries'].includes(workload), 'Unknown benchmark workload');
+check(['core-shell', 'core-read', 'core-read-ready', 'core-none', 'core-workload', 'boundaries'].includes(workload), 'Unknown benchmark workload');
 mark('workload', { workload });
 if (workload === 'boundaries') {
   await runBoundaryBenchmarks();
+} else if (workload === 'core-workload') {
+  await runRepresentativeBenchmarks();
 } else {
 let history = [];
 const warmTurns = Number(process.env.BENCH_WARM_TURNS ?? 5);
