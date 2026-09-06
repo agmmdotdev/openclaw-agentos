@@ -1,0 +1,50 @@
+{
+  "date": "2026-09-06T12:55:23.642253+00:00",
+  "scope": "Linux enforcement primitives; full sandbox host gate blocked",
+  "baseLocalCommit": "fe0e4dba6af8772d38781e9f7a4c8198605c0309",
+  "node": "v24.19.0",
+  "compiler": "cc (Ubuntu 13.3.0-6ubuntu2~24.04) 13.3.0",
+  "sdkTests": {
+    "passed": 25,
+    "failed": 0,
+    "skipped": 0,
+    "command": "npm run test:sdk"
+  },
+  "seccompSelfTest": {
+    "seccompInstalled": true,
+    "socketAllowedBeforeFilter": true,
+    "checks": 11,
+    "sandboxVerified": false
+  },
+  "openat2Race": {
+    "readAttempts": 100,
+    "writeAttempts": 100,
+    "outsideReadOrWriteObserved": false
+  },
+  "nodeUnderActualSeccompFilter": [
+    "file read/write",
+    "child process with captured stdout and exit code 7",
+    "worker thread"
+  ],
+  "hostAcceptance": {
+    "status": "blocked",
+    "exitCode": 77,
+    "protectedCasesExecuted": 0,
+    "report": "artifacts/results/linux-host-acceptance.json"
+  },
+  "protectedSdkEnabled": false,
+  "newProtectedBenchmarks": false,
+  "sha256": {
+    "packages/agentos-sdk/native/launcher.c": "f9bef2f2c72463ec9e4449a332f28acb424e92c3b4f05a624b45b76f263c6356",
+    "packages/agentos-sdk/native/file-access.c": "4eba5f52f717807d5969eaaef9fa0279cb388386bc6e2a3f7c4dfdfbc0054e2d",
+    "packages/agentos-sdk/native/preflight.c": "535db3d51b029d7ebe37ed888df3faead5583857b6e37961361e5a3796cd6c2c",
+    "packages/agentos-sdk/scripts/build-native.mjs": "91781eed2866aac0d4e29cd6b33af40c217468ecd41ae1e8b6b3d1d71eabce61",
+    "packages/agentos-sdk/test/linux-primitives.test.mjs": "680c2b8918712be9f7b192ff25d3d356ac819ef5c51b07b18472311185ff7795",
+    "packages/agentos-sdk/test/fixtures/seccomp-node.c": "8f512924726e5b4bfc0f09542af1466804df05814cdb46b56fb5feb4e68bad89",
+    "packages/agentos-sdk/src/preflight.ts": "6e63eddd5b60f4ed12a95fd5721ffe96ce01b4fa33eae0543aca9a5f9c1fa337",
+    "scripts/linux-host/runtime-manifest.mjs": "cf2a6583ae875b0483bace4d129b26c0ad653b6f8ad76fd9bdb1374652d2fa68",
+    "scripts/linux-host/acceptance.mjs": "d0271d8ee1529cf7957cc021699ea82ae2d8f38561a32478a1036b39caaa05d3",
+    "packages/agentos-sdk/dist/linux-launcher-experimental": "0b488756ae526909c75b32bee7947cec0470c523ca655ad769f73f32daa29bac",
+    "packages/agentos-sdk/dist/linux-file-access": "a583d8f26ef4f6b592878f59c63c6e6c3e3a876f3c84e110d33b9215790563da"
+  }
+}

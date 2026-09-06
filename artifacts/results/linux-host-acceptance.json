@@ -1,0 +1,96 @@
+{
+  "version": 1,
+  "date": "2026-09-06T12:52:04.577Z",
+  "kind": "experimental-linux-host-acceptance",
+  "status": "blocked",
+  "sdkSandboxEnabled": false,
+  "sandboxEnforcementVerified": false,
+  "host": {
+    "platform": "linux",
+    "kernel": "6.18.35",
+    "architecture": "x64",
+    "landlock": {
+      "landlockAbi": -1,
+      "landlockErrno": 38
+    },
+    "cgroupControllers": "cpuset cpu io memory hugetlb pids",
+    "cgroupSubtreeControl": "",
+    "cgroupWritable": false,
+    "processSecurity": [
+      "CapEff:\t0000000000000000",
+      "CapBnd:\t0000000000000000",
+      "NoNewPrivs:\t1",
+      "Seccomp:\t2"
+    ],
+    "launcherImplemented": false,
+    "sandboxEnforcementVerified": false,
+    "experimentalLauncher": {
+      "implemented": true,
+      "sdkIntegrated": false,
+      "minimumLandlockAbi": 6,
+      "architecture": "x64",
+      "acceptance": "unverified"
+    }
+  },
+  "launcherSha256": "0b488756ae526909c75b32bee7947cec0470c523ca655ad769f73f32daa29bac",
+  "blockers": [
+    "Landlock ABI >=6 required; probe={\"landlockAbi\":-1,\"landlockErrno\":38}",
+    "AGENTOS_TEST_CGROUP must name an existing delegated cgroup with cpu/memory/pids enabled"
+  ],
+  "tests": [],
+  "remainingGates": [
+    "SDK integration and full OpenClaw security parity",
+    "Manager crash containment and orphan reaping under a host supervisor",
+    "Independent policy review and matched protected RAM/CPU benchmarks"
+  ],
+  "seccompProbe": {
+    "seccompInstalled": true,
+    "socketAllowedBeforeFilter": true,
+    "checks": 11,
+    "sandboxVerified": false
+  },
+  "runtime": {
+    "version": 1,
+    "node": "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+    "nodeVersion": "v24.19.0",
+    "reviewRequired": true,
+    "files": [
+      {
+        "path": "/etc/ld.so.cache",
+        "sha256": "aedff81ada5dd66fe64305c84dfba6555bf346d4e975df9e7a1b84b79f011cd9"
+      },
+      {
+        "path": "/opt/codex/runtimes/codex-primary-runtime/dependencies/node/bin/node",
+        "sha256": "bc17c508ffeed0ec622934f9b7fa72f8e78da65350e63c3eceb56fa688aa5e12"
+      },
+      {
+        "path": "/usr/lib/x86_64-linux-gnu/ld-linux-x86-64.so.2",
+        "sha256": "6222a16be7f2d458d6870efe6e715fc0c8d45766fb79cf7dcc3125538d703e28"
+      },
+      {
+        "path": "/usr/lib/x86_64-linux-gnu/libc.so.6",
+        "sha256": "511f825ee075610ac9c0f7f91e2c13de2000d0f7b859f6461137e809a0a009d0"
+      },
+      {
+        "path": "/usr/lib/x86_64-linux-gnu/libdl.so.2",
+        "sha256": "feee7549138dc862300b9ba9b2b02502059c838a6c0b92d2ea4c0a357e8e0b45"
+      },
+      {
+        "path": "/usr/lib/x86_64-linux-gnu/libgcc_s.so.1",
+        "sha256": "d93224d2b0dab4247598be683adca02f5cf00586f99c187579cd7e92058fb7cb"
+      },
+      {
+        "path": "/usr/lib/x86_64-linux-gnu/libm.so.6",
+        "sha256": "f06f2ce1f1833df5f41cf13b6447ff07bea993ad9b27297d3428c2f70ab3f0e7"
+      },
+      {
+        "path": "/usr/lib/x86_64-linux-gnu/libpthread.so.0",
+        "sha256": "4472cde19acc87a431ad1eefe9e86f8238dd1f26f8dac692cff7040474d9d085"
+      },
+      {
+        "path": "/usr/lib/x86_64-linux-gnu/libstdc++.so.6.0.33",
+        "sha256": "1fd75fe70354a416d75aef22bcae68c47bd25d20e2d0568c30b1a9838cf62f11"
+      }
+    ]
+  }
+}

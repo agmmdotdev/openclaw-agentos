@@ -50,9 +50,10 @@
     "test:core:memory": "CORE_PROBE_REPORT=artifacts/results/core-probe-memory.json node scripts/run-core-memory.mjs scripts/probe-core.mjs",
     "bench:bottlenecks": "python3 scripts/benchmark/bottlenecks.py",
     "test:core-artifacts": "node --test test/core-artifact-store.test.mjs",
-    "sdk:build": "npm exec -- tsc -p packages/agentos-sdk/tsconfig.json && cc -O2 -Wall -Wextra packages/agentos-sdk/native/preflight.c -o packages/agentos-sdk/dist/linux-preflight",
+    "sdk:build": "npm exec -- tsc -p packages/agentos-sdk/tsconfig.json && node packages/agentos-sdk/scripts/build-native.mjs",
     "test:sdk": "npm run sdk:build && node --test --test-concurrency=1 packages/agentos-sdk/test/*.test.mjs",
-    "test:native-sdk": "python3 scripts/benchmark/probe-hybrid.py --native-sdk --node-memory-profile"
+    "test:native-sdk": "python3 scripts/benchmark/probe-hybrid.py --native-sdk --node-memory-profile",
+    "test:linux-host": "npm run sdk:build && node scripts/linux-host/acceptance.mjs"
   },
   "dependencies": {
     "@rivet-dev/agentos-core": "0.2.19",

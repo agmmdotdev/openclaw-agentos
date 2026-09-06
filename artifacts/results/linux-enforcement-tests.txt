@@ -1,0 +1,41 @@
+
+> @agmmdotdev/openclaw-agentos@0.1.0 test:sdk
+> npm run sdk:build && node --test --test-concurrency=1 packages/agentos-sdk/test/*.test.mjs
+
+
+> @agmmdotdev/openclaw-agentos@0.1.0 sdk:build
+> npm exec -- tsc -p packages/agentos-sdk/tsconfig.json && node packages/agentos-sdk/scripts/build-native.mjs
+
+✔ openat2 read/write/stat use the pinned directory descriptor after root rename (15.886964ms)
+✔ openat2 rejects traversal, absolute paths and every symlink component (23.715921ms)
+✔ special files and hardlinks cannot be read or truncated by file helper (13.773158ms)
+✔ bounded file operations reject excess data without publishing partial reads or truncating on excess input (8.06025ms)
+✔ concurrent directory/symlink replacement cannot redirect helper reads or writes outside root (332.484979ms)
+✔ fixed seccomp self-test installs a filter and checks denied and permitted calls (2.051333ms)
+✔ actual syscall filter permits native Node files, threads and child processes (no Landlock/cgroup claim) (216.733752ms)
+✔ incomplete launcher enforcement fails before executing payload (4.137347ms)
+✔ protected mode fails before creating workspace; never falls back (18.312986ms)
+✔ unknown options and implicit trust are rejected (3.706317ms)
+✔ filesystem CRUD, batches, metadata, recursive listings and persistence (9.765962ms)
+✔ direct traversal and symlink outside workspace rejected (not a race-proof sandbox test) (2.328781ms)
+✔ native process argv, cwd, environment, stdin, Unicode output, exit and replay (61.768485ms)
+✔ nonzero, missing executable, capture modes and invalid options (5.57265ms)
+✔ timeout and AbortSignal terminate commands (105.08886ms)
+✔ output and input bounds; callback failure cannot crash the host (33.056712ms)
+✔ managed admission limits, bounded history and stale handles (14.798448ms)
+✔ dispose racing with spawn settles and never launches after disposal (1.375464ms)
+✔ same-process-group descendants are stopped when shell exits (2.54084ms)
+✔ JavaScript module, CommonJS and file execution use native Node (93.83825ms)
+✔ 20 create/run/dispose lifecycles leave no managed children; files reopen (51.474552ms)
+✔ unsupported SDK surfaces fail explicitly (1.443917ms)
+✔ oversized initial stdin is rejected before a child launches (0.826095ms)
+✔ shared extracted contract: native-node (45.43049ms)
+✔ shared extracted contract: agentos (1456.551244ms)
+ℹ tests 25
+ℹ suites 0
+ℹ pass 25
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 2756.782451
