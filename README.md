@@ -98,6 +98,11 @@ listener-table representation. See the report for these compatibility limits.
 
 ## Performance and placement
 
+The [writable host-directory diagnostic](docs/writable-host-dir.md) observes
+39 → 29 ms warm read turns in one comparison, but that backend permits writes
+beyond the configured filesystem limit. It is **not adopted** for tenant data;
+workspace/state keep their existing `chunked_local` mounts.
+
 The [statement reuse experiment](docs/sqlite-statement-reuse.md) reduces host
 statement prepares by **18%**, but repeated full-core runs do not establish a
 warm CPU, latency or memory gain. It remains disabled by default. Enable it

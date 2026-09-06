@@ -1,0 +1,60 @@
+{
+  "recordedAt": "2026-09-06T05:22:27.450Z",
+  "agentos": "0.2.19",
+  "scope": "Disposable fixture probe; not a proof of hostile-tenant containment or crash durability",
+  "reports": [
+    {
+      "backend": "chunked_local",
+      "hostSeededEscapes": false,
+      "checks": {
+        "uid": 1000,
+        "absolute-escapeCreationError": "Error: EXDEV: cross-device link not permitted, symlink '/workspace/absolute-escape'",
+        "relative-escapeCreationError": "Error: EXDEV: cross-device link not permitted, symlink '/workspace/relative-escape'",
+        "readWriteRename": true,
+        "internalSymlink": true,
+        "absolute-escape": true,
+        "absolute-escapeError": "Error: ENOENT: no such file or directory, open '/workspace/absolute-escape'",
+        "relative-escape": true,
+        "relative-escapeError": "Error: ENOENT: no such file or directory, open '/workspace/relative-escape'",
+        "fsync": true,
+        "quotaRejected": true,
+        "quotaError": "Error: ERR_AGENTOS_NODE_SYNC_RPC: fs.writeFile /workspace/over-limit: ENOSPC: maximum filesystem size limit reached; raise limits.resources.maxFilesystemBytes if needed",
+        "outsideUnchanged": true,
+        "restored": true
+      },
+      "restored": {
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": "",
+        "stdoutTruncated": false,
+        "stderrTruncated": false,
+        "outcome": "succeeded"
+      }
+    },
+    {
+      "backend": "host_dir",
+      "hostSeededEscapes": true,
+      "checks": {
+        "uid": 1000,
+        "readWriteRename": true,
+        "internalSymlink": true,
+        "absolute-escape": true,
+        "absolute-escapeError": "Error: EACCES: permission denied, open '/workspace/absolute-escape'",
+        "relative-escape": true,
+        "relative-escapeError": "Error: EACCES: permission denied, open '/workspace/relative-escape'",
+        "fsync": true,
+        "quotaRejected": false,
+        "outsideUnchanged": true,
+        "restored": true
+      },
+      "restored": {
+        "exitCode": 0,
+        "stdout": "",
+        "stderr": "",
+        "stdoutTruncated": false,
+        "stderrTruncated": false,
+        "outcome": "succeeded"
+      }
+    }
+  ]
+}
