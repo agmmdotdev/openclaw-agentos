@@ -105,7 +105,9 @@ for (let i = 0; i < 50; i++) check(sqlStatement.get().value === 1, 'SQL calibrat
 mark('sql-roundtrips:end', { durationMs: performance.now() - sqlStart, roundtrips: 50 });
 sqlDatabase.close();
 mark('idle:start');
-await new Promise(resolve => setTimeout(resolve, 1500));
+const idleMs = Number(process.env.BENCH_IDLE_MS ?? 1500);
+check(Number.isSafeInteger(idleMs) && idleMs >= 1500 && idleMs <= 60000, 'Invalid BENCH_IDLE_MS');
+await new Promise(resolve => setTimeout(resolve, idleMs));
 mark('idle:end');
 
 

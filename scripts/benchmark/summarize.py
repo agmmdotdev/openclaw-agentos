@@ -1,12 +1,18 @@
 #!/usr/bin/env python3
-import json, statistics, os
+import argparse, json, statistics, os
 from pathlib import Path
 root = Path(__file__).resolve().parents[2]
 folder = root / 'artifacts/results'
+parser = argparse.ArgumentParser()
+parser.add_argument('--trials', nargs='+', type=int, help='Include only these trial numbers')
+parser.add_argument('--output', default='benchmark-summary.json', help='Output filename inside artifacts/results')
+args = parser.parse_args()
+if Path(args.output).name != args.output: parser.error('--output must be a filename')
 rows = []
 for path in sorted(folder.glob('benchmark-*.json')):
     if path.name in ('benchmark-summary.json', 'benchmark-bottlenecks.json'): continue
     report = json.loads(path.read_text())
+    if args.trials and report.get('trial') not in args.trials: continue
     events, samples = report['events'], report['samples']
     def event(label, instance=None):
         return next((e for e in events if e['label'] == label and (instance is None or e.get('instance') == instance)), None)
@@ -56,6 +62,8 @@ for path in sorted(folder.glob('benchmark-*.json')):
     last_warm = warm_ends[-1]['label'] if warm_ends else 'warm-turn-5:end'
     rows.append({'file':path.name,'runtime':report.get('runtime','native' if native else 'agentos'),
         'sqlStatementCacheSize':report.get('sqlStatementCacheSize',0),
+        'dataMount':report.get('dataMount','chunked_local'),
+        'idleMs':report.get('idleMs',1500),
         'workload':report.get('diagnostics',{}).get('BENCH_WORKLOAD') or 'core-shell',
         'profile':report.get('coreManifest',{}).get('profile','full'),
         'coreArtifactMode': next((e.get('coreMount', 'upload') for e in events if e['label'] == 'baseline'), 'native'),
@@ -82,6 +90,8 @@ for path in sorted(folder.glob('benchmark-*.json')):
         },
         'peakPssMiB':report['peakPssBytes']/2**20,'peakRssMiB':report['peakRssBytes']/2**20,
         'allIdlePssMiB':median_memory(max(idle_starts),min(idle_ends)) if idle_starts and idle_ends and max(idle_starts)<min(idle_ends) else None,
+        'earlyIdlePssMiB':median_memory(max(idle_starts),min(min(idle_ends),max(idle_starts)+1500)) if idle_starts and idle_ends else None,
+        'lateIdlePssMiB':median_memory(max(max(idle_starts),min(idle_ends)-5000),min(idle_ends)) if idle_starts and idle_ends else None,
         'baselinePssMiB':checkpoint_memory('baseline'),'emptyVmsPssMiB':checkpoint_memory('empty-vms'),
         'stagedPssMiB':checkpoint_memory('staged'),'disposedVmsPssMiB':checkpoint_memory('disposed-host-gc'),
         'disposedSidecarsPssMiB':checkpoint_memory('sidecars-disposed')})
@@ -89,7 +99,7 @@ result={'method':{'memory':'MiB; sampled process-tree PSS includes Node driver a
     'cpu':'Sum of maximum sampled CPU ticks per PID/start-time identity; phases align event clocks, include reaped children where indicated, and use nearest 100 ms samples and are emitted only for one VM. Approximate, may miss CPU between the last sample and exit',
     'latency':'Same read + shell exec turn, synthetic inference, six turns per guest by default (BENCH_WARM_TURNS extends the run); cold means fresh process/storage with warm host file cache',
     'scope':'Small local experiment, not production capacity or cloud billing'},'runs':rows}
-(folder/'benchmark-summary.json').write_text(json.dumps(result,indent=2)+'\n')
+(folder/args.output).write_text(json.dumps(result,indent=2)+'\n')
 for row in rows:
     warm=[v for instance in row['instances'] for v in instance['warmTurnMs']]
     print(row['file'], 'PASS' if row['passed'] else 'FAIL',

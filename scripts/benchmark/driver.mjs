@@ -1,4 +1,4 @@
-import { AgentOs } from '@rivet-dev/agentos-core';
+import { AgentOs, createHostDirBackend } from '@rivet-dev/agentos-core';
 import { readFile, readdir, mkdir, mkdtemp, rm, realpath } from 'node:fs/promises';
 import { join, dirname } from 'node:path';
 import { tmpdir } from 'node:os';
@@ -12,10 +12,15 @@ import { createCoreHostSqlite } from '../../src/core-host-sqlite.mjs';
 import { createCoreArtifactStore } from '../../src/core-artifact-store.mjs';
 
 const coreMount = process.env.BENCH_CORE_MOUNT ?? 'upload';
+// Diagnostic only: host_dir did not enforce maxFilesystemBytes in the probe.
+const dataMount = process.env.BENCH_DATA_MOUNT ?? 'chunked_local';
+if (!['chunked_local', 'host_dir'].includes(dataMount)) throw new Error('Unknown BENCH_DATA_MOUNT');
 if (!['upload', 'host_dir'].includes(coreMount)) throw new Error('Unknown BENCH_CORE_MOUNT');
 if (process.env.BENCH_SQL_SCHEMA_MODE && !['individual', 'table-only', 'table-index'].includes(process.env.BENCH_SQL_SCHEMA_MODE)) throw new Error('Unknown BENCH_SQL_SCHEMA_MODE');
 const canonicalBatching = process.env.BENCH_CANONICAL_BATCHING === '1' && !process.env.BENCH_SQL_SCHEMA_MODE;
 const warmTurns = Number(process.env.BENCH_WARM_TURNS ?? 5);
+const idleMs = Number(process.env.BENCH_IDLE_MS ?? 1500);
+if (!Number.isSafeInteger(idleMs) || idleMs < 1500 || idleMs > 60000) throw new Error('BENCH_IDLE_MS must be between 1500 and 60000');
 if (!Number.isSafeInteger(warmTurns) || warmTurns < 1 || warmTurns > 100) throw new Error('BENCH_WARM_TURNS must be between 1 and 100');
 const heapMb = Number(process.env.CORE_HEAP_MB ?? 256);
 const wasmHeapMb = process.env.CORE_WASM_HEAP_MB ? Number(process.env.CORE_WASM_HEAP_MB) : undefined;
@@ -28,10 +33,18 @@ const root = await mkdtemp(join(tmpdir(), 'openclaw-bench-'));
 function mark(label, data = {}) { console.log('BENCH_EVENT=' + JSON.stringify({ label, atMs: performance.now() - start, ...data })); }
 const settle = () => new Promise(resolve => setTimeout(resolve, 600));
 try {
-  mark('baseline', { placement: 'one-sidecar-pool-per-vm', coreMount, canonicalBatching }); await settle();
+  mark('baseline', { placement: 'one-sidecar-pool-per-vm', coreMount, dataMount, canonicalBatching }); await settle();
   if (coreMount === 'host_dir') artifactStore = await createCoreArtifactStore();
   for (let index = 0; index < instances; index++) {
     const directory = join(root, String(index)); await mkdir(directory);
+    const dataMounts = [];
+    for (const name of ['workspace', 'state']) {
+      if (dataMount === 'host_dir') {
+        const hostPath = join(directory, name);
+        await mkdir(hostPath, { mode: 0o777 });
+        dataMounts.push({ path: `/${name}`, plugin: createHostDirBackend({ hostPath, readOnly: false }) });
+      } else dataMounts.push({ path: `/${name}`, plugin: { id: 'chunked_local', config: { metadataPath: join(directory, `${name}.sqlite`), blockRoot: join(directory, `${name}-blocks`), uid: 1000, gid: 1000, dirMode: 0o700, fileMode: 0o600 } } });
+    }
     const sqlite = await createCoreHostSqlite(join(directory, 'databases'), { statementCacheSize: Number(process.env.BENCH_SQL_STATEMENT_CACHE ?? 0) });
     let hostSqlMilliseconds = 0;
     const executeSql = sqlite.collection.bindings.call.execute;
@@ -51,7 +64,7 @@ try {
       // A shared sidecar replaces its host binding handler on VM creation.
       // Separate pools preserve the instance's binding closure; no containers.
       sidecar: { kind: 'shared', pool: `core-benchmark-${randomUUID()}` },
-      mounts: ['workspace', 'state'].map(name => ({ path: `/${name}`, plugin: { id: 'chunked_local', config: { metadataPath: join(directory, `${name}.sqlite`), blockRoot: join(directory, `${name}-blocks`), uid: 1000, gid: 1000, dirMode: 0o700, fileMode: 0o600 } } })),
+      mounts: dataMounts,
       bindings: [sqlite.collection, { name: 'bench', description: 'Benchmark checkpoints', bindings: { mark: { description: 'Record a checkpoint', inputSchema: z.object({ label: z.string(), data: z.string() }), execute({ label, data }) { mark(label, { instance: index, sqliteCalls: sqlite.stats.calls, hostSqlMilliseconds, ...JSON.parse(data) }); return 'ok'; } } } }],
       allowedNodeBuiltins: [...OPENCLAW_AGENTOS_NODE_BUILTINS, 'querystring', 'console', 'sqlite', 'stream/web', 'constants', 'inspector'],
       permissions: { fs: 'allow', process: 'allow', childProcess: 'allow', env: 'allow', network: 'deny', binding: { default: 'deny', rules: [{ patterns: ['core-sqlite:call', 'bench:mark'], mode: 'allow' }] } },
@@ -61,7 +74,9 @@ try {
     mark('provision:start', { instance: index });
     const setup = await AgentOs.create({ ...options, user: { uid: 0, gid: 0 } });
     try {
-      const result = await setup.process.execFile('node', ['-e', "const fs=require('fs');for(const p of ['/workspace','/state']){fs.chownSync(p,1000,1000);fs.chmodSync(p,0o700)}"], { output: { capture: 'all' } });
+      const result = await setup.process.execFile('node', ['-e', dataMount === 'host_dir'
+        ? "const fs=require('fs');for(const p of ['/workspace','/state'])fs.chmodSync(p,0o777)"
+        : "const fs=require('fs');for(const p of ['/workspace','/state']){fs.chownSync(p,1000,1000);fs.chmodSync(p,0o700)}"], { output: { capture: 'all' } });
       if (result.exitCode !== 0) throw new Error(result.stderr);
     } finally { await setup.dispose(); }
     entry.vm = await AgentOs.create(options);
@@ -152,7 +167,7 @@ globalThis.__benchmarkFsTiming = () => benchmarkFsTiming;
   mark('staged'); await settle();
   mark('launch:start');
   const results = await Promise.all(resources.map(async ({ vm, index, sqlite }) => {
-    const result = await vm.process.execFile('node', ['/core/benchmark.mjs', '--internal-worker-prewarm'], { env: { OPENCLAW_STATE_DIR: '/state/openclaw', OPENCLAW_CHILD_OOM_SCORE_ADJ: '0', BENCH_WORKLOAD: process.env.BENCH_WORKLOAD ?? 'core-shell', BENCH_REVERSE: process.env.BENCH_REVERSE ?? '0', BENCH_WARM_TURNS: String(warmTurns), BENCH_SPLIT_INIT: process.env.BENCH_SPLIT_INIT ?? '0', BENCH_PROFILE_CORE: process.env.BENCH_PROFILE_CORE ?? '0' }, timeoutMs: 180000, output: { capture: 'all' } });
+    const result = await vm.process.execFile('node', ['/core/benchmark.mjs', '--internal-worker-prewarm'], { env: { OPENCLAW_STATE_DIR: '/state/openclaw', OPENCLAW_CHILD_OOM_SCORE_ADJ: '0', BENCH_WORKLOAD: process.env.BENCH_WORKLOAD ?? 'core-shell', BENCH_REVERSE: process.env.BENCH_REVERSE ?? '0', BENCH_WARM_TURNS: String(warmTurns), BENCH_IDLE_MS: String(idleMs), BENCH_SPLIT_INIT: process.env.BENCH_SPLIT_INIT ?? '0', BENCH_PROFILE_CORE: process.env.BENCH_PROFILE_CORE ?? '0' }, timeoutMs: 180000, output: { capture: 'all' } });
     mark('process:end', { instance: index, result, sqlite: sqlite.stats });
     if (/failed to asynchronously prepare wasm|Aborted\(Error:.*\/core\//.test(result.stderr ?? '')) throw new Error('Core parser asset failed to load');
     return result;
