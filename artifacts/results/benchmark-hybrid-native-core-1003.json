@@ -1,0 +1,367 @@
+{
+  "recordedAt": "2026-09-06T07:31:12Z",
+  "instances": 1,
+  "trial": 1003,
+  "sampleIntervalMs": 100.0,
+  "nodeSemiSpaceMiB": 8,
+  "nodeMaxOpt": null,
+  "runtime": "hybrid-native-core",
+  "splitInitializer": false,
+  "sqlStatementCacheSize": 0,
+  "dataMount": "chunked_local",
+  "idleMs": 1500,
+  "allocatorEnvironment": {
+    "MALLOC_ARENA_MAX": "1",
+    "MALLOC_TRIM_THRESHOLD_": "65536",
+    "MALLOC_MMAP_THRESHOLD_": "65536",
+    "MALLOC_TOP_PAD_": null,
+    "GLIBC_TUNABLES": null
+  },
+  "coreManifest": {
+    "schemaCollector": {
+      "sha256": "9332ebdb5f95cb07092629b46eeb884f1a124e3f6a2b18052e9c7bacdd378d17",
+      "bytes": 15166,
+      "roots": [
+        "init_sqlite_schema_sql",
+        "collectSqliteTableContract",
+        "collectSqliteNamedIndexContract",
+        "collectCanonicalStrictTableMetadata"
+      ]
+    },
+    "profile": "core",
+    "profileReport": {
+      "roots": [
+        "init_embedded_agent_runtime",
+        "runWorkerEmbeddedTurn"
+      ],
+      "paths": {
+        "init_bundled_channel_config_metadata_generated": [
+          "init_embedded_agent_runtime",
+          "init_model_registry",
+          "init_model_discovery_context",
+          "init_config$14",
+          "init_validation$4",
+          "init_bundled_channel_config_metadata_generated"
+        ]
+      },
+      "largest": [
+        {
+          "names": [
+            "init_bundled_channel_config_metadata_generated"
+          ],
+          "bytes": 308217
+        },
+        {
+          "names": [
+            "index_incubating_exports"
+          ],
+          "bytes": 170036
+        },
+        {
+          "names": [
+            "require_llhttp_simd_wasm"
+          ],
+          "bytes": 144717
+        },
+        {
+          "names": [
+            "require_llhttp_wasm"
+          ],
+          "bytes": 144208
+        },
+        {
+          "names": [
+            "init_node"
+          ],
+          "bytes": 142909
+        },
+        {
+          "names": [
+            "require_isbl"
+          ],
+          "bytes": 142816
+        },
+        {
+          "names": [
+            "init_acorn"
+          ],
+          "bytes": 126506
+        },
+        {
+          "names": [
+            "require_mathematica"
+          ],
+          "bytes": 109955
+        },
+        {
+          "names": [
+            "require_ponyfill_es2018"
+          ],
+          "bytes": 98456
+        },
+        {
+          "names": [
+            "init_index_min"
+          ],
+          "bytes": 88455
+        },
+        {
+          "names": [
+            "init_experimental_attributes"
+          ],
+          "bytes": 83714
+        },
+        {
+          "names": [
+            "init_openclaw_state_schema"
+          ],
+          "bytes": 83197
+        }
+      ],
+      "inputStatements": 81389,
+      "retainedStatements": 36989,
+      "removedBytes": 31995835,
+      "legalNoticeBytes": 6648,
+      "eagerInitializers": 44,
+      "retainedRegistrations": [
+        "setWorkerDeployRuntime({highlightJs:worker_deploy_highlight_runtime_default,json5:worker_deploy_json5_runtime_default,resolveSecureTempRoot})"
+      ],
+      "excludedBoundaries": [
+        "gateway compaction runtime",
+        "source extension loader"
+      ]
+    },
+    "inputBytes": 46593544,
+    "nativeCoreBytes": 14597672,
+    "outputBytes": 16598881,
+    "nativeCoreSha256": "9cdf14575c806336f7f19f6db2e206dad6807f78a0a7ac53d60b8906259fdb7d",
+    "openclaw": "2026.8.1",
+    "agentos": "0.2.19",
+    "inputSha256": "03eca1d346aa24fd5028b2ca8d09385b764bf9dd2c82810ce564043a34356f1c",
+    "outputSha256": "03fafac4c25ad5c9b38fd00c902a4b422d56b0b2f564f81cfbdc526b6270196e",
+    "asyncCompiler": {
+      "name": "esbuild",
+      "version": "0.28.2",
+      "supported": {
+        "async-await": false,
+        "async-generator": false,
+        "for-await": false
+      }
+    },
+    "intrinsicReferences": 2,
+    "replacements": [
+      {
+        "start": 6698,
+        "end": 6711,
+        "from": "node:module",
+        "to": "./compat/module.mjs"
+      },
+      {
+        "start": 6737,
+        "end": 6750,
+        "from": "node:crypto",
+        "to": "./compat/crypto.mjs"
+      },
+      {
+        "start": 6919,
+        "end": 6932,
+        "from": "node:crypto",
+        "to": "./compat/crypto.mjs"
+      },
+      {
+        "start": 6955,
+        "end": 6964,
+        "from": "node:fs",
+        "to": "./compat/fs.mjs"
+      },
+      {
+        "start": 7343,
+        "end": 7352,
+        "from": "node:fs",
+        "to": "./compat/fs.mjs"
+      },
+      {
+        "start": 8113,
+        "end": 8131,
+        "from": "node:async_hooks",
+        "to": "./compat/async-hooks.mjs"
+      },
+      {
+        "start": 8152,
+        "end": 8172,
+        "from": "node:child_process",
+        "to": "./compat/child-process.mjs"
+      },
+      {
+        "start": 8264,
+        "end": 8284,
+        "from": "node:child_process",
+        "to": "./compat/child-process.mjs"
+      },
+      {
+        "start": 8448,
+        "end": 8459,
+        "from": "node:util",
+        "to": "./compat/util.mjs"
+      },
+      {
+        "start": 9125,
+        "end": 9142,
+        "from": "node:perf_hooks",
+        "to": "./compat/perf-hooks.mjs"
+      }
+    ],
+    "compatibilityFiles": {
+      "crypto.mjs": "e73413c8e40c0356177a8b79ea329597714e512bb28e18a9cc73384d549ca00e",
+      "fs.mjs": "9eef1b59ce9191195f33beb9b814bdcec103a9cd718a91f03da66247b6107347",
+      "module.mjs": "0b42e0632916a4922ac9a61537b55502c362c98fc7f2b94aeba1686e9f7d2c5f",
+      "perf-hooks.mjs": "bb1084bd98fb604747b4ce53cebc827a0a2f4c8b4fd7d4e5709e2d7962077d7c",
+      "readline-promises.mjs": "6705c91651cfb9f3a2d81631cb5c041448637f3aa839e76d621aec24f4d7ddc4",
+      "util.mjs": "8fb311c732efcf8f1936ececc0f8f14699442af0b089bb15ceb025428198955a",
+      "async-hooks.mjs": "62f7e3dd394203875115cc73b46c25abc52f484b74eb41ee81ea20f58e3f27df",
+      "child-process.mjs": "a44baff695fba23ddd978f5734d1fef33fb3d05674f1ce7cbe294c479a50259b",
+      "sqlite.mjs": "4c5b5c5623d373172a3cd375a4b584319d7e303b3d59623c1873de16b6b58650",
+      "init.mjs": "f7cecfb8fdfd3197bb3351f259b0c1453411e424d6516f0c6df0e2bee6045571",
+      "text-decoder.mjs": "ba47fd59fa220e984a900afe3e748b2660aa4f18fe5a1d2d1ae94cdc8d2ecaa4",
+      "async-intrinsics.mjs": "7b145fa1054d44ef04ee540e24efdc3c205caaad54da9b3705133dcfbb89179e"
+    },
+    "addedExports": [
+      "runOpenClawCoreTurn"
+    ],
+    "invokesUpstreamInitializer": "init_embedded_agent_runtime"
+  },
+  "diagnostics": {
+    "BENCH_NATIVE_MEMORY": "0",
+    "BENCH_GC_AT_IDLE": "0",
+    "BENCH_PROFILE_CORE": "0",
+    "BENCH_PROFILE_FS": "0",
+    "BENCH_SQL_SCHEMA_MODE": "0",
+    "BENCH_PROFILE_PROCESS": "0",
+    "BENCH_PROFILE_SQL": "0",
+    "CORE_HEAP_MB": null,
+    "CORE_WASM_HEAP_MB": null,
+    "AGENTOS_V8_WARM_ISOLATES": "0",
+    "AGENTOS_WASM_SNAPSHOT_RUNNER": null,
+    "BENCH_WARM_TURNS": "1",
+    "BENCH_WORKLOAD": "core-workload",
+    "BENCH_REVERSE": null,
+    "BENCH_CORE_MOUNT": null,
+    "BENCH_CANONICAL_BATCHING": null
+  },
+  "method": "Linux smaps_rollup RSS/PSS summed across isolated benchmark driver and descendants; compiler runs separately",
+  "environment": {
+    "platform": "Linux-6.18.35-x86_64-with-glibc2.39",
+    "cpuCount": 9,
+    "cpuAffinity": [
+      0,
+      1
+    ],
+    "clockTicksPerSecond": 100,
+    "cpuMax": "800000 100000",
+    "memoryMax": "21474836480"
+  },
+  "exitCode": 1,
+  "measurementValid": false,
+  "missingCheckpoints": [
+    "cold-turn:end",
+    "idle:end",
+    "representative:complete",
+    "warm-turn-1:end"
+  ],
+  "wallMs": 2248.896513001455,
+  "driverAndReapedUserSeconds": 2.176672,
+  "driverAndReapedSystemSeconds": 0.507072,
+  "sampledTreeCpuSeconds": 2.47,
+  "accountedTreeCpuSeconds": 2.65,
+  "peakRssBytes": 472023040,
+  "peakPssBytes": 470218752,
+  "events": [
+    {
+      "label": "worker-ready",
+      "atMs": 0.057777000000101,
+      "instance": 0,
+      "receivedAtMs": 977.6156200005062
+    },
+    {
+      "label": "workload",
+      "atMs": 3.437272000000007,
+      "instance": 0,
+      "workload": "core-workload",
+      "receivedAtMs": 980.825945000106
+    },
+    {
+      "label": "workload-stage:start",
+      "atMs": 3.850414999999998,
+      "instance": 0,
+      "receivedAtMs": 981.1948360002134
+    },
+    {
+      "label": "workload-stage:end",
+      "atMs": 151.92924700000015,
+      "instance": 0,
+      "sourceFiles": 48,
+      "sourceBytes": 16384,
+      "catalogBytes": 1048576,
+      "totalSeedBytes": 1839113,
+      "receivedAtMs": 1129.3581950012594
+    },
+    {
+      "label": "representative:config",
+      "atMs": 152.394588,
+      "instance": 0,
+      "sourceFiles": 48,
+      "sourceBytes": 16384,
+      "catalogBytes": 1048576,
+      "initialHistoryBytes": 103069,
+      "initialMessages": 24,
+      "responseDelayMs": 60,
+      "betweenTurnsMs": 100,
+      "warmTurns": 1,
+      "receivedAtMs": 1129.700411000158
+    },
+    {
+      "label": "cold-turn:start",
+      "atMs": 152.43936599999995,
+      "instance": 0,
+      "receivedAtMs": 1129.7112080010265
+    }
+  ],
+  "stderr": [
+    "file:///workspace/scratch/a59ce3689e70/openclaw-agentos/artifacts/core/hybrid-core-benchmark.mjs:44279",
+    "async function runWorkerEmbeddedTurn(Ot){if(Ot.allowedToolNames.includes(`browser`)!==(Ot.browser!==void 0))throw Error(`Worker Browser authority and launch descriptor must be provided together.`);if(Ot.allowedToolNames.includes(`computer`)!==(Ot.computer!==void 0))throw Error(`Worker computer authority and launch descriptor must be provided together.`);if(Ot.operationalRunInstance.runId!==Ot.runId)throw Error(`worker operational run instance disagrees with the admitted turn`);let Zt=createNativeModelOwnedRuntimeModel({provider:Ot.modelRef.provider,modelId:Ot.modelRef.model}),_n=AuthStorage.inMemory({}),Dn=ModelRegistry.inMemory(_n),kn=SettingsManager.inMemory({compaction:{enabled:!1},retry:{enabled:!1}}),Pn=buildBootstrapContextForFiles((await loadWorkspaceBootstrapFiles(Ot.cwd)).filter(Ot=>Ot.name===DEFAULT_AGENTS_FILENAME),{}),Fn=createEmbeddedAgentResourceLoader({cwd:Ot.cwd,agentDir:Ot.stateDir,settingsManager:kn,appendSystemPromptTransform:()=>Ot.systemPrompt===void 0?[]:[Ot.systemPrompt],agentsFilesOverride:()=>({agentsFiles:Pn})});await Fn.reload();let Ln=SessionManager.inMemory(Ot.cwd);for(let Zt of Ot.initialMessages??[])Ln.appendMessage(toAgentMessage(Zt));let Jn=createWorkerTranscriptRuntime(Ot.transcript),cr=guardSessionManager(Ln,{suppressNextUserMessagePersistence:Ot.suppressPromptTranscript,onMessagePersisted:Jn.onMessagePersisted}),pr=new Set(Ot.allowedToolNames),xr=new Set(WORKER_LOCAL_TOOL_NAMES),Mr=Ot.permissionMode?resolveSessionPermissionCoreToolPolicy({mode:Ot.permissionMode}):void 0,Pr=Mr?.readOnly?new Set([`write`,`edit`,`apply_patch`]):void 0,Br=WORKER_TOOL_NAMES.filter(Ot=>pr.has(Ot)&&!Pr?.has(Ot)),Hr=Ot.permissionMode?`Exec denied (approval_required) in worker ${Ot.permissionMode} permission mode. Run this command locally for interactive approval, or ask an administrator to clear the session permission mode.`:void 0,mi=createCoreCodingTools({codingRoot:Ot.cwd,containmentRoot:Ot.workerContainmentRoot,includeBaseCodingTools:!0,includeShellTools:!0,workspaceOnly:Mr?.workspaceOnly??!1,readOnly:Mr?.readOnly??!1,modelContextWindowTokens:Zt.contextWindow,imageSanitization:{},applyPatchEnabled:Mr?.readOnly!==!0&&isApplyPatchAllowedForModel({modelProvider:Ot.modelRef.provider,modelId:Ot.modelRef.model}),applyPatchWorkspaceOnly:Mr?.applyPatchWorkspaceOnly??!0,execDefaults:{bypassHostApprovalFloors:Mr?.bypassHostApprovalFloors,host:`gateway`,mode:Mr?.execMode??`full`,security:`full`,ask:`off`,nonInteractiveApproval:!!(Mr&&Mr.execMode!==`full`),approvalFollowupText:Hr,config:WORKER_TOOL_CONFIG,commandHighlighting:!1,agentId:Ot.agentId,allowBackground:!0,scopeKey:Ot.sessionKey,sessionKey:Ot.sessionKey,runId:Ot.runId,notifySessionKey:Ot.sessionKey,sessionId:Ot.sessionId,eventRouting:{preserveSessionKey:!1}},processDefaults:{scopeKey:Ot.sessionKey}}),Si=Ot.browser?await createWorkerBrowserToolRuntime({descriptor:Ot.browser,sessionKey:Ot.sessionKey,stateDir:Ot.stateDir,workspaceDir:Ot.cwd,...Ot.browserRuntime?{runtime:Ot.browserRuntime}:{}}):void 0,wi=new AbortController,Di=Ot.signal?AbortSignal.any([Ot.signal,wi.signal]):wi.signal,Mi,disposeComputer=async()=>{let Ot=Mi;Mi=void 0,await Ot?.(`Worker turn finished`)},{session:ea}=await(async()=>{try{let Pn=Ot.computer?createWorkerComputerTool({...Ot.computer,runId:Ot.runId,registerRunCleanup:Ot=>{Mi=Ot}}):void 0,Ln=finalizeAgentTools({tools:[...mi,...Si?[Si.tool]:[],...Pn?[Pn]:[]],modelProvider:Ot.modelRef.provider,modelId:Ot.modelRef.model,hookContext:{agentId:Ot.agentId,config:WORKER_TOOL_CONFIG,cwd:Ot.cwd,workspaceDir:Ot.cwd,sessionKey:Ot.sessionKey,sessionId:Ot.sessionId,runId:Ot.runId,requester:{senderIsOwner:!0},loopDetection:resolveToolLoopDetectionConfig({cfg:WORKER_TOOL_CONFIG,agentId:Ot.agentId})},agentId:Ot.agentId,abortSignal:Di}).filter(Ot=>xr.has(Ot.name)).map(Zt=>wrapToolWithGatewayCallerIdentity(Zt,{agentId:Ot.agentId,sessionKey:Ot.sessionKey,operationalRunInstance:Ot.operationalRunInstance,signedAgentRuntimeIdentityToken:Ot.agentRuntimeIdentityToken})),Mr=new Set(Ln.map(Ot=>Ot.name));for(let Ot of WORKER_REQUIRED_LOCAL_TOOL_NAMES)if(!Pr?.has(Ot)&&!Mr.has(Ot))throw Error(`Worker coding tool unavailable: ${Ot}`);if(WORKER_SESSION_TOOL_NAMES.filter(Ot=>pr.has(Ot)).length>0&&!Ot.sessions)throw Error(`Worker session tool client unavailable`);let Hr=Ot.sessions?createWorkerSessionTools(Ot.sessions).filter(Ot=>pr.has(Ot.name)):[];return await createAgentSession({cwd:Ot.cwd,agentDir:Ot.stateDir,authStorage:_n,modelRegistry:Dn,model:Zt,thinkingLevel:`medium`,tools:[...Br],customTools:toToolDefinitions([...Ln.filter(Ot=>pr.has(Ot.name)),...Hr.map(Ot=>wrapToolWithAbortSignal(Ot,Di))]),noTools:`all`,sessionManager:cr,settingsManager:kn,resourceLoader:Fn,withSessionWriteSettlement:Jn.withSessionWriteSettlement})}catch(Ot){wi.abort();try{await disposeComputer()}finally{await Si?.dispose()}throw Ot}})();ea.agent.sessionId=Ot.sessionId,ea.setActiveToolsByName([...Br]),ea.agent.streamFn=(Zt,_n,Dn)=>{let kn=toWorkerInferenceContext(_n);if(kn.kind===`provider-replay-unavailable`)throw Error(`${WORKER_PROVIDER_REPLAY_LOCAL_RETRY_MESSAGE} (${kn.details.reason})`);return Ot.inference.stream({modelRef:Ot.modelRef,context:kn.context,options:structuredClone(Ot.inferenceOptions??{}),...Dn?.signal?{signal:Dn.signal}:{}})};let ta=createWorkerLiveRuntime(Ot.live),na=ea.subscribe(ta.handleSessionEvent),abortTurn=()=>ea.agent.abort();Ot.signal?.addEventListener(`abort`,abortTurn,{once:!0});let ra;try{if(Ot.signal?.aborted||(await ea.agent.prompt({role:`user`,content:typeof Ot.prompt==`string`?[{type:`text`,text:Ot.prompt}]:Ot.prompt,timestamp:Date.now()}),await ea.agent.waitForIdle(),Ot.signal?.aborted))throw toWorkerAgentError(Ot.signal.reason,`Worker agent turn aborted.`);let Zt=ea.agent.state.messages.toReversed().find(Ot=>Ot.role===`assistant`);if(Zt?.stopReason===`error`)throw Error(Zt.errorMessage??`Worker inference failed.`);if(Zt?.stopReason===`aborted`)throw Error(Zt.errorMessage??`Worker inference was aborted.`)}catch(Zt){ra=Ot.signal?.aborted?toWorkerAgentError(Ot.signal.reason,`Worker agent turn aborted.`):toWorkerAgentError(Zt,`Worker agent turn failed.`),ta.enqueueRunFailure({aborted:Ot.signal?.aborted===!0,error:ra})}let ia;try{wi.abort();try{await disposeComputer()}catch(Zt){ra??=toWorkerAgentError(Zt,`Worker computer cleanup failed.`),ta.enqueueRunFailure({aborted:Ot.signal?.aborted===!0,error:ra})}try{await Jn.withSessionWriteSettlement(()=>void 0)}catch(Ot){ia=toWorkerAgentError(Ot,`Worker transcript flush failed.`)}ia===void 0&&await ta.emitTerminal()}finally{wi.abort(),Ot.signal?.removeEventListener(`abort`,abortTurn),na(),ea.dispose(),await Si?.dispose()}if(ra!==void 0)throw ra;if(ia!==void 0)throw ia}",
+    "                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            ",
+    "",
+    "Error: representative exec did not complete: {\"role\":\"toolResult\",\"toolCallId\":\"representative-0-2\",\"toolName\":\"exec\",\"content\":[{\"type\":\"text\",\"text\":\"error: command not found: grep\\n\\nCommand not found\"}],\"details\":{\"status\":\"failed\",\"exitCode\":127,\"failureKind\":\"shell-command-not-found\",\"exitReason\":\"exit\",\"durationMs\":758,\"aggregated\":\"error: command not found: grep\",\"timedOut\":false,\"cwd\":\"/tmp/openclaw-native-bench-sy6h51_j/workspace\"},\"isError\":false,\"timestamp\":1788679872460}",
+    "    at runWorkerEmbeddedTurn (file:///workspace/scratch/a59ce3689e70/openclaw-agentos/artifacts/core/hybrid-core-benchmark.mjs:44279:5838)",
+    "    at async runRepresentativeBenchmarks (file:///workspace/scratch/a59ce3689e70/openclaw-agentos/artifacts/core/hybrid-core-benchmark.mjs:44529:5)",
+    "    at async file:///workspace/scratch/a59ce3689e70/openclaw-agentos/artifacts/core/hybrid-core-benchmark.mjs:44365:3",
+    "    at async file:///workspace/scratch/a59ce3689e70/openclaw-agentos/artifacts/core/hybrid-core-benchmark.mjs:44305:7",
+    "",
+    "Node.js v24.19.0"
+  ],
+  "samples": [
+    {"atMs":7.69867600138241,"accountedTreeTicks":0,"rssBytes":5562368,"pssBytes":4939776,"processes":[{"pid":165990,"name":"node","ppid":165921,"ticks":0,"reapedChildTicks":0,"startTicks":1234473,"threads":1,"Rss":5562368,"Pss":4939776,"Private_Clean":3969024,"Private_Dirty":843776,"Swap":0}]},
+    {"atMs":108.48801500105765,"accountedTreeTicks":10,"rssBytes":85643264,"pssBytes":84838400,"processes":[{"pid":165990,"name":"MainThread","ppid":165921,"ticks":10,"reapedChildTicks":0,"startTicks":1234473,"threads":7,"Rss":85643264,"Pss":84838400,"Private_Clean":21909504,"Private_Dirty":62730240,"Swap":0}]},
+    {"atMs":209.05610900081228,"accountedTreeTicks":20,"rssBytes":118657024,"pssBytes":117852160,"processes":[{"pid":165990,"name":"MainThread","ppid":165921,"ticks":20,"reapedChildTicks":0,"startTicks":1234473,"threads":7,"Rss":118657024,"Pss":117852160,"Private_Clean":22179840,"Private_Dirty":95473664,"Swap":0}]},
+    {"atMs":309.8251370010985,"accountedTreeTicks":30,"rssBytes":149979136,"pssBytes":149174272,"processes":[{"pid":165990,"name":"MainThread","ppid":165921,"ticks":30,"reapedChildTicks":0,"startTicks":1234473,"threads":7,"Rss":149979136,"Pss":149174272,"Private_Clean":22245376,"Private_Dirty":126730240,"Swap":0}]},
+    {"atMs":414.41044800012605,"accountedTreeTicks":40,"rssBytes":168894464,"pssBytes":168089600,"processes":[{"pid":165990,"name":"MainThread","ppid":165921,"ticks":40,"reapedChildTicks":0,"startTicks":1234473,"threads":7,"Rss":168894464,"Pss":168089600,"Private_Clean":22253568,"Private_Dirty":145637376,"Swap":0}]},
+    {"atMs":514.6053400003439,"accountedTreeTicks":52,"rssBytes":166825984,"pssBytes":166009856,"processes":[{"pid":165990,"name":"MainThread","ppid":165921,"ticks":52,"reapedChildTicks":0,"startTicks":1234473,"threads":7,"Rss":166825984,"Pss":166009856,"Private_Clean":24215552,"Private_Dirty":141594624,"Swap":0}]},
+    {"atMs":618.4273440012475,"accountedTreeTicks":65,"rssBytes":183480320,"pssBytes":182656000,"processes":[{"pid":165990,"name":"MainThread","ppid":165921,"ticks":65,"reapedChildTicks":0,"startTicks":1234473,"threads":7,"Rss":183480320,"Pss":182656000,"Private_Clean":28831744,"Private_Dirty":153632768,"Swap":0}]},
+    {"atMs":718.9649730007659,"accountedTreeTicks":76,"rssBytes":227004416,"pssBytes":225252352,"processes":[{"pid":165990,"name":"MainThread","ppid":165921,"ticks":74,"reapedChildTicks":0,"startTicks":1234473,"threads":7,"Rss":194080768,"Pss":193179648,"Private_Clean":29097984,"Private_Dirty":163885056,"Swap":0},{"pid":166000,"name":"agentos-sidecar","ppid":165990,"ticks":2,"reapedChildTicks":0,"startTicks":1234541,"threads":13,"Rss":32923648,"Pss":32072704,"Private_Clean":26390528,"Private_Dirty":5509120,"Swap":0}]},
+    {"atMs":819.8706109997147,"accountedTreeTicks":87,"rssBytes":236953600,"pssBytes":235201536,"processes":[{"pid":165990,"name":"MainThread","ppid":165921,"ticks":80,"reapedChildTicks":0,"startTicks":1234473,"threads":7,"Rss":203710464,"Pss":202809344,"Private_Clean":30896128,"Private_Dirty":171716608,"Swap":0},{"pid":166000,"name":"agentos-sidecar","ppid":165990,"ticks":7,"reapedChildTicks":0,"startTicks":1234541,"threads":13,"Rss":33243136,"Pss":32392192,"Private_Clean":26456064,"Private_Dirty":5763072,"Swap":0}]},
+    {"atMs":920.8946070011734,"accountedTreeTicks":102,"rssBytes":266395648,"pssBytes":264643584,"processes":[{"pid":165990,"name":"MainThread","ppid":165921,"ticks":95,"reapedChildTicks":0,"startTicks":1234473,"threads":7,"Rss":233152512,"Pss":232251392,"Private_Clean":31137792,"Private_Dirty":200916992,"Swap":0},{"pid":166000,"name":"agentos-sidecar","ppid":165990,"ticks":7,"reapedChildTicks":0,"startTicks":1234541,"threads":13,"Rss":33243136,"Pss":32392192,"Private_Clean":26456064,"Private_Dirty":5763072,"Swap":0}]},
+    {"atMs":1021.3313630010816,"accountedTreeTicks":115,"rssBytes":272011264,"pssBytes":270259200,"processes":[{"pid":165990,"name":"MainThread","ppid":165921,"ticks":104,"reapedChildTicks":0,"startTicks":1234473,"threads":7,"Rss":236093440,"Pss":235192320,"Private_Clean":31281152,"Private_Dirty":203714560,"Swap":0},{"pid":166000,"name":"agentos-sidecar","ppid":165990,"ticks":11,"reapedChildTicks":0,"startTicks":1234541,"threads":13,"Rss":35917824,"Pss":35066880,"Private_Clean":28618752,"Private_Dirty":6275072,"Swap":0}]},
+    {"atMs":1121.5388430009625,"accountedTreeTicks":125,"rssBytes":281710592,"pssBytes":279958528,"processes":[{"pid":165990,"name":"MainThread","ppid":165921,"ticks":106,"reapedChildTicks":0,"startTicks":1234473,"threads":7,"Rss":238698496,"Pss":237797376,"Private_Clean":31305728,"Private_Dirty":206295040,"Swap":0},{"pid":166000,"name":"agentos-sidecar","ppid":165990,"ticks":19,"reapedChildTicks":0,"startTicks":1234541,"threads":13,"Rss":43012096,"Pss":42161152,"Private_Clean":28618752,"Private_Dirty":13369344,"Swap":0}]},
+    {"atMs":1221.8657030007307,"accountedTreeTicks":132,"rssBytes":278953984,"pssBytes":277175296,"processes":[{"pid":165990,"name":"MainThread","ppid":165921,"ticks":112,"reapedChildTicks":0,"startTicks":1234473,"threads":11,"Rss":241192960,"Pss":240265216,"Private_Clean":31752192,"Private_Dirty":208310272,"Swap":0},{"pid":166000,"name":"agentos-sidecar","ppid":165990,"ticks":20,"reapedChildTicks":0,"startTicks":1234541,"threads":13,"Rss":37761024,"Pss":36910080,"Private_Clean":28618752,"Private_Dirty":8118272,"Swap":0}]},
+    {"atMs":1322.4220240008435,"accountedTreeTicks":138,"rssBytes":280207360,"pssBytes":278428672,"processes":[{"pid":165990,"name":"MainThread","ppid":165921,"ticks":116,"reapedChildTicks":0,"startTicks":1234473,"threads":11,"Rss":241975296,"Pss":241047552,"Private_Clean":31772672,"Private_Dirty":209072128,"Swap":0},{"pid":166000,"name":"agentos-sidecar","ppid":165990,"ticks":22,"reapedChildTicks":0,"startTicks":1234541,"threads":13,"Rss":38232064,"Pss":37381120,"Private_Clean":28880896,"Private_Dirty":8327168,"Swap":0}]},
+    {"atMs":1422.9019040012645,"accountedTreeTicks":146,"rssBytes":304189440,"pssBytes":302419968,"processes":[{"pid":165990,"name":"MainThread","ppid":165921,"ticks":120,"reapedChildTicks":0,"startTicks":1234473,"threads":11,"Rss":245694464,"Pss":244773888,"Private_Clean":32808960,"Private_Dirty":211759104,"Swap":0},{"pid":166000,"name":"agentos-sidecar","ppid":165990,"ticks":26,"reapedChildTicks":0,"startTicks":1234541,"threads":13,"Rss":58494976,"Pss":57646080,"Private_Clean":49065984,"Private_Dirty":8400896,"Swap":0}]},
+    {"atMs":1524.0589710010681,"accountedTreeTicks":159,"rssBytes":407834624,"pssBytes":382208000,"processes":[{"pid":165990,"name":"MainThread","ppid":165921,"ticks":120,"reapedChildTicks":0,"startTicks":1234473,"threads":11,"Rss":245694464,"Pss":244722688,"Private_Clean":32804864,"Private_Dirty":211759104,"Swap":0},{"pid":166000,"name":"agentos-sidecar","ppid":165990,"ticks":33,"reapedChildTicks":0,"startTicks":1234541,"threads":15,"Rss":83218432,"Pss":76516352,"Private_Clean":51261440,"Private_Dirty":21975040,"Swap":0},{"pid":166035,"name":"agentos-sidecar","ppid":166000,"ticks":5,"reapedChildTicks":0,"startTicks":1234618,"threads":6,"Rss":44081152,"Pss":35044352,"Private_Clean":622592,"Private_Dirty":28762112,"Swap":0},{"pid":166042,"name":"agentos-sidecar","ppid":166000,"ticks":1,"reapedChildTicks":0,"startTicks":1234622,"threads":6,"Rss":34840576,"Pss":25924608,"Private_Clean":876544,"Private_Dirty":19509248,"Swap":0}]},
+    {"atMs":1624.9177669997152,"accountedTreeTicks":180,"rssBytes":440844288,"pssBytes":412065792,"processes":[{"pid":165990,"name":"MainThread","ppid":165921,"ticks":120,"reapedChildTicks":0,"startTicks":1234473,"threads":11,"Rss":245694464,"Pss":244721664,"Private_Clean":32804864,"Private_Dirty":211759104,"Swap":0},{"pid":166000,"name":"agentos-sidecar","ppid":165990,"ticks":33,"reapedChildTicks":0,"startTicks":1234541,"threads":15,"Rss":83218432,"Pss":76449792,"Private_Clean":51212288,"Private_Dirty":21975040,"Swap":0},{"pid":166035,"name":"agentos-sidecar","ppid":166000,"ticks":15,"reapedChildTicks":0,"startTicks":1234618,"threads":6,"Rss":58048512,"Pss":47490048,"Private_Clean":356352,"Private_Dirty":40042496,"Swap":0},{"pid":166042,"name":"agentos-sidecar","ppid":166000,"ticks":12,"reapedChildTicks":0,"startTicks":1234622,"threads":6,"Rss":53882880,"Pss":43404288,"Private_Clean":655360,"Private_Dirty":35737600,"Swap":0}]},
+    {"atMs":1725.789223000902,"accountedTreeTicks":200,"rssBytes":424308736,"pssBytes":395412480,"processes":[{"pid":165990,"name":"MainThread","ppid":165921,"ticks":120,"reapedChildTicks":0,"startTicks":1234473,"threads":11,"Rss":245694464,"Pss":244721664,"Private_Clean":32804864,"Private_Dirty":211759104,"Swap":0},{"pid":166000,"name":"agentos-sidecar","ppid":165990,"ticks":33,"reapedChildTicks":0,"startTicks":1234541,"threads":15,"Rss":83218432,"Pss":76436480,"Private_Clean":51191808,"Private_Dirty":21975040,"Swap":0},{"pid":166035,"name":"agentos-sidecar","ppid":166000,"ticks":26,"reapedChildTicks":0,"startTicks":1234618,"threads":6,"Rss":49049600,"Pss":38448128,"Private_Clean":335872,"Private_Dirty":30982144,"Swap":0},{"pid":166042,"name":"agentos-sidecar","ppid":166000,"ticks":21,"reapedChildTicks":0,"startTicks":1234622,"threads":6,"Rss":46346240,"Pss":35806208,"Private_Clean":671744,"Private_Dirty":28065792,"Swap":0}]},
+    {"atMs":1826.3154180003767,"accountedTreeTicks":219,"rssBytes":422006784,"pssBytes":408467456,"processes":[{"pid":165990,"name":"MainThread","ppid":165921,"ticks":120,"reapedChildTicks":0,"startTicks":1234473,"threads":11,"Rss":245694464,"Pss":244741120,"Private_Clean":32804864,"Private_Dirty":211759104,"Swap":0},{"pid":166000,"name":"agentos-sidecar","ppid":165990,"ticks":34,"reapedChildTicks":30,"startTicks":1234541,"threads":15,"Rss":107581440,"Pss":101259264,"Private_Clean":51699712,"Private_Dirty":43974656,"Swap":0},{"pid":166035,"name":"agentos-sidecar","ppid":166000,"ticks":35,"reapedChildTicks":0,"startTicks":1234618,"threads":6,"Rss":68730880,"Pss":62467072,"Private_Clean":6295552,"Private_Dirty":50601984,"Swap":0}]},
+    {"atMs":1926.7137110000476,"accountedTreeTicks":234,"rssBytes":472023040,"pssBytes":470218752,"processes":[{"pid":165990,"name":"MainThread","ppid":165921,"ticks":120,"reapedChildTicks":0,"startTicks":1234473,"threads":11,"Rss":245694464,"Pss":244764672,"Private_Clean":32792576,"Private_Dirty":211759104,"Swap":0},{"pid":166000,"name":"agentos-sidecar","ppid":165990,"ticks":46,"reapedChildTicks":68,"startTicks":1234541,"threads":14,"Rss":226328576,"Pss":225454080,"Private_Clean":75550720,"Private_Dirty":149712896,"Swap":0}]},
+    {"atMs":2027.6126180015126,"accountedTreeTicks":245,"rssBytes":445374464,"pssBytes":443570176,"processes":[{"pid":165990,"name":"MainThread","ppid":165921,"ticks":120,"reapedChildTicks":0,"startTicks":1234473,"threads":11,"Rss":245723136,"Pss":244793344,"Private_Clean":32792576,"Private_Dirty":211787776,"Swap":0},{"pid":166000,"name":"agentos-sidecar","ppid":165990,"ticks":57,"reapedChildTicks":68,"startTicks":1234541,"threads":14,"Rss":199651328,"Pss":198776832,"Private_Clean":76075008,"Private_Dirty":122511360,"Swap":0}]},
+    {"atMs":2127.938992000054,"accountedTreeTicks":256,"rssBytes":432041984,"pssBytes":430233600,"processes":[{"pid":165990,"name":"MainThread","ppid":165921,"ticks":120,"reapedChildTicks":0,"startTicks":1234473,"threads":11,"Rss":245743616,"Pss":244812800,"Private_Clean":32792576,"Private_Dirty":211808256,"Swap":0},{"pid":166000,"name":"agentos-sidecar","ppid":165990,"ticks":68,"reapedChildTicks":68,"startTicks":1234541,"threads":14,"Rss":186298368,"Pss":185420800,"Private_Clean":77451264,"Private_Dirty":107778048,"Swap":0}]},
+    {"atMs":2228.4144810000726,"accountedTreeTicks":265,"rssBytes":246091776,"pssBytes":245236736,"processes":[{"pid":165990,"name":"MainThread","ppid":165921,"ticks":123,"reapedChildTicks":142,"startTicks":1234473,"threads":11,"Rss":246091776,"Pss":245236736,"Private_Clean":32907264,"Private_Dirty":212119552,"Swap":0}]}
+  ]
+}

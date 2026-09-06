@@ -185,6 +185,12 @@ reduces hybrid retained RAM from 386 to 292 MiB in matched trials, with about
 5% more warm CPU. It is opt-in via `scripts/run-core-node-memory.mjs`; run
 `npm run test:hybrid:memory` for the real-tool probe. Peak RAM remains high.
 
+The [representative single-agent benchmark](docs/representative-workload.md)
+adds 21 turns of repository searching, configuration edits, report writes,
+child Node validation scripts, 16 KiB tool output, and approximately 1 MiB of
+final history. The optimized hybrid measured 305 MiB active / 311 MiB retained
+PSS; peak RAM remains 772–847 MiB. Model responses are still synthetic.
+
 ## Historical provider prototype
 
 The original TypeScript `WorkerProvider`, embedded lifecycle driver and their

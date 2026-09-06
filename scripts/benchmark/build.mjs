@@ -4,7 +4,8 @@ import { createHash } from 'node:crypto';
 const worker = await readFile('artifacts/core/worker.mjs', 'utf8');
 const manifest = JSON.parse(await readFile('artifacts/core/manifest.json', 'utf8'));
 if (createHash('sha256').update(worker).digest('hex') !== manifest.outputSha256) throw new Error('Compiled worker differs from its manifest');
-const fixture = await compileFixture(await readFile('test/fixtures/core-benchmark.mjs', 'utf8'));
+const fixtureSource = await readFile('test/fixtures/core-benchmark.mjs', 'utf8') + '\n' + await readFile('test/fixtures/core-workload-benchmark.mjs', 'utf8');
+const fixture = await compileFixture(fixtureSource);
 await writeFile('artifacts/core/benchmark.mjs', worker + '\n' + fixture);
 console.log('Benchmark entry built outside the measured process.');
 
@@ -12,7 +13,7 @@ console.log('Benchmark entry built outside the measured process.');
 // native SQLite, and the same tool/inference fixture. No guest shims or lowering.
 const upstream = await readFile('node_modules/openclaw/dist/worker/worker.mjs', 'utf8');
 if (createHash('sha256').update(upstream).digest('hex') !== manifest.inputSha256) throw new Error('Native baseline input differs from the verified worker');
-let nativeFixture = await readFile('test/fixtures/core-benchmark.mjs', 'utf8');
+let nativeFixture = fixtureSource;
 nativeFixture = nativeFixture.replace("import benchChildProcess from './compat/child-process.mjs';", "const benchChildProcess = await import('node:child_process');");
 nativeFixture = nativeFixture.replace("import { spawnSync as benchSpawnSync } from 'node:child_process';", '');
 nativeFixture = nativeFixture.replace("import { DatabaseSync as BenchDatabase, getBenchmarkSqlTiming } from './compat/sqlite.mjs';", "const { DatabaseSync: BenchDatabase } = await import('node:sqlite');");
@@ -52,6 +53,7 @@ const hybridSetup = `
 const { createHybridAdapter } = await import('../../scripts/benchmark/hybrid-adapter.mjs');
 if (process.env.BENCH_WORKLOAD === 'boundaries') throw new Error('Hybrid boundary microbenchmarks are not implemented');
 const hybrid = await createHybridAdapter(process.env.BENCH_ROOT);
+globalThis.__benchmarkWorkspaceBridge = hybrid.sandbox.fsBridge;
 init_embedded_agent_runtime();
 const originalCodingTools = createCoreCodingTools;
 createCoreCodingTools = options => originalCodingTools({ ...options, sandbox: hybrid.sandbox, execDefaults: { ...options.execDefaults, host: 'sandbox' } });
@@ -63,3 +65,10 @@ hybridFixture = hybridFixture.replace("'cat ' + benchWorkspace + '/seed.txt'", "
 if (hybridFixture === nativeFixture || !hybridFixture.includes('await hybrid.vm.filesystem.writeFile')) throw new Error('Hybrid fixture boundary changed');
 await writeFile('artifacts/core/hybrid-core-benchmark.mjs', nativeCore + '\n' + hybridSetup + '\ntry { await (async()=>{\n' + hybridFixture + '\n})(); if ((process.env.BENCH_WORKLOAD ?? "core-shell") === "core-shell" && (hybrid.counts.read !== Number(process.env.BENCH_WARM_TURNS ?? 5) + 1 || hybrid.counts.shell !== hybrid.counts.read)) throw new Error("Hybrid tool delegation count mismatch"); console.log("HYBRID_COUNTS=" + JSON.stringify(hybrid.counts)); } finally { await hybrid.dispose(); }\n');
 await writeFile('artifacts/core/hybrid-probe.mjs', nativeCore + '\n' + hybridSetup + '\ntry {\n' + await readFile('test/fixtures/hybrid-probe.mjs', 'utf8') + '\n} finally { await hybrid.dispose(); }\n');
+
+// Capture the actual fixture/build/adapter inputs and generated entries in reports.
+const benchmarkHashes = {};
+for (const path of ['scripts/benchmark/build.mjs', 'scripts/benchmark/hybrid-adapter.mjs', 'test/fixtures/core-benchmark.mjs', 'test/fixtures/core-workload-benchmark.mjs', 'artifacts/core/benchmark.mjs', 'artifacts/core/native-core-benchmark.mjs', 'artifacts/core/hybrid-core-benchmark.mjs']) {
+  benchmarkHashes[path] = createHash('sha256').update(await readFile(path)).digest('hex');
+}
+await writeFile('artifacts/core/benchmark-manifest.json', JSON.stringify({ fixtureSourceSha256: createHash('sha256').update(fixtureSource).digest('hex'), hashes: benchmarkHashes }, null, 2) + '\n');
