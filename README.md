@@ -172,6 +172,14 @@ and two concurrent core instances pass; shared-sidecar modes remain unsupported.
 Run `npm run probe:bindings` for the standalone evidence. Closing a VM alone does
 not reclaim all sidecar resident memory.
 
+## Native core with agentOS tools experiment
+
+[Matched benchmarks and boundary notes](docs/native-core-agentos-tools.md) compare
+the guest core with a trusted native Node core delegating file/shell tools to
+agentOS. This is an optional benchmark backend; it does not change the default
+runtime. Run `npm run bench:build` and `npm run test:hybrid` for its independent
+correctness probe.
+
 ## Historical provider prototype
 
 The original TypeScript `WorkerProvider`, embedded lifecycle driver and their
