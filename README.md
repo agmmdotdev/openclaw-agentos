@@ -180,6 +180,11 @@ agentOS. This is an optional benchmark backend; it does not change the default
 runtime. Run `npm run bench:build` and `npm run test:hybrid` for its independent
 correctness probe.
 
+A further [Node young-generation profile](docs/node-young-generation-memory.md)
+reduces hybrid retained RAM from 386 to 292 MiB in matched trials, with about
+5% more warm CPU. It is opt-in via `scripts/run-core-node-memory.mjs`; run
+`npm run test:hybrid:memory` for the real-tool probe. Peak RAM remains high.
+
 ## Historical provider prototype
 
 The original TypeScript `WorkerProvider`, embedded lifecycle driver and their

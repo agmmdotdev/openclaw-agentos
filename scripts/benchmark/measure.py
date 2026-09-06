@@ -9,6 +9,8 @@ parser.add_argument('--trial', type=int, default=1)
 parser.add_argument('--cpus', type=int, help='Restrict the measured process tree to this many currently allowed Linux CPUs')
 parser.add_argument('--interval', type=float, default=0.1)
 parser.add_argument('--native', action='store_true')
+parser.add_argument('--node-max-opt', type=int, choices=[0, 1, 2, 3], help='Diagnostic host V8 maximum compiler tier; requires revalidation on Node upgrades')
+parser.add_argument('--node-semi-space-mb', type=int, choices=[1, 2, 4, 8, 16, 32, 64], help='Host Node young-generation semi-space cap; does not change guest V8 limits')
 parser.add_argument('--hybrid', action='store_true', help='Trusted native core with agentOS tools; requires --native --core')
 parser.add_argument('--compiled', action='store_true', help='Use the lowered native Node baseline; requires --native')
 parser.add_argument('--core', action='store_true', help='Use the smaller native core; requires --native')
@@ -85,7 +87,9 @@ if native_root:
     env.update(BENCH_ROOT=native_root, OPENCLAW_STATE_DIR=f'{native_root}/state/openclaw', OPENCLAW_CHILD_OOM_SCORE_ADJ='0')
 native_entry = 'artifacts/core/native-core-benchmark.mjs' if args.core else 'artifacts/core/native-compiled-benchmark.mjs' if args.compiled else 'artifacts/core/native-benchmark.mjs'
 if args.hybrid: native_entry = 'artifacts/core/hybrid-core-benchmark.mjs'
-command = ['node', native_entry, '--internal-worker-prewarm'] if args.native else ['node', '--expose-gc', 'scripts/benchmark/driver.mjs', str(args.instances)]
+command = ['node', '--expose-gc', native_entry, '--internal-worker-prewarm'] if args.native else ['node', '--expose-gc', 'scripts/benchmark/driver.mjs', str(args.instances)]
+if args.node_semi_space_mb is not None: command.insert(1, f'--max-semi-space-size={args.node_semi_space_mb}')
+if args.node_max_opt is not None: command.insert(1, f'--max-opt={args.node_max_opt}')
 process = subprocess.Popen(command, cwd=root, env=env,
     preexec_fn=(lambda: os.sched_setaffinity(0, selected_cpus)) if args.cpus else None,
     stdout=subprocess.PIPE, stderr=subprocess.PIPE, start_new_session=True)
@@ -160,13 +164,14 @@ missing_labels = sorted(required_labels - {e['label'] for e in events})
 report = {
     'recordedAt': time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime()),
     'instances': args.instances, 'trial': args.trial, 'sampleIntervalMs': args.interval * 1000,
+    'nodeSemiSpaceMiB': args.node_semi_space_mb, 'nodeMaxOpt': args.node_max_opt,
     'runtime': native_label if args.native else 'agentos', 'splitInitializer': env.get('BENCH_SPLIT_INIT') == '1',
     'sqlStatementCacheSize': int(env.get('BENCH_SQL_STATEMENT_CACHE', '0')),
     'dataMount': env.get('BENCH_DATA_MOUNT', 'chunked_local'),
     'idleMs': int(env.get('BENCH_IDLE_MS', '1500')),
     'allocatorEnvironment': {k: env.get(k) for k in ['MALLOC_ARENA_MAX', 'MALLOC_TRIM_THRESHOLD_', 'MALLOC_MMAP_THRESHOLD_', 'MALLOC_TOP_PAD_', 'GLIBC_TUNABLES']},
     'coreManifest': json.loads((root / 'artifacts/core/manifest.json').read_text()),
-    'diagnostics': {k: env.get(k, '0') for k in ['BENCH_PROFILE_CORE', 'BENCH_PROFILE_FS', 'BENCH_SQL_SCHEMA_MODE', 'BENCH_PROFILE_PROCESS', 'BENCH_PROFILE_SQL']} | {k: env.get(k) for k in ['CORE_HEAP_MB', 'CORE_WASM_HEAP_MB', 'AGENTOS_V8_WARM_ISOLATES', 'AGENTOS_WASM_SNAPSHOT_RUNNER', 'BENCH_WARM_TURNS', 'BENCH_WORKLOAD', 'BENCH_REVERSE', 'BENCH_CORE_MOUNT', 'BENCH_CANONICAL_BATCHING']},
+    'diagnostics': {k: env.get(k, '0') for k in ['BENCH_NATIVE_MEMORY', 'BENCH_GC_AT_IDLE', 'BENCH_PROFILE_CORE', 'BENCH_PROFILE_FS', 'BENCH_SQL_SCHEMA_MODE', 'BENCH_PROFILE_PROCESS', 'BENCH_PROFILE_SQL']} | {k: env.get(k) for k in ['CORE_HEAP_MB', 'CORE_WASM_HEAP_MB', 'AGENTOS_V8_WARM_ISOLATES', 'AGENTOS_WASM_SNAPSHOT_RUNNER', 'BENCH_WARM_TURNS', 'BENCH_WORKLOAD', 'BENCH_REVERSE', 'BENCH_CORE_MOUNT', 'BENCH_CANONICAL_BATCHING']},
     'method': 'Linux smaps_rollup RSS/PSS summed across isolated benchmark driver and descendants; compiler runs separately',
     'environment': {'platform': platform.platform(), 'cpuCount': os.cpu_count(), 'cpuAffinity': selected_cpus, 'clockTicksPerSecond': os.sysconf('SC_CLK_TCK'),
         'cpuMax': read_optional('/sys/fs/cgroup/cpu.max'), 'memoryMax': read_optional('/sys/fs/cgroup/memory.max')},

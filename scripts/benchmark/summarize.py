@@ -61,6 +61,7 @@ for path in sorted(folder.glob('benchmark-*.json')):
     warm_ends = [e for e in events if e['label'].startswith('warm-turn-') and e['label'].endswith(':end')]
     last_warm = warm_ends[-1]['label'] if warm_ends else 'warm-turn-5:end'
     rows.append({'file':path.name,'runtime':report.get('runtime','native' if native else 'agentos'),
+        'nodeSemiSpaceMiB':report.get('nodeSemiSpaceMiB'), 'nodeMaxOpt':report.get('nodeMaxOpt'),
         'sqlStatementCacheSize':report.get('sqlStatementCacheSize',0),
         'dataMount':report.get('dataMount','chunked_local'),
         'idleMs':report.get('idleMs',1500),
