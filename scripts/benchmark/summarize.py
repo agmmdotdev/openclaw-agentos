@@ -55,6 +55,7 @@ for path in sorted(folder.glob('benchmark-*.json')):
     warm_ends = [e for e in events if e['label'].startswith('warm-turn-') and e['label'].endswith(':end')]
     last_warm = warm_ends[-1]['label'] if warm_ends else 'warm-turn-5:end'
     rows.append({'file':path.name,'runtime':report.get('runtime','native' if native else 'agentos'),
+        'sqlStatementCacheSize':report.get('sqlStatementCacheSize',0),
         'workload':report.get('diagnostics',{}).get('BENCH_WORKLOAD') or 'core-shell',
         'profile':report.get('coreManifest',{}).get('profile','full'),
         'coreArtifactMode': next((e.get('coreMount', 'upload') for e in events if e['label'] == 'baseline'), 'native'),

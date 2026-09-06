@@ -32,7 +32,7 @@ try {
   if (coreMount === 'host_dir') artifactStore = await createCoreArtifactStore();
   for (let index = 0; index < instances; index++) {
     const directory = join(root, String(index)); await mkdir(directory);
-    const sqlite = await createCoreHostSqlite(join(directory, 'databases'));
+    const sqlite = await createCoreHostSqlite(join(directory, 'databases'), { statementCacheSize: Number(process.env.BENCH_SQL_STATEMENT_CACHE ?? 0) });
     let hostSqlMilliseconds = 0;
     const executeSql = sqlite.collection.bindings.call.execute;
     sqlite.collection.bindings.call.execute = request => {

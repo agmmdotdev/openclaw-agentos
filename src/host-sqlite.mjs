@@ -25,10 +25,12 @@ export function decode([kind, value]) {
   throw new Error('Invalid SQLite wire value');
 }
 
-export function createHostSqlite(root, { collectTableContract, collectNamedIndexContract, collectCanonicalStrictTables } = {}) {
+export function createHostSqlite(root, { collectTableContract, collectNamedIndexContract, collectCanonicalStrictTables, statementCacheSize = 0 } = {}) {
+  if (!Number.isSafeInteger(statementCacheSize) || statementCacheSize < 0 || statementCacheSize > 128) throw new Error('Invalid SQLite statement cache size');
   mkdirSync(root, { recursive: true, mode: 0o700 });
   const databases = new Map();
-  const stats = { calls: 0, opens: 0, version: undefined, failures: [] };
+  const statementCaches = new Map();
+  const stats = { calls: 0, opens: 0, prepares: 0, statementCacheHits: 0, version: undefined, failures: [] };
   function execute({ payload }) {
     stats.calls++;
     try {
@@ -47,15 +49,17 @@ export function createHostSqlite(root, { collectTableContract, collectNamedIndex
         });
         const handle = randomUUID();
         databases.set(handle, db);
+        statementCaches.set(handle, new Map());
         stats.opens++;
         stats.version = db.prepare('SELECT sqlite_version() AS version').get().version;
         value = handle;
       } else {
         const db = databases.get(request.handle);
         if (!db) throw new Error('Unknown SQLite handle');
-        if (request.op === 'close') { db.close(); databases.delete(request.handle); }
+        const cache = statementCaches.get(request.handle);
+        if (request.op === 'close') { db.close(); databases.delete(request.handle); statementCaches.delete(request.handle); }
         else if (request.op === 'state') value = { isOpen: db.isOpen, isTransaction: db.isTransaction };
-        else if (request.op === 'exec') value = db.exec(request.sql);
+        else if (request.op === 'exec') { cache.clear(); value = db.exec(request.sql); }
         else if (request.op === 'openclaw-canonical-strict-tables') {
           if (!collectCanonicalStrictTables) throw new Error('Canonical table collector is not configured');
           value = collectCanonicalStrictTables(db);
@@ -70,11 +74,30 @@ export function createHostSqlite(root, { collectTableContract, collectNamedIndex
           value = collectNamedIndexContract(db, request.indexName);
         } else if (request.op === 'statement') {
           if (!['get', 'all', 'run', 'columns'].includes(request.method)) throw new Error('Unsupported SQLite statement operation');
-          const statement = db.prepare(request.sql);
-          if (request.readBigInts) statement.setReadBigInts(true);
-          if (request.allowBareNamedParameters !== undefined) statement.setAllowBareNamedParameters(request.allowBareNamedParameters);
-          if (request.allowUnknownNamedParameters !== undefined) statement.setAllowUnknownNamedParameters(request.allowUnknownNamedParameters);
-          value = statement[request.method](...(request.args ?? []));
+          // Keep only bounded DML/query statements, never query results. Bound
+          // payload size too, since SQLite can retain the most recent bindings.
+          // PRAGMA/DDL may have prepare-time effects: execute those afresh and
+          // invalidate cached statements. columns() needs fresh schema metadata.
+          const reusable = statementCacheSize > 0 && payload.length <= 32768 && request.method !== 'columns'
+            && typeof request.sql === 'string' && request.sql.length <= 16384
+            && (/^\s*(SELECT|INSERT|UPDATE|DELETE|REPLACE|WITH)\b/i.test(request.sql)
+              || /^\s*PRAGMA\s+(data_version|user_version)\s*;?\s*$/i.test(request.sql));
+          if (!reusable) cache.clear();
+          let statement = reusable ? cache.get(request.sql) : undefined;
+          if (statement) { stats.statementCacheHits++; cache.delete(request.sql); }
+          else { statement = db.prepare(request.sql); stats.prepares++; }
+          try {
+            // Different guest StatementSync objects can share SQL. Restore all
+            // options on every call so one object's settings cannot leak.
+            statement.setReadBigInts(Boolean(request.readBigInts));
+            statement.setAllowBareNamedParameters(request.allowBareNamedParameters === undefined ? true : request.allowBareNamedParameters);
+            statement.setAllowUnknownNamedParameters(request.allowUnknownNamedParameters === undefined ? false : request.allowUnknownNamedParameters);
+            value = statement[request.method](...(request.args ?? []));
+            if (reusable) {
+              cache.set(request.sql, statement);
+              if (cache.size > statementCacheSize) cache.delete(cache.keys().next().value);
+            }
+          } catch (error) { cache.delete(request.sql); throw error; }
         } else throw new Error('Unsupported SQLite operation');
       }
       const result = JSON.stringify(encode(value));
@@ -88,6 +111,6 @@ export function createHostSqlite(root, { collectTableContract, collectNamedIndex
       call: { description: 'Execute a scoped database operation', inputSchema: z.object({ payload: z.string().max(2 * 1024 * 1024) }), execute },
     } },
     execute,
-    dispose() { for (const db of databases.values()) db.close(); databases.clear(); },
+    dispose() { for (const db of databases.values()) db.close(); databases.clear(); statementCaches.clear(); },
   };
 }
