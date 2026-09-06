@@ -67,6 +67,7 @@ for path in sorted(folder.glob('benchmark-*.json')):
         'idleMs':report.get('idleMs',1500),
         'representativeConfig':event('representative:config'),
         'representativeResult':event('representative:complete'),
+        'nativeSdk':report.get('nativeSdk'),
         'wasmer':report.get('wasmer'),
         'activeMedianPssMiB':median_memory(event('cold-turn:start')['receivedAtMs'],event(last_warm)['receivedAtMs']) if event('cold-turn:start') and event(last_warm) else None,
         'workload':report.get('diagnostics',{}).get('BENCH_WORKLOAD') or 'core-shell',

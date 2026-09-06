@@ -38,7 +38,7 @@
     "test:host-sqlite": "node --test test/host-sqlite.test.mjs",
     "probe:async-context": "node scripts/probe-async-context.mjs",
     "core:report": "node scripts/summarize-core-results.mjs",
-    "bench:build": "node scripts/benchmark/build.mjs",
+    "bench:build": "npm run sdk:build && node scripts/benchmark/build.mjs",
     "bench:wasmer:prewarm": "node scripts/benchmark/prewarm-wasmer.mjs",
     "test:wasmer": "python3 scripts/benchmark/probe-hybrid.py --wasmer --node-memory-profile",
     "test:hybrid:memory": "python3 scripts/benchmark/probe-hybrid.py --node-memory-profile",
@@ -49,7 +49,10 @@
     "test:core:economy": "node scripts/run-core-economy.mjs scripts/probe-core.mjs",
     "test:core:memory": "CORE_PROBE_REPORT=artifacts/results/core-probe-memory.json node scripts/run-core-memory.mjs scripts/probe-core.mjs",
     "bench:bottlenecks": "python3 scripts/benchmark/bottlenecks.py",
-    "test:core-artifacts": "node --test test/core-artifact-store.test.mjs"
+    "test:core-artifacts": "node --test test/core-artifact-store.test.mjs",
+    "sdk:build": "npm exec -- tsc -p packages/agentos-sdk/tsconfig.json && cc -O2 -Wall -Wextra packages/agentos-sdk/native/preflight.c -o packages/agentos-sdk/dist/linux-preflight",
+    "test:sdk": "npm run sdk:build && node --test --test-concurrency=1 packages/agentos-sdk/test/*.test.mjs",
+    "test:native-sdk": "python3 scripts/benchmark/probe-hybrid.py --native-sdk --node-memory-profile"
   },
   "dependencies": {
     "@rivet-dev/agentos-core": "0.2.19",

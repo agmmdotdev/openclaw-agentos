@@ -71,9 +71,14 @@ const wasmerSetup = hybridSetup.replaceAll('createHybridAdapter', 'createWasmerA
 await writeFile('artifacts/core/wasmer-core-benchmark.mjs', nativeCore + '\n' + wasmerSetup + '\ntry { await (async()=>{\n' + hybridFixture + '\n})(); console.log("WASMER_COUNTS=" + JSON.stringify(hybrid.counts)); } finally { await hybrid.dispose(); }\n');
 await writeFile('artifacts/core/wasmer-probe.mjs', nativeCore + '\n' + wasmerSetup + '\ntry {\n' + await readFile('test/fixtures/hybrid-probe.mjs', 'utf8') + '\n} finally { await hybrid.dispose(); }\n');
 
+// Native SDK diagnostics keep the same host-visible workspace paths as native Node.
+const nativeSdkSetup = hybridSetup.replaceAll('createHybridAdapter', 'createNativeSdkAdapter').replace('hybrid-adapter.mjs', 'native-sdk-adapter.mjs');
+await writeFile('artifacts/core/native-sdk-core-benchmark.mjs', nativeCore + '\n' + nativeSdkSetup + '\ntry { await (async()=>{\n' + nativeFixture + '\n})(); console.log("NATIVE_SDK_COUNTS=" + JSON.stringify(hybrid.counts)); } finally { await hybrid.dispose(); }\n');
+await writeFile('artifacts/core/native-sdk-probe.mjs', nativeCore + '\n' + nativeSdkSetup + '\ntry {\n' + await readFile('test/fixtures/native-sdk-probe.mjs','utf8') + '\n} finally { await hybrid.dispose(); }\n');
+
 // Capture the actual fixture/build/adapter inputs and generated entries in reports.
 const benchmarkHashes = {};
-for (const path of ['scripts/benchmark/wasmer-adapter.mjs', 'artifacts/core/wasmer-core-benchmark.mjs', 'scripts/benchmark/build.mjs', 'scripts/benchmark/hybrid-adapter.mjs', 'test/fixtures/core-benchmark.mjs', 'test/fixtures/core-workload-benchmark.mjs', 'artifacts/core/benchmark.mjs', 'artifacts/core/native-core-benchmark.mjs', 'artifacts/core/hybrid-core-benchmark.mjs']) {
+for (const path of ['scripts/benchmark/native-sdk-adapter.mjs', 'packages/agentos-sdk/dist/native.js', 'packages/agentos-sdk/dist/filesystem.js', 'packages/agentos-sdk/dist/native-entry.js', 'artifacts/core/native-sdk-core-benchmark.mjs', 'scripts/benchmark/wasmer-adapter.mjs', 'artifacts/core/wasmer-core-benchmark.mjs', 'scripts/benchmark/build.mjs', 'scripts/benchmark/hybrid-adapter.mjs', 'test/fixtures/core-benchmark.mjs', 'test/fixtures/core-workload-benchmark.mjs', 'artifacts/core/benchmark.mjs', 'artifacts/core/native-core-benchmark.mjs', 'artifacts/core/hybrid-core-benchmark.mjs']) {
   benchmarkHashes[path] = createHash('sha256').update(await readFile(path)).digest('hex');
 }
 await writeFile('artifacts/core/benchmark-manifest.json', JSON.stringify({ fixtureSourceSha256: createHash('sha256').update(fixtureSource).digest('hex'), hashes: benchmarkHashes }, null, 2) + '\n');
