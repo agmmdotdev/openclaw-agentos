@@ -13,9 +13,11 @@ Source commit and API types are pinned; native and original backends pass shared
 contract tests. Native-only imports avoid the original runtime. Seventeen tests,
 including 20 create/run/dispose cycles, and the real OpenClaw tool probe pass.
 
-This advances M1 and the functional portions of M3/M4. M2 is still blocked and
-unimplemented: the compiled helper only probes capability; it does not enforce a
-sandbox. M5 protected-performance acceptance is not passed by the trusted-only
+This advances M1 and the functional portions of M3/M4. M2 now has an
+[experimental launcher, openat2 primitive and host acceptance runner](native-linux-enforcement-prototype.md).
+Twenty-five SDK/primitive tests pass, including actual seccomp/Node compatibility;
+Landlock/cgroup acceptance remains blocked, and protected SDK execution is disabled.
+M5 protected-performance acceptance is not passed by the trusted-only
 benchmark. Broader SDK/session/storage APIs remain deferred, with explicit errors.
 
 ## Milestones
@@ -24,7 +26,7 @@ benchmark. Broader SDK/session/storage APIs remain deferred, with explicit error
 |---|---|---|---|
 | M0 — Preflight and design | Complete for available environment | — | These three documents; explicit host limitations |
 | M1 — SDK source and backend contract | Implemented for extracted slice | M0 | Pinned source/fork base, API contract tests, backend seam |
-| M2 — Linux launcher and host gate | Pending; host validation blocked here | M0 | Capability report and verified enforcement on suitable Linux |
+| M2 — Linux launcher and host gate | Prototype implemented; host validation blocked here | M0 | Capability report and verified enforcement on suitable Linux |
 | M3 — Native SDK slice | Trusted functionality implemented; enforcement blocked | M1, M2 | Filesystem/process lifecycle APIs with supported capability report |
 | M4 — OpenClaw parity and security gate | Functional probe passes; security blocked | M3 | Real-tool and adversarial test results |
 | M5 — Matched RAM/CPU comparison | Trusted comparison recorded; protected gate blocked | M4 | Reproducible raw samples and comparison report |
@@ -35,15 +37,17 @@ benchmark. Broader SDK/session/storage APIs remain deferred, with explicit error
 
 - [x] Locate the upstream source corresponding to npm SDK 0.2.19; record commit,
   package integrity, license/notice obligations, and a reproducible SDK build.
-- [ ] Establish a focused SDK fork/workspace without changing OpenClaw source or
+- [x] Establish a focused SDK fork/workspace without changing OpenClaw source or
   rebuilding/forking the Rust runtime. Record its maintenance and upstream-update
-  policy. Repository creation has not happened in this documentation milestone.
+  policy. Implemented as `packages/agentos-sdk` in this repository; not a separately
+  published npm package or a Rust-runtime fork.
 - [x] Inventory the hybrid adapter's public calls and direct SDK sidecar coupling.
   Specify create/dispose, filesystem, process, event, cancellation, and error types.
 - [x] Resolve native path semantics: use the exposed native workspace cwd first;
   document deviations from a virtual `/workspace`. Resolve supported limits and
   reject unsupported storage/permission options before execution.
-- [ ] Extract the backend interface and keep the current backend behind it.
+- [x] Extract the backend interface for the selected slice and retain explicit
+  selection of the original SDK through the factory.
   Make native imports avoid original runtime initialization and heavy eager imports.
 - [x] Run shared contract tests against the current agentOS backend and the new
   interface. Record existing behavior gaps instead of treating them as desired
@@ -53,6 +57,12 @@ Exit: buildable SDK contract and unchanged existing-backend behavior on the
 supported slice. Test doubles are allowed here but are never labeled sandboxes.
 
 ## M2 — Establish the Linux execution boundary
+
+Candidate implementation: single-threaded C launcher, strict setup ordering,
+Landlock ABI 6 policy, syscall allowlist, verified cgroup limits, and host test
+orchestration. Available primitive/Node tests pass. The checkboxes below still
+require real host acceptance and final launcher/supervisor selection; source code
+and a seccomp-only diagnostic do not satisfy the complete boundary gate.
 
 - [ ] Run a reproducible host preflight on the actual target/delegated test host:
   available Landlock rights, seccomp support, controller delegation, privileges,
@@ -154,8 +164,9 @@ estimate tenant capacity by dividing RAM by the single-instance active median.
 ## Immediate next deliverable
 
 The initial extracted SDK slice and trusted benchmarks are now implemented.
-The next boundary milestone is M2: select and integrate a Linux launcher on a
-suitable test host, implement race-resistant host filesystem access and process-tree
-control, and run adversarial checks before enabling protected execution. The current
+The next boundary milestone is M2: run the experimental launcher and its nine
+candidate cases on a suitable delegated host, resolve policy/compatibility gaps,
+complete supervision and SDK filesystem/process integration, and run adversarial
+checks before enabling protected execution. The current
 package explicitly rejects protected mode; moving it to a VPS alone does not
 complete this implementation. See the implementation report for exact remaining gaps.

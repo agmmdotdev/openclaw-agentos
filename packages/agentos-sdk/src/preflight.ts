@@ -15,5 +15,7 @@ export async function inspectLinuxCapabilities() {
  return { platform:process.platform, kernel:release(), architecture:arch(), landlock,
  cgroupControllers:await read('/sys/fs/cgroup/cgroup.controllers'),cgroupSubtreeControl:await read('/sys/fs/cgroup/cgroup.subtree_control'),cgroupWritable,
  processSecurity:typeof status==='string'?status.split('\n').filter(x=>/^(CapEff|CapBnd|NoNewPrivs|Seccomp):/.test(x)):status,
- launcherImplemented:false, sandboxEnforcementVerified:false };
+ // launcherImplemented describes the production SDK path, not test-only helpers.
+ launcherImplemented:false, sandboxEnforcementVerified:false,
+ experimentalLauncher:{implemented:true,sdkIntegrated:false,minimumLandlockAbi:6,architecture:'x64',acceptance:'unverified'} };
 }

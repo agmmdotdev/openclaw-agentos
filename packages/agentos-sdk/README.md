@@ -10,7 +10,10 @@ See `UPSTREAM.json`, `NOTICE`, and `LICENSE` for provenance and attribution.
 **Native mode is currently trusted-only. It is not a Linux security sandbox.**
 `security: 'linux-sandbox'` always rejects with `SANDBOX_UNAVAILABLE`, including a
 capability report, before opening a workspace or launching workload code. No
-verified Linux enforcement launcher is implemented. This cannot be fixed merely
+verified Linux enforcement launcher is integrated. An experimental C launcher,
+openat2 file helper and host acceptance runner now exist; see
+[the enforcement report](../../docs/native-linux-enforcement-prototype.md).
+They are separate from ordinary SDK execution. This cannot be fixed merely
 by selecting a flag or installing the SDK on another host.
 
 ## Build and use from this repository
