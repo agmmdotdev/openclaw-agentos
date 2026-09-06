@@ -1,0 +1,1 @@
+const fs=require('node:fs');const rows=[];const timer=setInterval(()=>rows.push({ms:performance.now(),...process.memoryUsage(),cpu:process.cpuUsage()}),10);timer.unref();process.on('exit',()=>fs.writeFileSync('/tmp/core-memory-timeline.json',JSON.stringify(rows)));

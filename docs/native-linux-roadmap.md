@@ -182,3 +182,14 @@ complete this implementation. See the implementation report for exact remaining 
 Implemented request-based native-core experiments and a bounded filesystem allocation optimization. See [core-request-lifecycle.md](core-request-lifecycle.md) for the compatibility matrix, checkpoint recovery rules, 24 comparison runs, supervisor control, retained startup outlier, and 21-request continuity followup. Forty-eight SDK tests and three checkpoint tests pass; the upstream stdin/EOF limitation is explicitly recorded.
 
 The SDK can release all core process memory between requests in the tested workload, at a substantial startup CPU cost. Compile caching improves the repeated-start cost; peak RAM and cold-start tail latency remain unresolved. Next priorities are module/parser startup profiling and broader skill/package compatibility. Gateway, scheduling and protected Linux acceptance remain separate gates.
+
+### Cold-start profiling followup
+
+[Native core startup](native-core-startup.md) identifies the repeated transient
+peak in V8's optimizing compilation of the Bash grammar. A version-pinned,
+opt-in baseline-Wasm request launcher reduces matched cached-request peak PSS
+from 673 to 237 MiB and seven-turn CPU from 10.06 to 8.07 seconds. Twelve paired
+comparison runs, a 21-request continuity followup and a 19-case parser differential
+pass. Idle resident RAM is unchanged. The historical 41-second startup remains
+unexplained; next CPU work is JavaScript module/schema/highlighter initialization.
+Protected-host acceptance and production execution remain disabled.
