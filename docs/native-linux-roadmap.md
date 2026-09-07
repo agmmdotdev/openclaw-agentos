@@ -239,3 +239,7 @@ uninstrumented trials show 5.4% less cached-request CPU, 3.2% lower latency,
 still constructs the unchanged schemas on first use. The remaining eager core
 schemas and module-loading costs are the next ordinary-startup targets; isolated
 startup stalls still need an actual captured reproduction.
+
+## Source-owned initialization follow-up
+
+The [source initialization pass](source-core-initialization.md) removes eager broad-config imports from helper consumers and defers plugin-install validators. It includes immutable-artifact comparisons and request-level demand observations. Remaining source targets are model/catalog and computer-use initialization and separating terminal rendering from headless tool execution; Linux host enforcement remains a separate gate.

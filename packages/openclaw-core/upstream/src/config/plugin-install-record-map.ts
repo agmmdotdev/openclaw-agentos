@@ -1,9 +1,6 @@
 import { isRecord } from "@openclaw/normalization-core/record-coerce";
-import { z } from "zod";
 import type { PluginInstallRecord } from "./types.plugins.js";
-import { PluginInstallRecordShape } from "./zod-schema.installs.js";
-
-export const PluginInstallRecordSchema = z.object(PluginInstallRecordShape).passthrough();
+import { getPluginInstallRecordSchema } from "./zod-schema.installs.js";
 
 const NORMALIZED_STRING_FIELDS = [
   "spec",
@@ -99,7 +96,7 @@ export function copyPluginInstallRecordMap<T>(
 }
 
 export function parsePluginInstallRecord(value: unknown): PluginInstallRecord | null {
-  const parsed = PluginInstallRecordSchema.safeParse(value);
+  const parsed = getPluginInstallRecordSchema().safeParse(value);
   if (!parsed.success) {
     return null;
   }

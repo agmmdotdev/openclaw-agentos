@@ -48,3 +48,5 @@ The imported `upstream/AGENTS.md` requires a fresh Autoreview pass before a nont
 The [matched performance report](../../docs/source-core-performance.md) found that the minified source build reduces cached-process peak PSS but still increases CPU and request latency versus the merged reference. The default runtime remains unchanged.
 
 `npm run source-core:build:minified` produces `dist/minified-index.mjs`, a separate minified runtime candidate, plus diagnostics and the matched benchmark fixture with esbuild minification and function-name preservation. Run its focused checks with `npm run test:source-core:minified`. The standard artifacts remain available as controls.
+
+The [source initialization pass](../../docs/source-core-initialization.md) separates narrow config helpers and SecretRef schemas from broad schema construction, and defers install validators to first parse. Six focused tests now run for either build layout, including persisted-record and channel-metadata contracts. The default remains the merged artifact runtime.

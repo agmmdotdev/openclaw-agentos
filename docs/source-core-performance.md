@@ -1,5 +1,7 @@
 # Source-core migration: measured trade-offs
 
+This report records the initial PR #19 comparison. The subsequent [source initialization pass](source-core-initialization.md) contains current measurements and validation.
+
 PR #18 is merged. Keep the merged artifact runtime as the default: the source-owned core passes the focused behavior checks, but cached requests still cost more CPU and latency. Source ownership enables core changes; it does not itself guarantee a speedup.
 
 ## Matched request results
