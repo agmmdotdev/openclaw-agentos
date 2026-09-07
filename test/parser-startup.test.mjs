@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFile, writeFile, rm } from 'node:fs/promises';
-import { createHash } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
 import { spawnSync } from 'node:child_process';
 
 test('request profile preserves real Bash parser trees, spans, errors and size limit', { timeout: 60000 }, async t => {
@@ -19,7 +19,7 @@ test('request profile preserves real Bash parser trees, spans, errors and size l
     'diff <(echo a) <(echo b)', 'echo "${value:-default}" $((1 + 2))',
     'echo x\n'.repeat(1500),
   ];
-  const entry = `artifacts/core/parser-contract-${process.pid}.mjs`;
+  const entry = `artifacts/core/parser-contract-${randomUUID()}.mjs`;
   t.after(() => rm(entry, { force: true }));
   const fixture = `
 init_embedded_agent_runtime();
@@ -39,16 +39,17 @@ console.log(JSON.stringify({trees:__trees,oversize:__oversize}));
 `;
   await writeFile(entry, core + fixture, { flag: 'wx' });
   const results = [];
-  for (const profile of ['default', 'request']) {
+  for (const profile of ['default', 'execve', 'single']) {
     const env = { ...process.env };
     for (const key of ['NODE_OPTIONS', 'NODE_COMPILE_CACHE', 'NODE_DISABLE_COMPILE_CACHE', 'LD_PRELOAD']) delete env[key];
-    const args = profile === 'request' ? ['scripts/run-core-node-request.mjs', entry] : ['--max-semi-space-size=8', entry];
-    const result = spawnSync(process.execPath, args, { env, encoding: 'utf8', timeout: 25000, maxBuffer: 16 * 1024 * 1024 });
+    const args = profile === 'single' ? ['scripts/run-core-node-request.sh', entry] : profile === 'execve' ? ['scripts/run-core-node-request.mjs', entry] : ['--max-semi-space-size=8', entry];
+    const result = spawnSync(profile === 'single' ? 'sh' : process.execPath, args, { env, encoding: 'utf8', timeout: 25000, maxBuffer: 16 * 1024 * 1024 });
     assert.equal(result.status, 0, result.stderr || String(result.error));
     assert.equal(result.stderr, '', 'Parser must not silently fall back');
     results.push(JSON.parse(result.stdout));
   }
   assert.deepEqual(results[1], results[0]);
+  assert.deepEqual(results[2], results[0]);
   assert.equal(results[0].trees.length, corpus.length);
   assert.equal(results[0].trees[14][5], true, 'Malformed input must retain its parse error');
 });
