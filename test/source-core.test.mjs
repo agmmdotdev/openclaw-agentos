@@ -6,6 +6,8 @@ import { mkdtemp, mkdir, readFile, writeFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 const exec = promisify(execFile);
+const prefix = process.env.CORE_MINIFY === '1' ? 'minified-' : '';
+const diagnostics = new URL(`../packages/openclaw-core/dist/${prefix}diagnostics.mjs`, import.meta.url);
 
 test('source config results match merged core for all 28 existing cases', async () => {
   const fixture = await readFile('test/fixtures/native-lazy-init.mjs', 'utf8');
@@ -16,7 +18,7 @@ test('source config results match merged core for all 28 existing cases', async 
   const probe = `${cases}\nconst before = __sourceTestZ.string().safeParse(42).error.issues; __sourceTestZ.config({localeError:()=> 'custom-locale-preserved'}); const configs = __initConfigs.map(validateConfigObjectRaw); if(__sourceTestZ.string().safeParse(42).error.issues[0].message !== 'custom-locale-preserved') throw Error('Locale was reset'); console.log('RESULT='+JSON.stringify({before,configs}));`;
   const sourceFile = 'artifacts/core/source-config-parity.mjs';
   const referenceFile = 'artifacts/core/reference-config-parity.mjs';
-  await writeFile(sourceFile, `import {z as __sourceTestZ,validateConfigObjectRaw} from '../../packages/openclaw-core/dist/diagnostics.mjs';\nif (Object.values(globalThis.__sourceCoreInit ?? {}).some(Boolean)) throw Error('Configuration graph initialized eagerly');\n` + probe + `\nif (Object.values(globalThis.__sourceCoreInit ?? {}).length !== 3 || Object.values(globalThis.__sourceCoreInit).some(n=>n!==1)) throw Error('Configuration graph did not initialize exactly once');\n`);
+  await writeFile(sourceFile, `import {z as __sourceTestZ,validateConfigObjectRaw} from '../../packages/openclaw-core/dist/${prefix}diagnostics.mjs';\nif (Object.values(globalThis.__sourceCoreInit ?? {}).some(Boolean)) throw Error('Configuration graph initialized eagerly');\n` + probe + `\nif (Object.values(globalThis.__sourceCoreInit ?? {}).length !== 3 || Object.values(globalThis.__sourceCoreInit).some(n=>n!==1)) throw Error('Configuration graph did not initialize exactly once');\n`);
   await writeFile(referenceFile, await readFile('artifacts/core/native-core.mjs','utf8') + '\ninit_embedded_agent_runtime();\nconst __sourceTestZ = {string:string$3,config:config$1};\n' + probe);
   const results = [];
   for (const file of [referenceFile, sourceFile]) {
@@ -28,7 +30,7 @@ test('source config results match merged core for all 28 existing cases', async 
 });
 
 test('source SDK process routing isolates overlapping turns and revokes retained callbacks', async () => {
-  const {withProcessSpawn,getProcessSupervisor} = await import('../packages/openclaw-core/dist/diagnostics.mjs');
+  const {withProcessSpawn,getProcessSupervisor} = await import(diagnostics);
   let retained;
   const routes = await Promise.all(['a','b'].map(name => withProcessSpawn(async()=>name,async()=> {
     await new Promise(resolve=>setImmediate(resolve));
@@ -45,7 +47,7 @@ test('source core resumes three separate processes with five real SDK tools each
   try {
     await mkdir(join(root,'workspace')); await mkdir(join(root,'state'));
     for(let turn=0;turn<3;turn++) {
-      const {stdout,stderr}=await exec(process.execPath,['artifacts/core/source-native-sdk-core-benchmark.mjs'],{
+      const {stdout,stderr}=await exec(process.execPath,[`artifacts/core/${prefix}source-native-sdk-core-benchmark.mjs`],{
         env:{...process.env,BENCH_ROOT:root,BENCH_REQUEST_TURN:String(turn)},maxBuffer:8*1024*1024,
       });
       assert.doesNotMatch(stderr,/failed to asynchronously prepare wasm|Aborted\(/);
@@ -58,7 +60,7 @@ test('source core resumes three separate processes with five real SDK tools each
 });
 
 test('highlighter demand caches once and explicit replacements cancel pending demand', async () => {
-  const m = await import('../packages/openclaw-core/dist/diagnostics.mjs');
+  const m = await import(diagnostics);
   const original = m.getWorkerDeployHighlightJs();
   assert.match(original.highlight('const value = 42;', {language:'javascript'}).value,/hljs/);
   assert.equal(m.getWorkerDeployHighlightJs(),original);

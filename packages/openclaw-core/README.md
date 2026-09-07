@@ -42,3 +42,9 @@ Four focused tests passed: exact comparison of all 28 existing configuration cas
 These checks use scripted inference and actual filesystem/process tools. They do not establish live-provider parity, a sandbox boundary, or a new performance improvement. Whole-upstream type checking and tests have not run. The default launcher has not switched to this package.
 
 The imported `upstream/AGENTS.md` requires a fresh Autoreview pass before a nontrivial commit. Its dry run was blocked because the `codex` reviewer executable is unavailable; it also rejected the large untracked upstream lockfile during bundle preparation. The repository owner explicitly waived this requirement for this migration on 2026-09-07 and authorized manual review plus the completed tests. No clean automated review is claimed. The prior PRs #14–#17 are already merged into the parent repository's main branch.
+
+## Performance comparison
+
+The [matched performance report](../../docs/source-core-performance.md) found that the minified source build reduces cached-process peak PSS but still increases CPU and request latency versus the merged reference. The default runtime remains unchanged.
+
+`npm run source-core:build:minified` produces `dist/minified-index.mjs`, a separate minified runtime candidate, plus diagnostics and the matched benchmark fixture with esbuild minification and function-name preservation. Run its focused checks with `npm run test:source-core:minified`. The standard artifacts remain available as controls.
