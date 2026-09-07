@@ -50,3 +50,17 @@ The [matched performance report](../../docs/source-core-performance.md) found th
 `npm run source-core:build:minified` produces `dist/minified-index.mjs`, a separate minified runtime candidate, plus diagnostics and the matched benchmark fixture with esbuild minification and function-name preservation. Run its focused checks with `npm run test:source-core:minified`. The standard artifacts remain available as controls.
 
 The [source initialization pass](../../docs/source-core-initialization.md) separates narrow config helpers and SecretRef schemas from broad schema construction, and defers install validators to first parse. Six focused tests now run for either build layout, including persisted-record and channel-metadata contracts. The default remains the merged artifact runtime.
+
+## Owned SDK integration and request state
+
+The package's `./tool-runtime` subpath exports `createAgentOsToolRuntime(vm, { env })`.
+Pass its result as `toolRuntime` to `runOpenClawCoreTurn`; create the native SDK
+handle first and dispose it in your caller's `finally` block. The `./request-state`
+subpath exports `beginRequest(stateDir, turn)` for the existing single-session
+checkpoint protocol. Both are lightweight native ESM source modules.
+
+`npm run test:source-runtime` checks these runtime boundaries. See the
+[optimization ownership audit](../../docs/source-optimization-migration.md) for
+the complete migration mapping, repaired stdin/timeout behavior, and remaining
+process-supervisor compatibility work. The bridge supports the measured foreground
+file/shell slice; it does not yet implement the full upstream supervisor contract.

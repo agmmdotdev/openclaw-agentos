@@ -13,7 +13,7 @@ const setup = `
 import * as fs from 'node:fs';
 import { runOpenClawCoreTurn as runCore } from '../../packages/openclaw-core/dist/${prefix}index.mjs';
 import { createNativeSdkAdapter } from '../../scripts/benchmark/native-sdk-adapter.mjs';
-import { beginRequest } from '../../scripts/core/request-state.mjs';
+import { beginRequest } from '../../packages/openclaw-core/src/request-state.mjs';
 const check = (condition, message) => { if (!condition) throw new Error(message); };
 const started = performance.now();
 function mark(label, data = {}) { console.log('BENCH_EVENT=' + JSON.stringify({ label, atMs: performance.now()-started, instance: 0, ...data })); }

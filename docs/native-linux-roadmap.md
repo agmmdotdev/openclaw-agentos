@@ -243,3 +243,9 @@ startup stalls still need an actual captured reproduction.
 ## Source-owned initialization follow-up
 
 The [source initialization pass](source-core-initialization.md) removes eager broad-config imports from helper consumers and defers plugin-install validators. It includes immutable-artifact comparisons and request-level demand observations. Remaining source targets are model/catalog and computer-use initialization and separating terminal rendering from headless tool execution; Linux host enforcement remains a separate gate.
+
+The [optimization ownership audit](source-optimization-migration.md) maps earlier
+work to its current owners and moves SDK tool integration and request checkpoints
+into the core package. Next compatibility work is complete process lifecycle
+routing and broader real-tool coverage before default cutover. Benchmark and
+deployment scripts remain tooling; further module deferral is a performance task.
