@@ -5,8 +5,10 @@ Trusted workloads only. Control/sampler memory is excluded in every mode.
 import argparse, ctypes, hashlib, json, os, platform, re, resource, selectors, signal, statistics, subprocess, tempfile, time
 from pathlib import Path
 from process_metrics import proc_info, sample
+from benchmark_snapshot import Snapshot, sha256
 
 parser=argparse.ArgumentParser()
+parser.add_argument('--snapshot',type=Path,help='Copied runtime/dependency snapshot created by benchmark_snapshot.py')
 parser.add_argument('--backend',choices=['direct','sdk','sdk-upstream','sdk-source'],required=True)
 parser.add_argument('--source-layout',default='standard',help='Source artifact prefix (standard, minified, or an immutable comparison snapshot)')
 parser.add_argument('--mode',choices=['resident','request','request-cache'],required=True)
@@ -29,6 +31,15 @@ if args.profile!='request' and args.request_launcher!='single': parser.error('La
 if not 2<=args.turns<=101 or args.interval<=0: parser.error('Invalid turns/interval')
 if os.environ.get('AGENTOS_LINUX_EXPERIMENT')=='1': parser.error('Protected performance is not validated')
 ROOT=Path(__file__).resolve().parents[2]
+if args.snapshot and (args.backend not in ['sdk','sdk-source'] or args.initialization!='current' or args.startup_diagnostics or args.source_layout not in ['standard','minified']):
+    parser.error('Snapshots support current SDK/source layouts without startup instrumentation')
+snapshot=Snapshot(args.snapshot) if args.snapshot else None
+RUN_ROOT=snapshot.root if snapshot else ROOT
+if snapshot:
+    for local in ['scripts/benchmark/request-lifecycle.py','scripts/benchmark/process_metrics.py','scripts/benchmark/benchmark_snapshot.py']:
+        if sha256(ROOT/local)!=sha256(RUN_ROOT/local): raise RuntimeError(f'Running harness differs from snapshot: {local}')
+    if Path(subprocess.check_output(['which','node'],text=True).strip()).resolve()!=Path(snapshot.manifest['node']['path']):
+        raise RuntimeError('Node resolution differs from snapshot')
 source_prefix='' if args.source_layout=='standard' else args.source_layout+'-'
 output_backend=args.backend+('' if args.source_layout=='standard' else '-'+args.source_layout)
 output=ROOT/f'artifacts/results/lifecycle-{output_backend}-{args.mode}-{args.trial}.json'
@@ -42,11 +53,12 @@ entry=f'artifacts/core/{args.initialization}-native-sdk-core-benchmark.mjs' if a
 if args.backend=='sdk-source': entry=f'artifacts/core/{source_prefix}source-native-sdk-core-benchmark.mjs'
 source_entry=entry
 # Freeze provenance before execution and reject artifacts changed while sampling.
-artifact_paths=[ROOT/entry]
+artifact_paths=[RUN_ROOT/entry, ROOT/'scripts/benchmark/request-lifecycle.py', ROOT/'scripts/benchmark/process_metrics.py', ROOT/'scripts/benchmark/benchmark_snapshot.py']
 if args.backend=='sdk-source':
-    artifact_paths += [ROOT/f'packages/openclaw-core/dist/{source_prefix}index.mjs', ROOT/f'packages/openclaw-core/dist/{source_prefix}index.manifest.json']
+    artifact_paths += [RUN_ROOT/f'packages/openclaw-core/dist/{source_prefix}index.mjs', RUN_ROOT/f'packages/openclaw-core/dist/{source_prefix}index.manifest.json']
 artifact_hashes={path:hashlib.sha256(path.read_bytes()).hexdigest() for path in artifact_paths}
 def verify_artifacts():
+    if snapshot: snapshot.verify()
     if any(hashlib.sha256(path.read_bytes()).hexdigest()!=digest for path,digest in artifact_hashes.items()):
         raise RuntimeError('Benchmark artifact changed during trial; comparison rejected')
 profile_dir=ROOT/f'artifacts/results/startup-tail-{args.trial}'
@@ -84,7 +96,10 @@ def run(env,index):
         command+=['--import',str(ROOT/('scripts/diagnostics/allocation-preload.mjs' if args.startup_diagnostics=='allocations' else 'scripts/diagnostics/startup-preload.mjs'))]
         if args.startup_diagnostics=='allocations': env={**env,'STARTUP_ALLOCATION_OUTPUT':str(profile_dir/f'request-{index}.heapprofile.json.gz')}
         if args.startup_diagnostics=='cpu': command+=['--cpu-prof','--cpu-prof-interval=1000',f'--cpu-prof-dir={profile_dir}',f'--cpu-prof-name=request-{index}.cpuprofile']
-    child=subprocess.Popen(command+[entry,'--internal-worker-prewarm'],cwd=ROOT,env=env,stdout=subprocess.PIPE,stderr=subprocess.PIPE,start_new_session=True,preexec_fn=lambda:os.sched_setaffinity(0,cpus))
+    if snapshot:
+        if args.profile=='request': command[1]=str(RUN_ROOT/command[1])
+        command+=['--no-global-search-paths']
+    child=subprocess.Popen(command+[str(RUN_ROOT/entry),'--internal-worker-prewarm'],cwd=RUN_ROOT,env=env,stdout=subprocess.PIPE,stderr=subprocess.PIPE,start_new_session=True,preexec_fn=lambda:os.sched_setaffinity(0,cpus))
     pid=mounted_pid(child);selector=selectors.DefaultSelector()
     for stream in [child.stdout,child.stderr]:
         os.set_blocking(stream.fileno(),False);selector.register(stream,selectors.EVENT_READ);buffers[stream.fileno()]=b''
@@ -147,7 +162,7 @@ with tempfile.TemporaryDirectory(prefix='core-lifecycle-') as directory:
     base=Path(directory)
     for d in ['workspace','state','compile-cache']: (base/d).mkdir()
     env=os.environ.copy()
-    for key in ['NODE_OPTIONS','NODE_COMPILE_CACHE','NODE_DISABLE_COMPILE_CACHE','AGENTOS_LINUX_EXPERIMENT','BENCH_REQUEST_TURN','BENCH_NATIVE_MEMORY','BENCH_GC_AT_IDLE','BENCH_PROFILE_CORE','BENCH_SPLIT_INIT']: env.pop(key,None)
+    for key in ['NODE_PATH','NODE_OPTIONS','NODE_COMPILE_CACHE','NODE_DISABLE_COMPILE_CACHE','AGENTOS_LINUX_EXPERIMENT','BENCH_REQUEST_TURN','BENCH_NATIVE_MEMORY','BENCH_GC_AT_IDLE','BENCH_PROFILE_CORE','BENCH_SPLIT_INIT']: env.pop(key,None)
     env.update(BENCH_ROOT=directory,BENCH_WORKLOAD='core-workload',BENCH_WARM_TURNS=str(args.turns-1),BENCH_IDLE_MS='1500',OPENCLAW_STATE_DIR=str(base/'state/openclaw'),OPENCLAW_CHILD_OOM_SCORE_ADJ='0',AGENTOS_SDK_FILESYSTEM='node',MALLOC_ARENA_MAX='1',MALLOC_TRIM_THRESHOLD_='65536',MALLOC_MMAP_THRESHOLD_='65536')
     if args.mode=='request-cache': env['NODE_COMPILE_CACHE']=str(base/'compile-cache')
     for turn in range(1 if args.mode=='resident' else args.turns):
@@ -180,19 +195,23 @@ turn_events=[e for r in runs for e in r['events'] if e['label'].endswith('turn:e
 warm_events=[e for e in turn_events if e['label'].startswith('warm-turn-')]
 summary={'warmTurnMedianMs':statistics.median(e['durationMs'] for e in warm_events) if warm_events else None,'totalCpuSeconds':sum(r['cpuSeconds'] for r in runs),'totalProcessWallMs':sum(r['wallMs'] for r in runs),'peakPssMiB':max(r['peakPssMiB'] for r in runs),'idleCorePssMiB':statistics.median(idle) if idle else 0 if args.mode!='resident' else None,'firstProcessMs':runs[0]['wallMs'],'subsequentProcessMedianMs':statistics.median(r['wallMs'] for r in runs[1:]) if len(runs)>1 else None,'subsequentCpuMedianSeconds':statistics.median(r['cpuSeconds'] for r in runs[1:]) if len(runs)>1 else None}
 verify_artifacts()
-report={'valid':all(r['valid'] for r in runs) and validation['passed'],'backend':args.backend,'mode':args.mode,'turns':args.turns,'trial':args.trial,'sampleIntervalMs':args.interval*1000,'environment':{'node':subprocess.check_output(['node','--version'],text=True).strip(),'platform':platform.platform(),'cpus':cpus,'semiSpaceMiB':8,'profile':args.profile,'initialization':args.initialization,'wasmTiering':'liftoff-only' if args.profile=='request' else args.wasm_tiering,'maxOpt':args.max_opt,'allocator':{'MALLOC_ARENA_MAX':'1','MALLOC_TRIM_THRESHOLD_':'65536','MALLOC_MMAP_THRESHOLD_':'65536'}},'method':'Trusted native process tree PSS; external Python sampler excluded; 420ms scripted inference per turn; cache begins empty per trial; normal process exit (no forced exit); subreaper checks only trusted descendants; direct OpenClaw supervisor vs SDK supervisor still differ','summary':summary,'validation':validation,'benchmarkManifest':json.loads((ROOT/'artifacts/core/benchmark-manifest.json').read_text()),'entrySha256':hashlib.sha256((ROOT/entry).read_bytes()).hexdigest(),'requestLauncherSha256':hashlib.sha256((ROOT/'scripts/run-core-node-request.mjs').read_bytes()).hexdigest(),'harnessSha256':hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),'samplerSha256':hashlib.sha256((ROOT/'scripts/benchmark/process_metrics.py').read_bytes()).hexdigest(),'runs':runs}
+report={'valid':all(r['valid'] for r in runs) and validation['passed'],'backend':args.backend,'mode':args.mode,'turns':args.turns,'trial':args.trial,'sampleIntervalMs':args.interval*1000,'environment':{'node':subprocess.check_output(['node','--version'],text=True).strip(),'platform':platform.platform(),'cpus':cpus,'semiSpaceMiB':8,'profile':args.profile,'initialization':args.initialization,'wasmTiering':'liftoff-only' if args.profile=='request' else args.wasm_tiering,'maxOpt':args.max_opt,'allocator':{'MALLOC_ARENA_MAX':'1','MALLOC_TRIM_THRESHOLD_':'65536','MALLOC_MMAP_THRESHOLD_':'65536'}},'method':'Trusted native process tree PSS; external Python sampler excluded; 420ms scripted inference per turn; cache begins empty per trial; normal process exit (no forced exit); subreaper checks only trusted descendants; direct OpenClaw supervisor vs SDK supervisor still differ','summary':summary,'validation':validation,'benchmarkManifest':json.loads((RUN_ROOT/'artifacts/core/benchmark-manifest.json').read_text()),'entrySha256':hashlib.sha256((RUN_ROOT/entry).read_bytes()).hexdigest(),'requestLauncherSha256':hashlib.sha256((RUN_ROOT/'scripts/run-core-node-request.mjs').read_bytes()).hexdigest(),'harnessSha256':hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),'samplerSha256':hashlib.sha256((ROOT/'scripts/benchmark/process_metrics.py').read_bytes()).hexdigest(),'runs':runs}
 if args.backend=='sdk-source':
     report['sourceLayout']=args.source_layout
-    report['sourceCoreManifest']=json.loads((ROOT/f'packages/openclaw-core/dist/{source_prefix}index.manifest.json').read_text())
-    report['sourceCoreSha256']=hashlib.sha256((ROOT/f'packages/openclaw-core/dist/{source_prefix}index.mjs').read_bytes()).hexdigest()
+    report['sourceCoreManifest']=json.loads((RUN_ROOT/f'packages/openclaw-core/dist/{source_prefix}index.manifest.json').read_text())
+    report['sourceCoreSha256']=hashlib.sha256((RUN_ROOT/f'packages/openclaw-core/dist/{source_prefix}index.mjs').read_bytes()).hexdigest()
     if report['sourceCoreManifest']['sha256']!=report['sourceCoreSha256']: raise RuntimeError('Source core manifest mismatch')
-    report['sourceFixtureBuilderSha256']=hashlib.sha256((ROOT/'scripts/benchmark/build-source-core.mjs').read_bytes()).hexdigest()
+    report['sourceFixtureBuilderSha256']=hashlib.sha256((RUN_ROOT/'scripts/benchmark/build-source-core.mjs').read_bytes()).hexdigest()
 if args.startup_diagnostics=='allocations':
     report['allocationPreloadSha256']=hashlib.sha256((ROOT/'scripts/diagnostics/allocation-preload.mjs').read_bytes()).hexdigest()
 if args.startup_diagnostics:
     report['startupDiagnostics']={'mode':args.startup_diagnostics,'sourceEntry':source_entry,'sourceEntrySha256':hashlib.sha256((ROOT/source_entry).read_bytes()).hexdigest(),'preloadSha256':hashlib.sha256((ROOT/'scripts/diagnostics/startup-preload.mjs').read_bytes()).hexdigest(),'builderSha256':hashlib.sha256((ROOT/'scripts/diagnostics/build-startup-entry.mjs').read_bytes()).hexdigest(),'note':'Phase markers and optional V8 CPU profiling perturb execution. Do not combine with uninstrumented performance comparisons.'}
 report['environment']['requestLauncher']=args.request_launcher if args.profile=='request' else None
-if args.profile=='request' and args.request_launcher=='single': report['requestLauncherSha256']=hashlib.sha256((ROOT/'scripts/run-core-node-request.sh').read_bytes()).hexdigest()
-report['singleStartupLauncher']={'shellSha256':hashlib.sha256((ROOT/'scripts/run-core-node-request.sh').read_bytes()).hexdigest(),'guardSha256':hashlib.sha256((ROOT/'scripts/core/request-profile-guard.mjs').read_bytes()).hexdigest()} if args.profile=='request' and args.request_launcher=='single' else None
+if args.profile=='request' and args.request_launcher=='single': report['requestLauncherSha256']=hashlib.sha256((RUN_ROOT/'scripts/run-core-node-request.sh').read_bytes()).hexdigest()
+report['singleStartupLauncher']={'shellSha256':hashlib.sha256((RUN_ROOT/'scripts/run-core-node-request.sh').read_bytes()).hexdigest(),'guardSha256':hashlib.sha256((RUN_ROOT/'scripts/core/request-profile-guard.mjs').read_bytes()).hexdigest()} if args.profile=='request' and args.request_launcher=='single' else None
+if snapshot:
+    snapshot.verify(full=True)
+    report['dependencySnapshot']=snapshot.provenance()
+    report['environment']['globalModuleSearch']=False
 output.write_text(json.dumps(report,indent=2)+'\n');print(json.dumps({'output':str(output),'valid':report['valid'],'summary':summary}),flush=True)
 raise SystemExit(0 if report['valid'] else 1)

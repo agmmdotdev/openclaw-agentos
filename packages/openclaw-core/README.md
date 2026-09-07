@@ -74,3 +74,8 @@ creation through both SDK backends. Real core read/write/edit/apply_patch covera
 checks add, move and delete behavior. Rebuild the SDK with `npm run sdk:build`
 before building the core when updating this integration. Optional streaming copy
 is not advertised; cancellation does not roll back partial filesystem changes.
+
+The [post-compatibility comparison](../../docs/source-runtime-revalidation.md)
+remeasures the runtime with copied SDK, parser and installed-package dependencies.
+Use its snapshot workflow for new performance comparisons; historical unfrozen
+reports require `compare-source-core.py --allow-legacy`.

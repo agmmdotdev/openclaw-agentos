@@ -263,3 +263,9 @@ reads and real patch add/move/delete coverage on both filesystem backends. Next:
 freeze external benchmark dependencies and refresh matched performance before
 considering the default switch; remaining startup deferral and broader skill
 compatibility still need evidence.
+
+The [frozen-dependency revalidation](source-runtime-revalidation.md) now compares
+the current source runtime against fresh controls: cached peak PSS is 8.4% lower,
+while seven-turn CPU is 3.8% higher and cached latency 1.7% higher. All 88 turns
+and 440 real tools pass. Keep the default unchanged and use refreshed source
+startup profiles to select the next module-initialization change.
