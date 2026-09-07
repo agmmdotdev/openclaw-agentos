@@ -12,10 +12,10 @@ parser.add_argument('--mode',choices=['resident','request','request-cache'],requ
 parser.add_argument('--turns',type=int,default=7)
 parser.add_argument('--trial',type=int,required=True)
 parser.add_argument('--interval',type=float,default=.04)
-parser.add_argument('--initialization',choices=['current','eager','bundled'],default='current',help='Use the current generated core, eager control or bundled lazy control (controls are SDK only)')
+parser.add_argument('--initialization',choices=['current','eager','bundled','before-allocations'],default='current',help='Use current core or a matched SDK initialization control')
 parser.add_argument('--profile',choices=['default','request'],default='default')
 parser.add_argument('--request-launcher',choices=['single','execve'],default='single',help='Single Node startup or legacy Node execve launcher; request profile only')
-parser.add_argument('--startup-diagnostics',choices=['phases','cpu'],help='Instrument startup phases; cpu also records V8 profiles. Diagnostic timings are not performance comparisons.')
+parser.add_argument('--startup-diagnostics',choices=['phases','cpu','allocations'],help='Instrument startup phases; cpu/allocations also record V8 profiles. Diagnostic timings are not performance comparisons.')
 parser.add_argument('--max-opt',type=int,choices=[0,1,2,3])
 parser.add_argument('--wasm-tiering',choices=['on','off','liftoff-only','no-loop-unrolling','no-loop-transforms'],default='on',help='Native core V8 WebAssembly optimizing tier; does not change spawned Node tools')
 args=parser.parse_args()
@@ -27,7 +27,7 @@ if not 2<=args.turns<=101 or args.interval<=0: parser.error('Invalid turns/inter
 if os.environ.get('AGENTOS_LINUX_EXPERIMENT')=='1': parser.error('Protected performance is not validated')
 ROOT=Path(__file__).resolve().parents[2]
 output=ROOT/f'artifacts/results/lifecycle-{args.backend}-{args.mode}-{args.trial}.json'
-if output.exists(): parser.error('Result already exists')
+if output.exists() or output.with_suffix('.json.gz').exists(): parser.error('Result already exists')
 # Adopt only our trusted descendants so cleanup failures are observable after
 # the root exits. This is measurement infrastructure, not a workload sandbox.
 if ctypes.CDLL(None,use_errno=True).prctl(36,1,0,0,0)!=0: raise RuntimeError('Cannot become test subreaper')
@@ -66,7 +66,8 @@ def run(env,index):
     start=time.monotonic();events=[];startup_events=[];samples=[];logs=[];buffers={};seen={}
     command=(['sh','scripts/run-core-node-request.sh'] if args.request_launcher=='single' else ['node','scripts/run-core-node-request.mjs']) if args.profile=='request' else ['node','--max-semi-space-size=8']+([f'--max-opt={args.max_opt}'] if args.max_opt is not None else [])+({'on':[],'off':['--no-wasm-tier-up'],'liftoff-only':['--liftoff-only'],'no-loop-unrolling':['--no-wasm-loop-unrolling'],'no-loop-transforms':['--no-wasm-loop-unrolling','--no-wasm-loop-peeling']}[args.wasm_tiering])
     if args.startup_diagnostics:
-        command+=['--import',str(ROOT/'scripts/diagnostics/startup-preload.mjs')]
+        command+=['--import',str(ROOT/('scripts/diagnostics/allocation-preload.mjs' if args.startup_diagnostics=='allocations' else 'scripts/diagnostics/startup-preload.mjs'))]
+        if args.startup_diagnostics=='allocations': env={**env,'STARTUP_ALLOCATION_OUTPUT':str(profile_dir/f'request-{index}.heapprofile.json.gz')}
         if args.startup_diagnostics=='cpu': command+=['--cpu-prof','--cpu-prof-interval=1000',f'--cpu-prof-dir={profile_dir}',f'--cpu-prof-name=request-{index}.cpuprofile']
     child=subprocess.Popen(command+[entry,'--internal-worker-prewarm'],cwd=ROOT,env=env,stdout=subprocess.PIPE,stderr=subprocess.PIPE,start_new_session=True,preexec_fn=lambda:os.sched_setaffinity(0,cpus))
     pid=mounted_pid(child);selector=selectors.DefaultSelector()
@@ -119,6 +120,10 @@ def run(env,index):
             path=profile_dir/f'request-{index}.cpuprofile'
             result['cpuProfile']=str(path.relative_to(ROOT))
             result['valid'] &= path.is_file()
+        if args.startup_diagnostics=='allocations':
+            path=profile_dir/f'request-{index}.heapprofile.json.gz'
+            result['allocationProfile']=str(path.relative_to(ROOT))
+            result['valid'] &= path.is_file()
     return result
 
 runs=[];validation={};started=time.monotonic()
@@ -159,6 +164,8 @@ turn_events=[e for r in runs for e in r['events'] if e['label'].endswith('turn:e
 warm_events=[e for e in turn_events if e['label'].startswith('warm-turn-')]
 summary={'warmTurnMedianMs':statistics.median(e['durationMs'] for e in warm_events) if warm_events else None,'totalCpuSeconds':sum(r['cpuSeconds'] for r in runs),'totalProcessWallMs':sum(r['wallMs'] for r in runs),'peakPssMiB':max(r['peakPssMiB'] for r in runs),'idleCorePssMiB':statistics.median(idle) if idle else 0 if args.mode!='resident' else None,'firstProcessMs':runs[0]['wallMs'],'subsequentProcessMedianMs':statistics.median(r['wallMs'] for r in runs[1:]) if len(runs)>1 else None,'subsequentCpuMedianSeconds':statistics.median(r['cpuSeconds'] for r in runs[1:]) if len(runs)>1 else None}
 report={'valid':all(r['valid'] for r in runs) and validation['passed'],'backend':args.backend,'mode':args.mode,'turns':args.turns,'trial':args.trial,'sampleIntervalMs':args.interval*1000,'environment':{'node':subprocess.check_output(['node','--version'],text=True).strip(),'platform':platform.platform(),'cpus':cpus,'semiSpaceMiB':8,'profile':args.profile,'initialization':args.initialization,'wasmTiering':'liftoff-only' if args.profile=='request' else args.wasm_tiering,'maxOpt':args.max_opt,'allocator':{'MALLOC_ARENA_MAX':'1','MALLOC_TRIM_THRESHOLD_':'65536','MALLOC_MMAP_THRESHOLD_':'65536'}},'method':'Trusted native process tree PSS; external Python sampler excluded; 420ms scripted inference per turn; cache begins empty per trial; normal process exit (no forced exit); subreaper checks only trusted descendants; direct OpenClaw supervisor vs SDK supervisor still differ','summary':summary,'validation':validation,'benchmarkManifest':json.loads((ROOT/'artifacts/core/benchmark-manifest.json').read_text()),'entrySha256':hashlib.sha256((ROOT/entry).read_bytes()).hexdigest(),'requestLauncherSha256':hashlib.sha256((ROOT/'scripts/run-core-node-request.mjs').read_bytes()).hexdigest(),'harnessSha256':hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),'samplerSha256':hashlib.sha256((ROOT/'scripts/benchmark/process_metrics.py').read_bytes()).hexdigest(),'runs':runs}
+if args.startup_diagnostics=='allocations':
+    report['allocationPreloadSha256']=hashlib.sha256((ROOT/'scripts/diagnostics/allocation-preload.mjs').read_bytes()).hexdigest()
 if args.startup_diagnostics:
     report['startupDiagnostics']={'mode':args.startup_diagnostics,'sourceEntry':source_entry,'sourceEntrySha256':hashlib.sha256((ROOT/source_entry).read_bytes()).hexdigest(),'preloadSha256':hashlib.sha256((ROOT/'scripts/diagnostics/startup-preload.mjs').read_bytes()).hexdigest(),'builderSha256':hashlib.sha256((ROOT/'scripts/diagnostics/build-startup-entry.mjs').read_bytes()).hexdigest(),'note':'Phase markers and optional V8 CPU profiling perturb execution. Do not combine with uninstrumented performance comparisons.'}
 report['environment']['requestLauncher']=args.request_launcher if args.profile=='request' else None

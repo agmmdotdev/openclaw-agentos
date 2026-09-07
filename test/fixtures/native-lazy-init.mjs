@@ -4,12 +4,25 @@ __initCheck(__testHighlightLoads === (__testMode === 'lazy' ? 0 : 1), 'eager hig
 init_embedded_agent_runtime();
 __initCheck(__testSchemaLoads === (__testMode === 'lazy' ? 0 : 1), 'root schema initialized too early');
 __initCheck(__testHighlightLoads === (__testMode === 'lazy' ? 0 : 1), 'embedded init loaded highlighting');
+__initCheck(__testAgentSchemaLoads === (__testPruned ? 0 : 1), 'agent schema initialized before demand');
+__initCheck(__testRootSupportLoads === (__testPruned ? 0 : 1), 'root support initialized before demand');
 if (__testSplit) __initCheck(!__nativeHighlightRequire.cache[__nativeHighlightRequire.resolve('./native-highlight.cjs')], 'split module loaded before demand');
 
 // A distinct schema's errors must have the same eager default locale, even
 // before any root configuration validation. A later custom locale must survive.
 const __initLocaleBefore = string$3().safeParse(42).error.issues;
 config$1({ localeError: () => 'custom-locale-preserved' });
+// Exercise the direct helper before root schema validation, including property
+// names that cannot be represented by ordinary object-literal __proto__ syntax.
+if (process.env.TEST_SCHEMA_DEMAND === 'config-first') {
+  __initCheck(validateConfigObjectRaw({}).ok, 'first configuration validation failed');
+  __initCheck(__testAgentSchemaLoads === 1 && __testRootSupportLoads === 1, 'configuration did not initialize dependencies');
+}
+const __initMcpInputs = [null, {}, JSON.parse('{"mcp":{"servers":{"__proto__":{}}}}'),
+  { nodeHost: { mcp: { servers: { ' spaced ': {}, '': {} } } } },
+  { mcp: { servers: { normal: {} } } }];
+const __initMcpIssues = __initMcpInputs.map(value => collectMcpServerNameIssues(value));
+__initCheck(__testRootSupportLoads === 1, 'direct MCP helper did not initialize once');
 const __initConfigs = [
   {}, { unknownOption: true }, null, [], { gateway: { port: -1 } },
   { gateway: { port: 18789 } }, { agents: { defaults: { model: 'openai/gpt-4.1' } } },
@@ -20,8 +33,25 @@ const __initConfigs = [
   { agents: { entries: { main: { identity: { name: 'Test' } } } } },
   { tools: { exec: { timeoutSec: 'invalid' } } },
 ];
+__initConfigs.push(
+  { agents: { defaults: { sandbox: { mode: 'all', scope: 'agent' } }, entries: { main: {} } } },
+  { agents: { defaults: { sandbox: { mode: 'invalid' } } } },
+  { tools: { allow: ['read'], alsoAllow: ['write'] } },
+  { tools: { subagents: { tools: { allow: ['read'], alsoAllow: ['write'] } } } },
+  { agents: { entries: { main: { tools: { allow: ['read'], alsoAllow: ['write'] } } } } },
+  { agents: { entries: { main: { sandbox: { mode: 'all' } } } } },
+  { agents: { entries: { main: { skills: ['search'] } } } },
+  { tools: { exec: { timeoutSec: -1, safeBins: ['cat'] } } },
+  { tools: { fs: { workspaceOnly: true } } },
+  { tools: { loopDetection: { enabled: true, warningThreshold: -1 } } },
+  { mcp: { servers: { test: { transport: 'stdio' } } } },
+  { models: { providers: { custom: { baseUrl: 'https://example.invalid', models: [{ id: 'test', cost: { input: 1, output: 2 } }] } } } },
+);
 const __initValidationResults = __initConfigs.map(value => validateConfigObjectRaw(value));
+__initCheck(__initValidationResults[22].ok, 'valid agent skill configuration rejected');
+__initCheck(!__initValidationResults[20].ok, 'conflicting agent tool policy accepted');
 __initCheck(__testSchemaLoads === 1, 'schema did not initialize exactly once');
+__initCheck(__testAgentSchemaLoads === 1, 'agent schema did not initialize exactly once on validation');
 __initCheck(string$3().safeParse(42).error.issues[0].message === 'custom-locale-preserved', 'lazy schema reset the locale');
 init_embedded_agent_runtime();
 __initCheck(__testSchemaLoads === 1, 'repeated init rebuilt schema');
@@ -59,5 +89,5 @@ __initHighlighter.registerLanguage('fixture', () => ({ keywords: 'custom', alias
 const __initCustom = __initHighlighter.highlight('custom value', { language: 'fixture-alias' }).value;
 __initHighlighter.unregisterLanguage('fixture');
 __initCheck(!__initHighlighter.getLanguage('fixture'), 'custom language was not unregistered');
-console.log(JSON.stringify({ localeBefore: __initLocaleBefore, configs: __initValidationResults,
+console.log(JSON.stringify({ localeBefore: __initLocaleBefore, mcpIssues: __initMcpIssues, configs: __initValidationResults,
   languages: __initLanguages, highlights: __initHighlights, auto: { value: __initAuto.value, language: __initAuto.language }, custom: __initCustom }));

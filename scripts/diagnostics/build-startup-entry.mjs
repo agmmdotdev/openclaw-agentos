@@ -6,6 +6,7 @@ const [input, output] = process.argv.slice(2);
 const allowed = new Map([
   ['artifacts/core/native-sdk-core-benchmark.mjs', 'native-core.mjs'],
   ['artifacts/core/bundled-native-sdk-core-benchmark.mjs', 'bundled-native-core.mjs'],
+  ['artifacts/core/before-allocations-native-sdk-core-benchmark.mjs', 'before-allocations-native-core.mjs'],
 ]);
 if (!allowed.has(input) || !/^artifacts\/core\/startup-tail-\d+\.mjs$/.test(output ?? '')) throw new Error('Invalid startup diagnostic entry');
 const source = await readFile(input, 'utf8');

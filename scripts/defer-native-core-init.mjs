@@ -14,6 +14,8 @@ export function deferNativeCoreInitialization(source) {
   for (const [name, expected] of Object.entries({
     import_lib$12: 2, es_default: 2, worker_deploy_highlight_runtime_default: 2,
     require_lib$9: 2, OpenClawSchema: 3, init_zod_schema: 2, installZodDefaultLocale: 2,
+    AllowFromEntrySchema: 3, AllowFromListSchema: 3, init_config_schema$1: 2,
+    init_zod_schema_root_support: 4, collectMcpServerNameIssues: 3,
   })) {
     if (references.get(name) !== expected) throw new Error(`Lazy initialization reference boundary changed: ${name}`);
   }
@@ -38,6 +40,21 @@ export function deferNativeCoreInitialization(source) {
     'init_zod_schema_root_shape(),OpenClawSchema=', 'schema locale');
   replace('function validateConfigObjectRaw(Ot,Zt){',
     'function validateConfigObjectRaw(Ot,Zt){init_zod_schema();', 'validation entry');
-  return { source, report: { mode: 'lazy', patches, preservesEagerLocale: true } };
+  const beforeAllocationsSource = source;
+  // The sliced channel-schema module constructs an unassigned schema; its two
+  // locals have no other consumers. Dropping that dead construction also avoids
+  // pulling in the entire agent-runtime schema graph before validation. Retain
+  // Zod, core-schema and validator initialization (including their side effects).
+  // The original agent schemas still initialize through their validation users.
+  replace('var init_config_schema$1=__esmMin((()=>{init_zod(),init_zod_schema_agent_runtime(),init_zod_schema_core(),init_schema_validator(),AllowFromEntrySchema=union([string$3(),number$1()]),AllowFromListSchema=array(AllowFromEntrySchema).optional(),object({requireMention:boolean$1().optional(),tools:ToolPolicySchema,toolsBySender:record(string$3(),ToolPolicySchema).optional(),skills:array(string$3()).optional(),enabled:boolean$1().optional(),allowFrom:AllowFromListSchema,systemPrompt:string$3().optional()}).strict()}));',
+    'var init_config_schema$1=__esmMin((()=>{init_zod(),init_zod_schema_core(),init_schema_validator()}));', 'unused channel schema');
+  // Validation's only direct root-support consumer is this MCP-name helper.
+  // Initialize at its entry as well as through the existing schema dependency
+  // edges, so even a direct helper call preserves synchronous validation.
+  replace('init_zod_schema_core(),installZodDefaultLocale(),init_zod_schema_root_support()',
+    'init_zod_schema_core(),installZodDefaultLocale()', 'root support validation dependency');
+  replace('function collectMcpServerNameIssues(Ot){',
+    'function collectMcpServerNameIssues(Ot){init_zod_schema_root_support();', 'MCP name validation entry');
+  return { source, beforeAllocationsSource, report: { mode: 'lazy', patches, preservesEagerLocale: true, unusedChannelSchema: 'pruned', rootSupport: 'on-demand' } };
 }
 function hash(value) { return createHash('sha256').update(value).digest('hex'); }

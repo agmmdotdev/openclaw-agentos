@@ -226,3 +226,16 @@ trials show 8.5% lower CPU and 5.6% lower subsequent-request latency; RAM is
 essentially unchanged. Seven focused tests and 710 real tool calls pass overall.
 The rare stalls remain open: use phase capture to locate a repeatable slow stage
 before attributing them to compilation, GC or SDK setup.
+
+
+### Startup allocation profiling and schema consumers
+
+[Startup allocation profiling](native-startup-allocations.md) identifies two eager
+paths into unused-on-this-workload configuration schemas. Removing the discarded
+channel schema and deferring root-support initialization cuts sampled allocation
+estimates from 91.5–97.9 MiB to 76.5–79.8 MiB before readiness. Twelve matched
+uninstrumented trials show 5.4% less cached-request CPU, 3.2% lower latency,
+4.2% lower request peak PSS and 8.5 MiB less resident idle PSS. Full validation
+still constructs the unchanged schemas on first use. The remaining eager core
+schemas and module-loading costs are the next ordinary-startup targets; isolated
+startup stalls still need an actual captured reproduction.

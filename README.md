@@ -245,3 +245,9 @@ capture tools and a request launcher that starts Node once. Fresh matched trials
 show 8.5% less cached-request CPU and 5.6% lower latency with essentially unchanged
 RAM. The historical startup spikes remain unexplained. The same pinned Wasm
 request profile stays opt-in; `--request-launcher execve` retains the old control.
+
+The [allocation profiling pass](docs/native-startup-allocations.md) removes an
+unused channel-schema construction and defers root-support schemas to validation.
+Fresh matched trials show 5.4% less cached-request CPU, 3.2% lower latency,
+4.2% less peak PSS and 8.5 MiB less resident idle PSS. First configuration
+validation pays the deferred construction cost; all original schemas remain.
