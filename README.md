@@ -1,14 +1,17 @@
 # OpenClaw core on agentOS
 
-An out-of-tree experiment running OpenClaw **2026.8.1** core turns inside the
-published **agentOS 0.2.19** runtime. No containers, OpenClaw source fork,
-agentOS source changes, or Rust build are used in the current experiment.
+Experiments running OpenClaw **2026.8.1** core turns with agentOS-compatible tools.
+The repository now owns editable [OpenClaw core source](packages/openclaw-core/README.md)
+and a [native Node/Linux SDK](packages/agentos-sdk/README.md). The native SDK uses
+Node and Linux directly, without the Rust/Wasm engine; it remains trusted-only.
+The published **agentOS 0.2.19** and compiled-artifact backends remain comparison controls.
 
-**Status: the current core compatibility gate passes.**
-The async-context and process-completion failures are fixed within the compiled
-adapter boundary. This remains a prototype, not a production runtime.
+The source core is opt-in while compatibility and performance validation continue.
+See the [source migration measurements](docs/source-core-performance.md) and
+[latest initialization changes](docs/source-core-initialization.md). This remains
+a prototype. Gateway and channel integration are separate work.
 
-## Current core boundary
+## Published-runtime reference boundary
 
 - Uses the actual standalone worker from the published OpenClaw package.
 - Verifies its SHA-256 before touching the generated artifact.
@@ -31,8 +34,9 @@ loading, which the existing embedded worker already disables. It removes the
 worker CLI entry; gateway and channel integration remain separate work.
 `CORE_PROFILE=full npm run core:build` retains the full control artifact.
 
-These are **artifact patches**, even though neither source project is forked.
-The private core boundary is version-specific, not a stable upstream SDK.
+This reference backend uses **artifact patches**. The owned source core instead
+compiles editable TypeScript. Both core boundaries are version-specific, not a
+stable upstream SDK.
 
 Inference is injected deterministically in the tests. No model API credentials
 are needed, and guest network access is denied. The real OpenClaw core consumes

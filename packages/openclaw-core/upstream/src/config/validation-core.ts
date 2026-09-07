@@ -41,7 +41,7 @@ import {
   mergeUnsupportedMutableSecretRefIssues,
   withConfigIssuePath,
 } from "./validation-issues.js";
-import { isBuiltInModelProviderOverlayId } from "./zod-schema.core.js";
+import { isBuiltInModelProviderOverlayId } from "./model-provider-config.js";
 import { getOpenClawSchema } from "./zod-schema-loader.js";
 import { McpServerNameSchema, NodeHostMcpServerNameSchema } from "./zod-schema.mcp-names.js";
 

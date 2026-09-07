@@ -11,7 +11,7 @@ import type { ConfigValidationIssue, OpenClawConfig } from "./types.js";
 import {
   type DmPolicyAllowFromViolation,
   evaluateDmPolicyAllowFromDependency,
-} from "./zod-schema.core.js";
+} from "./dm-policy-allow-from.js";
 
 export const bundledChannelSchemaById = new Map<string, unknown>(
   GENERATED_BUNDLED_CHANNEL_CONFIG_METADATA.filter((entry) => entry.configurable !== false).map(

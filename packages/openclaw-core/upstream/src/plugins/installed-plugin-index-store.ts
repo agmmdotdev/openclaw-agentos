@@ -2,10 +2,8 @@
 import type { DatabaseSync } from "node:sqlite";
 import { safeParseJson } from "@openclaw/normalization-core/json-coercion";
 import { z } from "zod";
-import {
-  parsePluginInstallRecordMap,
-  PluginInstallRecordSchema,
-} from "../config/plugin-install-record-map.js";
+import { parsePluginInstallRecordMap } from "../config/plugin-install-record-map.js";
+import { getPluginInstallRecordSchema } from "../config/zod-schema.installs.js";
 import { safeParseWithSchema } from "../utils/zod-parse.js";
 import { recordInstalledPluginIndexInstallOwner } from "./installed-plugin-index-install-owner.js";
 import { getPersistedInstalledPluginIndexCacheEntry } from "./installed-plugin-index-record-state.js";
@@ -23,102 +21,111 @@ export {
   type InstalledPluginIndexStoreOptions,
 } from "./installed-plugin-index-store-path.js";
 
-const StringArraySchema = z.array(z.string());
 // Shared with installed-plugin-index-store-write.ts.
 export const INSTALLED_PLUGIN_INDEX_STATE_KEY = "plugins.installedIndex";
 
-const InstalledPluginIndexStartupSchema = z.object({
-  sidecar: z.boolean(),
-  memory: z.boolean(),
-  agentHarnesses: StringArraySchema,
-  configPaths: StringArraySchema.optional(),
-});
+function createInstalledPluginIndexSchema() {
+  const StringArraySchema = z.array(z.string());
 
-const InstalledPluginIndexContributionSchema = z.object({
-  channels: StringArraySchema,
-  channelConfigs: StringArraySchema,
-  providers: StringArraySchema,
-  modelCatalogProviders: StringArraySchema,
-  modelSupportPrefixes: StringArraySchema,
-  modelSupportPatterns: StringArraySchema,
-  autoEnableProviderIds: StringArraySchema,
-  commandAliases: StringArraySchema,
-  contracts: z.record(z.string(), StringArraySchema),
-});
+  const InstalledPluginIndexStartupSchema = z.object({
+    sidecar: z.boolean(),
+    memory: z.boolean(),
+    agentHarnesses: StringArraySchema,
+    configPaths: StringArraySchema.optional(),
+  });
 
-const InstalledPluginFileSignatureSchema = z.object({
-  size: z.number(),
-  mtimeMs: z.number(),
-  ctimeMs: z.number().optional(),
-});
+  const InstalledPluginIndexContributionSchema = z.object({
+    channels: StringArraySchema,
+    channelConfigs: StringArraySchema,
+    providers: StringArraySchema,
+    modelCatalogProviders: StringArraySchema,
+    modelSupportPrefixes: StringArraySchema,
+    modelSupportPatterns: StringArraySchema,
+    autoEnableProviderIds: StringArraySchema,
+    commandAliases: StringArraySchema,
+    contracts: z.record(z.string(), StringArraySchema),
+  });
 
-const InstalledPluginIndexRecordSchema = z.object({
-  pluginId: z.string(),
-  installOwner: z.string().optional(),
-  installOwnerAmbiguous: z.literal(true).optional(),
-  packageName: z.string().optional(),
-  packageVersion: z.string().optional(),
-  installRecord: PluginInstallRecordSchema.optional(),
-  installRecordHash: z.string().optional(),
-  packageInstall: z.unknown().optional(),
-  packageChannel: z.unknown().optional(),
-  packageBuild: z
-    .object({
-      bundledDist: z.boolean().optional(),
-    })
-    .optional(),
-  manifestPath: z.string(),
-  manifestHash: z.string(),
-  doctorContractHash: z.string().optional(),
-  doctorContractFile: InstalledPluginFileSignatureSchema.optional(),
-  manifestFile: InstalledPluginFileSignatureSchema.optional(),
-  format: z.string().optional(),
-  bundleFormat: z.string().optional(),
-  source: z.string().optional(),
-  setupSource: z.string().optional(),
-  packageJson: z
-    .object({
-      path: z.string(),
-      hash: z.string(),
-      fileSignature: InstalledPluginFileSignatureSchema.optional(),
-    })
-    .optional(),
-  rootDir: z.string(),
-  origin: z.string(),
-  enabled: z.boolean(),
-  enabledByDefault: z.boolean().optional(),
-  enabledByDefaultOnPlatforms: StringArraySchema.optional(),
-  syntheticAuthRefs: StringArraySchema.optional(),
-  startup: InstalledPluginIndexStartupSchema,
-  contributions: InstalledPluginIndexContributionSchema.optional(),
-  compat: z.array(z.string()),
-});
+  const InstalledPluginFileSignatureSchema = z.object({
+    size: z.number(),
+    mtimeMs: z.number(),
+    ctimeMs: z.number().optional(),
+  });
 
-const PluginDiagnosticSchema = z.object({
-  level: z.union([z.literal("warn"), z.literal("error")]),
-  message: z.string(),
-  pluginId: z.string().optional(),
-  source: z.string().optional(),
-  code: z.string().optional(),
-});
+  const InstalledPluginIndexRecordSchema = z.object({
+    pluginId: z.string(),
+    installOwner: z.string().optional(),
+    installOwnerAmbiguous: z.literal(true).optional(),
+    packageName: z.string().optional(),
+    packageVersion: z.string().optional(),
+    installRecord: getPluginInstallRecordSchema().optional(),
+    installRecordHash: z.string().optional(),
+    packageInstall: z.unknown().optional(),
+    packageChannel: z.unknown().optional(),
+    packageBuild: z
+      .object({
+        bundledDist: z.boolean().optional(),
+      })
+      .optional(),
+    manifestPath: z.string(),
+    manifestHash: z.string(),
+    doctorContractHash: z.string().optional(),
+    doctorContractFile: InstalledPluginFileSignatureSchema.optional(),
+    manifestFile: InstalledPluginFileSignatureSchema.optional(),
+    format: z.string().optional(),
+    bundleFormat: z.string().optional(),
+    source: z.string().optional(),
+    setupSource: z.string().optional(),
+    packageJson: z
+      .object({
+        path: z.string(),
+        hash: z.string(),
+        fileSignature: InstalledPluginFileSignatureSchema.optional(),
+      })
+      .optional(),
+    rootDir: z.string(),
+    origin: z.string(),
+    enabled: z.boolean(),
+    enabledByDefault: z.boolean().optional(),
+    enabledByDefaultOnPlatforms: StringArraySchema.optional(),
+    syntheticAuthRefs: StringArraySchema.optional(),
+    startup: InstalledPluginIndexStartupSchema,
+    contributions: InstalledPluginIndexContributionSchema.optional(),
+    compat: z.array(z.string()),
+  });
 
-const InstalledPluginIndexSchema = z.object({
-  version: z.literal(INSTALLED_PLUGIN_INDEX_VERSION),
-  warning: z.string().optional(),
-  hostContractVersion: z.string(),
-  compatRegistryVersion: z.string(),
-  migrationVersion: z.literal(INSTALLED_PLUGIN_INDEX_MIGRATION_VERSION),
-  policyHash: z.string(),
-  generatedAtMs: z.number(),
-  workspaceDir: z.string().optional(),
-  refreshReason: z.string().optional(),
-  installRecords: z.unknown().optional(),
-  plugins: z.array(InstalledPluginIndexRecordSchema),
-  diagnostics: z.array(PluginDiagnosticSchema),
-});
+  const PluginDiagnosticSchema = z.object({
+    level: z.union([z.literal("warn"), z.literal("error")]),
+    message: z.string(),
+    pluginId: z.string().optional(),
+    source: z.string().optional(),
+    code: z.string().optional(),
+  });
+
+  return z.object({
+    version: z.literal(INSTALLED_PLUGIN_INDEX_VERSION),
+    warning: z.string().optional(),
+    hostContractVersion: z.string(),
+    compatRegistryVersion: z.string(),
+    migrationVersion: z.literal(INSTALLED_PLUGIN_INDEX_MIGRATION_VERSION),
+    policyHash: z.string(),
+    generatedAtMs: z.number(),
+    workspaceDir: z.string().optional(),
+    refreshReason: z.string().optional(),
+    installRecords: z.unknown().optional(),
+    plugins: z.array(InstalledPluginIndexRecordSchema),
+    diagnostics: z.array(PluginDiagnosticSchema),
+  });
+}
+
+let installedPluginIndexSchema: ReturnType<typeof createInstalledPluginIndexSchema> | undefined;
+
+function getInstalledPluginIndexSchema() {
+  return (installedPluginIndexSchema ??= createInstalledPluginIndexSchema());
+}
 
 export function parseInstalledPluginIndex(value: unknown): InstalledPluginIndex | null {
-  const parsed = safeParseWithSchema(InstalledPluginIndexSchema, value) as
+  const parsed = safeParseWithSchema(getInstalledPluginIndexSchema(), value) as
     | (Omit<InstalledPluginIndex, "installRecords" | "plugins"> & {
         installRecords?: unknown;
         plugins: Array<

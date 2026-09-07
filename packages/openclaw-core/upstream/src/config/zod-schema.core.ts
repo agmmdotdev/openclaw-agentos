@@ -1,16 +1,12 @@
 // Defines core Zod schema fragments for canonical config parsing.
 import path from "node:path";
-import { normalizeStringEntries } from "@openclaw/normalization-core/string-normalization";
 import { z } from "zod";
 import { isSafeExecutableValue } from "../infra/exec-safety.js";
 import type { OpenRouterRouting, VercelGatewayRouting } from "../llm/types.js";
 import { normalizeExactAllowedHost } from "../secrets/exact-hostname.js";
-import {
-  formatExecSecretRefIdValidationMessage,
-  isValidExecSecretRefId,
-  isValidFileSecretRefId,
-  SECRET_PROVIDER_ALIAS_PATTERN,
-} from "../secrets/ref-contract.js";
+import { SECRET_PROVIDER_ALIAS_PATTERN } from "../secrets/ref-contract.js";
+import { evaluateDmPolicyAllowFromDependency } from "./dm-policy-allow-from.js";
+import { SecretRefSchema } from "./zod-schema.secret-ref.js";
 import { isBuiltInModelProviderOverlayId } from "./model-provider-config.js";
 import type { ModelCompatConfig } from "./types.models.js";
 import { MODEL_APIS, MODEL_THINKING_FORMATS } from "./types.models.js";
@@ -18,6 +14,8 @@ import { ENV_SECRET_REF_ID_RE } from "./types.secrets.js";
 import { createAllowDenyChannelRulesSchema } from "./zod-schema.allowdeny.js";
 import { sensitive } from "./zod-schema.sensitive.js";
 
+export { evaluateDmPolicyAllowFromDependency, type DmPolicyAllowFromViolation } from "./dm-policy-allow-from.js";
+export { SecretRefSchema } from "./zod-schema.secret-ref.js";
 export { isBuiltInModelProviderOverlayId } from "./model-provider-config.js";
 
 const WINDOWS_ABS_PATH_PATTERN = /^[A-Za-z]:[\\/]/;
@@ -32,81 +30,6 @@ function isAbsolutePath(value: string): boolean {
     WINDOWS_UNC_PATH_PATTERN.test(value)
   );
 }
-
-const EnvSecretRefSchema = z
-  .object({
-    source: z.literal("env"),
-    provider: z
-      .string()
-      .regex(
-        SECRET_PROVIDER_ALIAS_PATTERN,
-        'Secret reference provider must match /^[a-z][a-z0-9_-]{0,63}$/ (example: "default").',
-      ),
-    id: z
-      .string()
-      .regex(
-        ENV_SECRET_REF_ID_RE,
-        'Env secret reference id must match /^[A-Z][A-Z0-9_]{0,127}$/ (example: "OPENAI_API_KEY").',
-      ),
-  })
-  .strict();
-
-const FileSecretRefSchema = z
-  .object({
-    source: z.literal("file"),
-    provider: z
-      .string()
-      .regex(
-        SECRET_PROVIDER_ALIAS_PATTERN,
-        'Secret reference provider must match /^[a-z][a-z0-9_-]{0,63}$/ (example: "default").',
-      ),
-    id: z
-      .string()
-      .refine(
-        isValidFileSecretRefId,
-        'File secret reference id must be an absolute JSON pointer (example: "/providers/openai/apiKey"), or "value" for singleValue mode.',
-      ),
-  })
-  .strict();
-
-const ExecSecretRefSchema = z
-  .object({
-    source: z.literal("exec"),
-    provider: z
-      .string()
-      .regex(
-        SECRET_PROVIDER_ALIAS_PATTERN,
-        'Secret reference provider must match /^[a-z][a-z0-9_-]{0,63}$/ (example: "default").',
-      ),
-    id: z.string().refine(isValidExecSecretRefId, formatExecSecretRefIdValidationMessage()),
-  })
-  .strict();
-
-const StoreSecretRefSchema = z
-  .object({
-    source: z.literal("store"),
-    provider: z
-      .string()
-      .regex(
-        SECRET_PROVIDER_ALIAS_PATTERN,
-        'Secret reference provider must match /^[a-z][a-z0-9_-]{0,63}$/ (example: "default").',
-      ),
-    id: z
-      .string()
-      .regex(
-        ENV_SECRET_REF_ID_RE,
-        'Store secret reference id must match /^[A-Z][A-Z0-9_]{0,127}$/ (example: "OPENAI_API_KEY").',
-      ),
-  })
-  .strict();
-
-/** Config-level secret reference schema shared by model/provider/plugin credential fields. */
-export const SecretRefSchema = z.discriminatedUnion("source", [
-  EnvSecretRefSchema,
-  FileSecretRefSchema,
-  ExecSecretRefSchema,
-  StoreSecretRefSchema,
-]);
 
 /** Accepts either legacy inline secret strings or structured secret references. */
 export const SecretInputSchema = z.union([z.string(), SecretRefSchema]);
@@ -817,34 +740,6 @@ export const HumanDelaySchema = z
     maxMs: z.number().int().nonnegative().optional(),
   })
   .strict();
-
-const normalizeAllowFrom = (values?: Array<string | number>): string[] =>
-  normalizeStringEntries(values);
-
-/**
- * Closed set of sender-policy/allowFrom dependency violations. Both cases drop
- * every inbound DM at runtime, so callers surface them as config problems.
- */
-export type DmPolicyAllowFromViolation = "open_requires_wildcard" | "allowlist_requires_entries";
-
-/**
- * Canonical cross-field check for dmPolicy vs allowFrom. This is the single
- * source of truth shared by the Zod schema refinements and the CLI config
- * validator so the rule cannot drift between the two surfaces.
- */
-export const evaluateDmPolicyAllowFromDependency = (params: {
-  policy?: string;
-  allowFrom?: Array<string | number>;
-}): DmPolicyAllowFromViolation | null => {
-  const allow = normalizeAllowFrom(params.allowFrom);
-  if (params.policy === "open" && !allow.includes("*")) {
-    return "open_requires_wildcard";
-  }
-  if (params.policy === "allowlist" && allow.length === 0) {
-    return "allowlist_requires_entries";
-  }
-  return null;
-};
 
 export const requireOpenAllowFrom = (params: {
   policy?: string;

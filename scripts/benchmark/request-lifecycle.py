@@ -2,12 +2,13 @@
 """Serial representative turns: persistent core vs fresh process per request.
 Trusted workloads only. Control/sampler memory is excluded in every mode.
 """
-import argparse, ctypes, hashlib, json, os, platform, resource, selectors, signal, statistics, subprocess, tempfile, time
+import argparse, ctypes, hashlib, json, os, platform, re, resource, selectors, signal, statistics, subprocess, tempfile, time
 from pathlib import Path
 from process_metrics import proc_info, sample
 
 parser=argparse.ArgumentParser()
-parser.add_argument('--backend',choices=['direct','sdk','sdk-upstream'],required=True)
+parser.add_argument('--backend',choices=['direct','sdk','sdk-upstream','sdk-source'],required=True)
+parser.add_argument('--source-layout',default='standard',help='Source artifact prefix (standard, minified, or an immutable comparison snapshot)')
 parser.add_argument('--mode',choices=['resident','request','request-cache'],required=True)
 parser.add_argument('--turns',type=int,default=7)
 parser.add_argument('--trial',type=int,required=True)
@@ -19,6 +20,8 @@ parser.add_argument('--startup-diagnostics',choices=['phases','cpu','allocations
 parser.add_argument('--max-opt',type=int,choices=[0,1,2,3])
 parser.add_argument('--wasm-tiering',choices=['on','off','liftoff-only','no-loop-unrolling','no-loop-transforms'],default='on',help='Native core V8 WebAssembly optimizing tier; does not change spawned Node tools')
 args=parser.parse_args()
+if not re.fullmatch(r'[a-z][a-z0-9-]*',args.source_layout): parser.error('Invalid source artifact prefix')
+if args.source_layout!='standard' and args.backend!='sdk-source': parser.error('Source layout requires source backend')
 if args.initialization!='current' and args.backend!='sdk': parser.error('Initialization controls require SDK backend')
 if args.startup_diagnostics and (args.backend!='sdk' or args.initialization=='eager' or args.mode=='resident'): parser.error('Startup diagnostics require SDK request mode and current/bundled initialization')
 if args.profile=='request' and (args.max_opt is not None or args.wasm_tiering!='on'): parser.error('Request profile cannot be combined with diagnostic compiler overrides')
@@ -26,7 +29,9 @@ if args.profile!='request' and args.request_launcher!='single': parser.error('La
 if not 2<=args.turns<=101 or args.interval<=0: parser.error('Invalid turns/interval')
 if os.environ.get('AGENTOS_LINUX_EXPERIMENT')=='1': parser.error('Protected performance is not validated')
 ROOT=Path(__file__).resolve().parents[2]
-output=ROOT/f'artifacts/results/lifecycle-{args.backend}-{args.mode}-{args.trial}.json'
+source_prefix='' if args.source_layout=='standard' else args.source_layout+'-'
+output_backend=args.backend+('' if args.source_layout=='standard' else '-'+args.source_layout)
+output=ROOT/f'artifacts/results/lifecycle-{output_backend}-{args.mode}-{args.trial}.json'
 if output.exists() or output.with_suffix('.json.gz').exists(): parser.error('Result already exists')
 # Adopt only our trusted descendants so cleanup failures are observable after
 # the root exits. This is measurement infrastructure, not a workload sandbox.
@@ -34,7 +39,16 @@ if ctypes.CDLL(None,use_errno=True).prctl(36,1,0,0,0)!=0: raise RuntimeError('Ca
 parent=int(os.readlink('/proc/self'))
 cpus=sorted(os.sched_getaffinity(0))[:2]
 entry=f'artifacts/core/{args.initialization}-native-sdk-core-benchmark.mjs' if args.initialization!='current' else 'artifacts/core/native-sdk-supervised-benchmark.mjs' if args.backend=='sdk-upstream' else 'artifacts/core/native-sdk-core-benchmark.mjs' if args.backend=='sdk' else 'artifacts/core/native-core-benchmark.mjs'
+if args.backend=='sdk-source': entry=f'artifacts/core/{source_prefix}source-native-sdk-core-benchmark.mjs'
 source_entry=entry
+# Freeze provenance before execution and reject artifacts changed while sampling.
+artifact_paths=[ROOT/entry]
+if args.backend=='sdk-source':
+    artifact_paths += [ROOT/f'packages/openclaw-core/dist/{source_prefix}index.mjs', ROOT/f'packages/openclaw-core/dist/{source_prefix}index.manifest.json']
+artifact_hashes={path:hashlib.sha256(path.read_bytes()).hexdigest() for path in artifact_paths}
+def verify_artifacts():
+    if any(hashlib.sha256(path.read_bytes()).hexdigest()!=digest for path,digest in artifact_hashes.items()):
+        raise RuntimeError('Benchmark artifact changed during trial; comparison rejected')
 profile_dir=ROOT/f'artifacts/results/startup-tail-{args.trial}'
 if args.startup_diagnostics:
     entry=f'artifacts/core/startup-tail-{args.trial}.mjs'
@@ -62,6 +76,7 @@ def direct_children():
     return found
 
 def run(env,index):
+    verify_artifacts()
     before=resource.getrusage(resource.RUSAGE_CHILDREN)
     start=time.monotonic();events=[];startup_events=[];samples=[];logs=[];buffers={};seen={}
     command=(['sh','scripts/run-core-node-request.sh'] if args.request_launcher=='single' else ['node','scripts/run-core-node-request.mjs']) if args.profile=='request' else ['node','--max-semi-space-size=8']+([f'--max-opt={args.max_opt}'] if args.max_opt is not None else [])+({'on':[],'off':['--no-wasm-tier-up'],'liftoff-only':['--liftoff-only'],'no-loop-unrolling':['--no-wasm-loop-unrolling'],'no-loop-transforms':['--no-wasm-loop-unrolling','--no-wasm-loop-peeling']}[args.wasm_tiering])
@@ -124,6 +139,7 @@ def run(env,index):
             path=profile_dir/f'request-{index}.heapprofile.json.gz'
             result['allocationProfile']=str(path.relative_to(ROOT))
             result['valid'] &= path.is_file()
+    verify_artifacts()
     return result
 
 runs=[];validation={};started=time.monotonic()
@@ -163,7 +179,14 @@ if args.mode=='resident':
 turn_events=[e for r in runs for e in r['events'] if e['label'].endswith('turn:end') or (e['label'].startswith('warm-turn-') and e['label'].endswith(':end'))]
 warm_events=[e for e in turn_events if e['label'].startswith('warm-turn-')]
 summary={'warmTurnMedianMs':statistics.median(e['durationMs'] for e in warm_events) if warm_events else None,'totalCpuSeconds':sum(r['cpuSeconds'] for r in runs),'totalProcessWallMs':sum(r['wallMs'] for r in runs),'peakPssMiB':max(r['peakPssMiB'] for r in runs),'idleCorePssMiB':statistics.median(idle) if idle else 0 if args.mode!='resident' else None,'firstProcessMs':runs[0]['wallMs'],'subsequentProcessMedianMs':statistics.median(r['wallMs'] for r in runs[1:]) if len(runs)>1 else None,'subsequentCpuMedianSeconds':statistics.median(r['cpuSeconds'] for r in runs[1:]) if len(runs)>1 else None}
+verify_artifacts()
 report={'valid':all(r['valid'] for r in runs) and validation['passed'],'backend':args.backend,'mode':args.mode,'turns':args.turns,'trial':args.trial,'sampleIntervalMs':args.interval*1000,'environment':{'node':subprocess.check_output(['node','--version'],text=True).strip(),'platform':platform.platform(),'cpus':cpus,'semiSpaceMiB':8,'profile':args.profile,'initialization':args.initialization,'wasmTiering':'liftoff-only' if args.profile=='request' else args.wasm_tiering,'maxOpt':args.max_opt,'allocator':{'MALLOC_ARENA_MAX':'1','MALLOC_TRIM_THRESHOLD_':'65536','MALLOC_MMAP_THRESHOLD_':'65536'}},'method':'Trusted native process tree PSS; external Python sampler excluded; 420ms scripted inference per turn; cache begins empty per trial; normal process exit (no forced exit); subreaper checks only trusted descendants; direct OpenClaw supervisor vs SDK supervisor still differ','summary':summary,'validation':validation,'benchmarkManifest':json.loads((ROOT/'artifacts/core/benchmark-manifest.json').read_text()),'entrySha256':hashlib.sha256((ROOT/entry).read_bytes()).hexdigest(),'requestLauncherSha256':hashlib.sha256((ROOT/'scripts/run-core-node-request.mjs').read_bytes()).hexdigest(),'harnessSha256':hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),'samplerSha256':hashlib.sha256((ROOT/'scripts/benchmark/process_metrics.py').read_bytes()).hexdigest(),'runs':runs}
+if args.backend=='sdk-source':
+    report['sourceLayout']=args.source_layout
+    report['sourceCoreManifest']=json.loads((ROOT/f'packages/openclaw-core/dist/{source_prefix}index.manifest.json').read_text())
+    report['sourceCoreSha256']=hashlib.sha256((ROOT/f'packages/openclaw-core/dist/{source_prefix}index.mjs').read_bytes()).hexdigest()
+    if report['sourceCoreManifest']['sha256']!=report['sourceCoreSha256']: raise RuntimeError('Source core manifest mismatch')
+    report['sourceFixtureBuilderSha256']=hashlib.sha256((ROOT/'scripts/benchmark/build-source-core.mjs').read_bytes()).hexdigest()
 if args.startup_diagnostics=='allocations':
     report['allocationPreloadSha256']=hashlib.sha256((ROOT/'scripts/diagnostics/allocation-preload.mjs').read_bytes()).hexdigest()
 if args.startup_diagnostics:

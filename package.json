@@ -67,7 +67,9 @@
     "test:request-launcher": "node --test test/request-launcher.test.mjs",
     "source-core:install": "npm ci --prefix packages/openclaw-core --ignore-scripts --no-audit --no-fund",
     "source-core:build": "node packages/openclaw-core/build.mjs && CORE_DIAGNOSTICS=1 node packages/openclaw-core/build.mjs && node scripts/benchmark/build-source-core.mjs",
-    "test:source-core": "node --test --test-concurrency=1 test/source-core.test.mjs"
+    "test:source-core": "node --test --test-concurrency=1 test/source-core.test.mjs test/source-install-records.test.mjs test/source-schema-helpers.test.mjs",
+    "source-core:build:minified": "CORE_MINIFY=1 npm run source-core:build",
+    "test:source-core:minified": "CORE_MINIFY=1 npm run test:source-core"
   },
   "dependencies": {
     "@rivet-dev/agentos-core": "0.2.19",

@@ -5,7 +5,7 @@ import {
   getOfficialExternalChannelSecretContract,
 } from "../plugins/official-external-plugin-catalog.js";
 import { cloneSchema } from "./schema.shared.js";
-import { SecretRefSchema } from "./zod-schema.core.js";
+import { SecretRefSchema } from "./zod-schema.secret-ref.js";
 
 type JsonSchemaObject = Record<string, unknown> & {
   properties?: Record<string, JsonSchemaObject>;
