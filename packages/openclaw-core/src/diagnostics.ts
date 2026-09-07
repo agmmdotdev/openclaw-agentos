@@ -13,3 +13,4 @@ export { SecretRefSchema } from '../upstream/src/config/zod-schema.secret-ref.js
 export { widenOfficialExternalChannelSecretSchema } from '../upstream/src/config/official-external-channel-secret-schema.js';
 export { createCoreCodingTools } from "../upstream/src/agents/core-coding-tools.js";
 export { acknowledgeInternalToolResult } from "../upstream/src/agents/runtime/internal-hooks.js";
+export * from '../upstream/src/plugins/computer-use-contract.js';

@@ -58,13 +58,10 @@ npm run source-core:build
 npm run test:source-core
 npm run source-core:build:minified
 npm run test:source-core:minified
-python3 scripts/benchmark/summarize-source-initialization.py \
-  --before-trials 26090760 26090762 26090764 \
-  --after-trials 26090761 26090763 26090765
 node scripts/diagnostics/observe-source-initializers.mjs packages/openclaw-core/dist/index.mjs
 ```
 
-For a new comparison, build the baseline at commit `f6427b5d16d8c17491154e55bf72d136bf9e64da` in a separate checkout. Copy its minified runtime and manifest into the candidate's dist directory as `baseline-minified-index.mjs` and `baseline-minified-index.manifest.json`. Copy its minified benchmark fixture as `baseline-minified-source-native-sdk-core-benchmark.mjs`, changing only the runtime import to `baseline-minified-index.mjs`. The shared parser assets must match. Use `--backend sdk-source --source-layout baseline-minified` for that snapshot, `--source-layout minified` for the candidate, and `--backend sdk` for the control. Choose unused trial IDs. Never swap files used by an active trial.
+The historical baseline was commit `f6427b5d16d8c17491154e55bf72d136bf9e64da`. Its unfrozen reports and original summary remain archived. The current initialization summarizer requires frozen provenance and intentionally rejects those historical reports. For a new comparison, use the complete baseline/index/tool-runtime snapshot workflow in the [validator initialization follow-up](source-validator-initialization.md).
 
 The runtime source diff is 20 net added lines after the schema moves; growth is the cached factory/getter boundary. Diagnostic tooling, tests, reports, and locks are counted separately.
 
@@ -73,3 +70,9 @@ The runtime source diff is 20 net added lines after the schema moves; growth is 
 Further module-init candidates include model-catalog loading, computer-use contract schemas, and terminal/TUI imports used by tool definitions. The current change does not separate those renderers. Each needs demand tracing and a fresh end-to-end comparison before claiming a gain.
 
 No default switch, dependency upgrade, live-provider parity, whole-upstream type-check, or sandbox-enforcement claim. The existing source-migration waiver permits manual review and focused tests; no fresh automated-review pass is claimed. The README overview was also corrected because it still described the repository as having no owned source.
+
+The next [validator initialization pass](source-validator-initialization.md) now
+defers the private model/theme schemas and computer-use compilers. It includes
+fresh profiles, real request-level demand checks, and one frozen dependency
+snapshot covering both source revisions and the artifact control. Terminal
+rendering remains a separate source ownership target.

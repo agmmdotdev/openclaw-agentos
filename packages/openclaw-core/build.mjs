@@ -17,6 +17,21 @@ const result = await build({
   minify: minified, keepNames: minified,
   metafile: true, sourcemap: true, nodePaths, loader: { '.sql': 'text' },
   plugins: entry === 'diagnostics' ? [{ name: 'initialization-observation', setup(builder) {
+    builder.onLoad({filter: /[\\/](?:model-registry|theme)\.ts$/}, async ({path}) => {
+      const source = await readFile(path, 'utf8');
+      const factory = path.endsWith('/sessions/model-registry.ts') ? 'createModelsConfigSchema'
+        : path.endsWith('/interactive/theme/theme.ts') ? 'createThemeJsonSchema' : undefined;
+      if (!factory) return;
+      const boundary = `function ${factory}() {`;
+      if (source.split(boundary).length !== 2) throw new Error(`Private schema factory boundary changed: ${factory}`);
+      return {contents: source.replace(boundary, boundary + `\nglobalThis.__sourcePrivateSchemaInit ??= {}; globalThis.__sourcePrivateSchemaInit.${factory} = (globalThis.__sourcePrivateSchemaInit.${factory} ?? 0) + 1;`), loader: 'ts'};
+    });
+    builder.onLoad({filter: /[\\/]plugins[\\/]computer-use-contract\.ts$/}, async ({path}) => {
+      const source = await readFile(path, 'utf8');
+      const boundary = 'const validator = Compile(schema);';
+      if (source.split(boundary).length !== 2) throw new Error('Computer validator boundary changed');
+      return {contents: source.replace(boundary, 'globalThis.__sourceComputerCompiles = (globalThis.__sourceComputerCompiles ?? 0) + 1;\n' + boundary), loader: 'ts'};
+    });
     builder.onLoad({filter: /[\\/]config[\\/]zod-schema(?:\.agent-runtime|\.root-support|\.core)?\.ts$/}, async ({path}) => ({
       contents: (await readFile(path, 'utf8')) + `\nglobalThis.__sourceCoreInit ??= {}; globalThis.__sourceCoreInit[${JSON.stringify(path.split('/').at(-1))}] = (globalThis.__sourceCoreInit[${JSON.stringify(path.split('/').at(-1))}] ?? 0) + 1;`,
       loader: 'ts',

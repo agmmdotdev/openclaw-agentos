@@ -68,7 +68,7 @@
     "source-core:install": "npm ci --prefix packages/openclaw-core --ignore-scripts --no-audit --no-fund",
     "source-core:build": "CORE_TOOL_RUNTIME=1 node packages/openclaw-core/build.mjs && node packages/openclaw-core/build.mjs && CORE_DIAGNOSTICS=1 node packages/openclaw-core/build.mjs && node scripts/benchmark/build-source-core.mjs",
     "test:source-runtime": "node --test --test-concurrency=1 test/source-sdk-runtime.test.mjs test/source-filesystem.test.mjs test/source-supervision.test.mjs test/request-state.test.mjs",
-    "test:source-core": "node --test --test-concurrency=1 test/source-core.test.mjs test/source-install-records.test.mjs test/source-schema-helpers.test.mjs test/source-process-tools.test.mjs test/source-filesystem-tools.test.mjs",
+    "test:source-core": "node --test --test-concurrency=1 test/source-core.test.mjs test/source-install-records.test.mjs test/source-schema-helpers.test.mjs test/source-process-tools.test.mjs test/source-filesystem-tools.test.mjs test/source-computer-validators.test.mjs test/source-private-validators.test.mjs",
     "source-core:build:minified": "CORE_MINIFY=1 npm run source-core:build",
     "test:source-core:minified": "CORE_MINIFY=1 npm run test:source-core"
   },

@@ -31,11 +31,12 @@ if args.profile!='request' and args.request_launcher!='single': parser.error('La
 if not 2<=args.turns<=101 or args.interval<=0: parser.error('Invalid turns/interval')
 if os.environ.get('AGENTOS_LINUX_EXPERIMENT')=='1': parser.error('Protected performance is not validated')
 ROOT=Path(__file__).resolve().parents[2]
-if args.snapshot and (args.backend not in ['sdk','sdk-source'] or args.initialization!='current' or args.startup_diagnostics or args.source_layout not in ['standard','minified']):
+if args.snapshot and (args.backend not in ['sdk','sdk-source'] or args.initialization!='current' or args.startup_diagnostics):
     parser.error('Snapshots support current SDK/source layouts without startup instrumentation')
 snapshot=Snapshot(args.snapshot) if args.snapshot else None
 RUN_ROOT=snapshot.root if snapshot else ROOT
 if snapshot:
+    if args.backend=='sdk-source': snapshot.require_source_layout(args.source_layout)
     for local in ['scripts/benchmark/request-lifecycle.py','scripts/benchmark/process_metrics.py','scripts/benchmark/benchmark_snapshot.py']:
         if sha256(ROOT/local)!=sha256(RUN_ROOT/local): raise RuntimeError(f'Running harness differs from snapshot: {local}')
     if Path(subprocess.check_output(['which','node'],text=True).strip()).resolve()!=Path(snapshot.manifest['node']['path']):
@@ -56,6 +57,8 @@ source_entry=entry
 artifact_paths=[RUN_ROOT/entry, ROOT/'scripts/benchmark/request-lifecycle.py', ROOT/'scripts/benchmark/process_metrics.py', ROOT/'scripts/benchmark/benchmark_snapshot.py']
 if args.backend=='sdk-source':
     artifact_paths += [RUN_ROOT/f'packages/openclaw-core/dist/{source_prefix}index.mjs', RUN_ROOT/f'packages/openclaw-core/dist/{source_prefix}index.manifest.json']
+    if snapshot:
+        artifact_paths += [RUN_ROOT/f'packages/openclaw-core/dist/{source_prefix}sdk-tool-runtime.mjs', RUN_ROOT/f'packages/openclaw-core/dist/{source_prefix}sdk-tool-runtime.manifest.json']
 artifact_hashes={path:hashlib.sha256(path.read_bytes()).hexdigest() for path in artifact_paths}
 def verify_artifacts():
     if snapshot: snapshot.verify()
@@ -201,6 +204,10 @@ if args.backend=='sdk-source':
     report['sourceCoreManifest']=json.loads((RUN_ROOT/f'packages/openclaw-core/dist/{source_prefix}index.manifest.json').read_text())
     report['sourceCoreSha256']=hashlib.sha256((RUN_ROOT/f'packages/openclaw-core/dist/{source_prefix}index.mjs').read_bytes()).hexdigest()
     if report['sourceCoreManifest']['sha256']!=report['sourceCoreSha256']: raise RuntimeError('Source core manifest mismatch')
+    if snapshot:
+        report['sourceToolRuntimeManifest']=json.loads((RUN_ROOT/f'packages/openclaw-core/dist/{source_prefix}sdk-tool-runtime.manifest.json').read_text())
+        report['sourceToolRuntimeSha256']=sha256(RUN_ROOT/f'packages/openclaw-core/dist/{source_prefix}sdk-tool-runtime.mjs')
+        if report['sourceToolRuntimeManifest']['sha256']!=report['sourceToolRuntimeSha256']: raise RuntimeError('Source tool runtime manifest mismatch')
     report['sourceFixtureBuilderSha256']=hashlib.sha256((RUN_ROOT/'scripts/benchmark/build-source-core.mjs').read_bytes()).hexdigest()
 if args.startup_diagnostics=='allocations':
     report['allocationPreloadSha256']=hashlib.sha256((ROOT/'scripts/diagnostics/allocation-preload.mjs').read_bytes()).hexdigest()

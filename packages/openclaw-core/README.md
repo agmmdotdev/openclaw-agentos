@@ -79,3 +79,9 @@ The [post-compatibility comparison](../../docs/source-runtime-revalidation.md)
 remeasures the runtime with copied SDK, parser and installed-package dependencies.
 Use its snapshot workflow for new performance comparisons; historical unfrozen
 reports require `compare-source-core.py --allow-legacy`.
+
+The [validator initialization follow-up](../../docs/source-validator-initialization.md)
+moves custom-model and theme schema construction, plus computer-use validator
+compilation, to their existing parsing boundaries. Both build layouts now run
+37 focused source/runtime tests. The benchmark snapshot can include a preserved
+`baseline-minified` layout for source-before/source-after/control comparisons.
