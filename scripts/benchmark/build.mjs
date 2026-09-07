@@ -85,13 +85,17 @@ await writeFile('artifacts/core/native-sdk-probe.mjs', nativeCore + '\n' + nativ
 const eagerNativeCore = await readFile('artifacts/core/eager-native-core.mjs', 'utf8');
 if (createHash('sha256').update(eagerNativeCore).digest('hex') !== manifest.eagerNativeCoreSha256) throw new Error('Eager core differs from manifest');
 await writeFile('artifacts/core/eager-native-sdk-core-benchmark.mjs', eagerNativeCore + '\n' + nativeSdkSetup + '\ntry { await (async()=>{\n' + nativeFixture + '\n})(); console.log("NATIVE_SDK_COUNTS=" + JSON.stringify(hybrid.counts)); } finally { await hybrid.dispose(); }\n');
+const bundledNativeCore = await readFile('artifacts/core/bundled-native-core.mjs', 'utf8');
+if (createHash('sha256').update(bundledNativeCore).digest('hex') !== manifest.bundledNativeCoreSha256) throw new Error('Bundled core differs from manifest');
+await writeFile('artifacts/core/bundled-native-sdk-core-benchmark.mjs', bundledNativeCore + '\n' + nativeSdkSetup + '\ntry { await (async()=>{\n' + nativeFixture + '\n})(); console.log("NATIVE_SDK_COUNTS=" + JSON.stringify(hybrid.counts)); } finally { await hybrid.dispose(); }\n');
+if (manifest.nativeLayout.highlight && createHash('sha256').update(await readFile('artifacts/core/native-highlight.cjs')).digest('hex') !== manifest.nativeLayout.highlight.moduleSha256) throw new Error('Highlighter module differs from manifest');
 
 // Capture the actual fixture/build/adapter inputs and generated entries in reports.
 const benchmarkHashes = {};
 for (const path of ['scripts/core/request-state.mjs', 'packages/agentos-sdk/dist/linux-filesystem.js', 'packages/agentos-sdk/dist/linux-process-driver.js', 'packages/agentos-sdk/dist/linux-file-access', 'packages/agentos-sdk/dist/linux-launcher-experimental', 'packages/agentos-sdk/dist/linux-supervisor-experimental', 'scripts/benchmark/native-sdk-adapter.mjs', 'packages/agentos-sdk/dist/native.js', 'packages/agentos-sdk/dist/filesystem.js', 'packages/agentos-sdk/dist/native-entry.js', 'artifacts/core/native-sdk-core-benchmark.mjs', 'scripts/benchmark/wasmer-adapter.mjs', 'artifacts/core/wasmer-core-benchmark.mjs', 'scripts/benchmark/build.mjs', 'scripts/benchmark/hybrid-adapter.mjs', 'test/fixtures/core-benchmark.mjs', 'test/fixtures/core-workload-benchmark.mjs', 'artifacts/core/benchmark.mjs', 'artifacts/core/native-core-benchmark.mjs', 'artifacts/core/hybrid-core-benchmark.mjs']) {
   benchmarkHashes[path] = createHash('sha256').update(await readFile(path)).digest('hex');
 }
-for (const path of ['scripts/defer-native-core-init.mjs', 'scripts/build-core-artifact.mjs', 'artifacts/core/eager-native-sdk-core-benchmark.mjs']) {
+for (const path of ['scripts/defer-native-core-init.mjs', 'scripts/build-core-artifact.mjs', 'scripts/split-native-highlight.mjs', 'artifacts/core/bundled-native-sdk-core-benchmark.mjs', 'artifacts/core/eager-native-sdk-core-benchmark.mjs', ...(manifest.nativeLayout.highlight ? ['artifacts/core/native-highlight.cjs'] : [])]) {
   benchmarkHashes[path] = createHash('sha256').update(await readFile(path)).digest('hex');
 }
-await writeFile('artifacts/core/benchmark-manifest.json', JSON.stringify({ nativeInitialization: manifest.nativeInitialization, fixtureSourceSha256: createHash('sha256').update(fixtureSource).digest('hex'), hashes: benchmarkHashes }, null, 2) + '\n');
+await writeFile('artifacts/core/benchmark-manifest.json', JSON.stringify({ nativeLayout: manifest.nativeLayout, nativeInitialization: manifest.nativeInitialization, fixtureSourceSha256: createHash('sha256').update(fixtureSource).digest('hex'), hashes: benchmarkHashes }, null, 2) + '\n');

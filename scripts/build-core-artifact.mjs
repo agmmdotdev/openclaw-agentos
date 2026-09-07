@@ -6,6 +6,7 @@ import { sliceCoreArtifact } from './slice-core-artifact.mjs';
 import { prepareCoreProfile } from './core-profile.mjs';
 import { compileAsync, asyncCompiler } from './compile-async.mjs';
 import { deferNativeCoreInitialization } from './defer-native-core-init.mjs';
+import { splitNativeHighlight } from './split-native-highlight.mjs';
 
 // Rewrite imports, then lower async syntax for agentOS promise context capture.
 // OpenClaw source and agentOS packages stay untouched. This is an artifact patch.
@@ -89,8 +90,18 @@ await mkdir(output, { recursive: true });
 const nativeInitMode = process.env.NATIVE_CORE_INIT ?? (profile === 'core' ? 'lazy' : 'eager');
 if (!['eager', 'lazy'].includes(nativeInitMode) || (profile !== 'core' && nativeInitMode === 'lazy')) throw new Error('Invalid NATIVE_CORE_INIT for this profile');
 const nativePrepared = nativeInitMode === 'lazy' ? deferNativeCoreInitialization(prepared.source) : { source: prepared.source, report: { mode: 'eager' } };
+// Matched trials show a small RAM benefit but no consistent CPU win. Opt in.
+const nativeLayout = process.env.NATIVE_CORE_LAYOUT ?? 'bundled';
+if (!['split', 'bundled'].includes(nativeLayout) || (nativeLayout === 'split' && nativeInitMode !== 'lazy')) throw new Error('Invalid NATIVE_CORE_LAYOUT for this initialization mode');
+const split = nativeInitMode === 'lazy' ? splitNativeHighlight(nativePrepared.source) : undefined;
+await writeFile(`${output}/bundled-native-core.mjs`, nativePrepared.source);
+if (split) {
+  await writeFile(`${output}/native-highlight.cjs`, split.moduleSource);
+  await writeFile(`${output}/split-native-core.mjs`, split.source);
+}
+const nativeSource = nativeLayout === 'split' ? split.source : nativePrepared.source;
 await writeFile(`${output}/eager-native-core.mjs`, prepared.source);
-await writeFile(`${output}/native-core.mjs`, nativePrepared.source);
+await writeFile(`${output}/native-core.mjs`, nativeSource);
 await writeFile(`${output}/schema-collector.mjs`, schemaCollector.source);
 transformed = await compileAsync(transformed) + (profile === 'full' ? '\nawait workerEntryReady;\n' : '');
 await mkdir(`${output}/compat`, { recursive: true });
@@ -103,9 +114,11 @@ for (const name of [...modules.values(), 'sqlite', 'init', 'text-decoder', 'asyn
 }
 await writeFile(`${output}/worker.mjs`, transformed);
 const manifest = { schemaCollector: { sha256: createHash('sha256').update(schemaCollector.source).digest('hex'), bytes: Buffer.byteLength(schemaCollector.source), roots: schemaCollector.report.roots }, profile, profileReport: prepared.report, inputBytes: Buffer.byteLength(source), nativeCoreBytes: Buffer.byteLength(prepared.source), outputBytes: Buffer.byteLength(transformed), nativeCoreSha256: createHash('sha256').update(prepared.source).digest('hex'), openclaw: '2026.8.1', agentos: '0.2.19', inputSha256: sha256, outputSha256: createHash('sha256').update(transformed).digest('hex'), asyncCompiler, intrinsicReferences, replacements, compatibilityFiles, addedExports: ['runOpenClawCoreTurn'], invokesUpstreamInitializer: 'init_embedded_agent_runtime' };
-manifest.nativeCoreBytes = Buffer.byteLength(nativePrepared.source);
-manifest.nativeCoreSha256 = createHash('sha256').update(nativePrepared.source).digest('hex');
+manifest.nativeCoreBytes = Buffer.byteLength(nativeSource);
+manifest.nativeCoreSha256 = createHash('sha256').update(nativeSource).digest('hex');
 manifest.nativeInitialization = nativePrepared.report;
+manifest.nativeLayout = { mode: nativeLayout, ...(split ? { highlight: split.report } : {}) };
+manifest.bundledNativeCoreSha256 = createHash('sha256').update(nativePrepared.source).digest('hex');
 manifest.eagerNativeCoreSha256 = createHash('sha256').update(prepared.source).digest('hex');
 await writeFile(`${output}/manifest.json`, JSON.stringify(manifest, null, 2) + '\n');
 console.log(JSON.stringify({ output, inputSha256: sha256, replacements: replacements.length }));

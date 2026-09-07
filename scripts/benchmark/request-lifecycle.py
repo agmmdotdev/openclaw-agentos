@@ -12,12 +12,12 @@ parser.add_argument('--mode',choices=['resident','request','request-cache'],requ
 parser.add_argument('--turns',type=int,default=7)
 parser.add_argument('--trial',type=int,required=True)
 parser.add_argument('--interval',type=float,default=.04)
-parser.add_argument('--initialization',choices=['current','eager'],default='current',help='Use the current generated core or its matched eager control (SDK only)')
+parser.add_argument('--initialization',choices=['current','eager','bundled'],default='current',help='Use the current generated core, eager control or bundled lazy control (controls are SDK only)')
 parser.add_argument('--profile',choices=['default','request'],default='default')
 parser.add_argument('--max-opt',type=int,choices=[0,1,2,3])
 parser.add_argument('--wasm-tiering',choices=['on','off','liftoff-only','no-loop-unrolling','no-loop-transforms'],default='on',help='Native core V8 WebAssembly optimizing tier; does not change spawned Node tools')
 args=parser.parse_args()
-if args.initialization=='eager' and args.backend!='sdk': parser.error('Eager initialization control requires SDK backend')
+if args.initialization!='current' and args.backend!='sdk': parser.error('Initialization controls require SDK backend')
 if args.profile=='request' and (args.max_opt is not None or args.wasm_tiering!='on'): parser.error('Request profile cannot be combined with diagnostic compiler overrides')
 if not 2<=args.turns<=101 or args.interval<=0: parser.error('Invalid turns/interval')
 if os.environ.get('AGENTOS_LINUX_EXPERIMENT')=='1': parser.error('Protected performance is not validated')
@@ -29,7 +29,7 @@ if output.exists(): parser.error('Result already exists')
 if ctypes.CDLL(None,use_errno=True).prctl(36,1,0,0,0)!=0: raise RuntimeError('Cannot become test subreaper')
 parent=int(os.readlink('/proc/self'))
 cpus=sorted(os.sched_getaffinity(0))[:2]
-entry='artifacts/core/eager-native-sdk-core-benchmark.mjs' if args.initialization=='eager' else 'artifacts/core/native-sdk-supervised-benchmark.mjs' if args.backend=='sdk-upstream' else 'artifacts/core/native-sdk-core-benchmark.mjs' if args.backend=='sdk' else 'artifacts/core/native-core-benchmark.mjs'
+entry=f'artifacts/core/{args.initialization}-native-sdk-core-benchmark.mjs' if args.initialization!='current' else 'artifacts/core/native-sdk-supervised-benchmark.mjs' if args.backend=='sdk-upstream' else 'artifacts/core/native-sdk-core-benchmark.mjs' if args.backend=='sdk' else 'artifacts/core/native-core-benchmark.mjs'
 
 def mounted_pid(child):
     for p in Path('/proc').iterdir():

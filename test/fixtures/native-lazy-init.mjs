@@ -4,6 +4,7 @@ __initCheck(__testHighlightLoads === (__testMode === 'lazy' ? 0 : 1), 'eager hig
 init_embedded_agent_runtime();
 __initCheck(__testSchemaLoads === (__testMode === 'lazy' ? 0 : 1), 'root schema initialized too early');
 __initCheck(__testHighlightLoads === (__testMode === 'lazy' ? 0 : 1), 'embedded init loaded highlighting');
+if (__testSplit) __initCheck(!__nativeHighlightRequire.cache[__nativeHighlightRequire.resolve('./native-highlight.cjs')], 'split module loaded before demand');
 
 // A distinct schema's errors must have the same eager default locale, even
 // before any root configuration validation. A later custom locale must survive.
@@ -38,6 +39,7 @@ setWorkerDeployRuntime({ ...__initOtherRuntime, highlightJs: __initRegistered })
 __initCheck(__testHighlightLoads === (__testMode === 'lazy' ? 0 : 1), 'replacement forced highlight load');
 const __initHighlighter = getWorkerDeployHighlightJs();
 __initCheck(getWorkerDeployHighlightJs() === __initHighlighter && __testHighlightLoads === 1, 'highlighter identity or cache changed');
+if (__testSplit) __initCheck(!!__nativeHighlightRequire.cache[__nativeHighlightRequire.resolve('./native-highlight.cjs')], 'split module did not use the checked artifact');
 const __initHighlightCases = [
   ['javascript', 'const value = 42; // hello'], ['typescript', 'interface User { name: string }'],
   ['python', 'def f(x):\n    return x + 1'], ['bash', 'echo "$(pwd)" | cat'],
