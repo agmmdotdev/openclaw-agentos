@@ -12,10 +12,12 @@ parser.add_argument('--mode',choices=['resident','request','request-cache'],requ
 parser.add_argument('--turns',type=int,default=7)
 parser.add_argument('--trial',type=int,required=True)
 parser.add_argument('--interval',type=float,default=.04)
+parser.add_argument('--initialization',choices=['current','eager'],default='current',help='Use the current generated core or its matched eager control (SDK only)')
 parser.add_argument('--profile',choices=['default','request'],default='default')
 parser.add_argument('--max-opt',type=int,choices=[0,1,2,3])
 parser.add_argument('--wasm-tiering',choices=['on','off','liftoff-only','no-loop-unrolling','no-loop-transforms'],default='on',help='Native core V8 WebAssembly optimizing tier; does not change spawned Node tools')
 args=parser.parse_args()
+if args.initialization=='eager' and args.backend!='sdk': parser.error('Eager initialization control requires SDK backend')
 if args.profile=='request' and (args.max_opt is not None or args.wasm_tiering!='on'): parser.error('Request profile cannot be combined with diagnostic compiler overrides')
 if not 2<=args.turns<=101 or args.interval<=0: parser.error('Invalid turns/interval')
 if os.environ.get('AGENTOS_LINUX_EXPERIMENT')=='1': parser.error('Protected performance is not validated')
@@ -27,7 +29,7 @@ if output.exists(): parser.error('Result already exists')
 if ctypes.CDLL(None,use_errno=True).prctl(36,1,0,0,0)!=0: raise RuntimeError('Cannot become test subreaper')
 parent=int(os.readlink('/proc/self'))
 cpus=sorted(os.sched_getaffinity(0))[:2]
-entry='artifacts/core/native-sdk-supervised-benchmark.mjs' if args.backend=='sdk-upstream' else 'artifacts/core/native-sdk-core-benchmark.mjs' if args.backend=='sdk' else 'artifacts/core/native-core-benchmark.mjs'
+entry='artifacts/core/eager-native-sdk-core-benchmark.mjs' if args.initialization=='eager' else 'artifacts/core/native-sdk-supervised-benchmark.mjs' if args.backend=='sdk-upstream' else 'artifacts/core/native-sdk-core-benchmark.mjs' if args.backend=='sdk' else 'artifacts/core/native-core-benchmark.mjs'
 
 def mounted_pid(child):
     for p in Path('/proc').iterdir():
@@ -133,6 +135,6 @@ if args.mode=='resident':
 turn_events=[e for r in runs for e in r['events'] if e['label'].endswith('turn:end') or (e['label'].startswith('warm-turn-') and e['label'].endswith(':end'))]
 warm_events=[e for e in turn_events if e['label'].startswith('warm-turn-')]
 summary={'warmTurnMedianMs':statistics.median(e['durationMs'] for e in warm_events) if warm_events else None,'totalCpuSeconds':sum(r['cpuSeconds'] for r in runs),'totalProcessWallMs':sum(r['wallMs'] for r in runs),'peakPssMiB':max(r['peakPssMiB'] for r in runs),'idleCorePssMiB':statistics.median(idle) if idle else 0 if args.mode!='resident' else None,'firstProcessMs':runs[0]['wallMs'],'subsequentProcessMedianMs':statistics.median(r['wallMs'] for r in runs[1:]) if len(runs)>1 else None,'subsequentCpuMedianSeconds':statistics.median(r['cpuSeconds'] for r in runs[1:]) if len(runs)>1 else None}
-report={'valid':all(r['valid'] for r in runs) and validation['passed'],'backend':args.backend,'mode':args.mode,'turns':args.turns,'trial':args.trial,'sampleIntervalMs':args.interval*1000,'environment':{'node':subprocess.check_output(['node','--version'],text=True).strip(),'platform':platform.platform(),'cpus':cpus,'semiSpaceMiB':8,'profile':args.profile,'wasmTiering':'liftoff-only' if args.profile=='request' else args.wasm_tiering,'maxOpt':args.max_opt,'allocator':{'MALLOC_ARENA_MAX':'1','MALLOC_TRIM_THRESHOLD_':'65536','MALLOC_MMAP_THRESHOLD_':'65536'}},'method':'Trusted native process tree PSS; external Python sampler excluded; 420ms scripted inference per turn; cache begins empty per trial; normal process exit (no forced exit); subreaper checks only trusted descendants; direct OpenClaw supervisor vs SDK supervisor still differ','summary':summary,'validation':validation,'benchmarkManifest':json.loads((ROOT/'artifacts/core/benchmark-manifest.json').read_text()),'entrySha256':hashlib.sha256((ROOT/entry).read_bytes()).hexdigest(),'requestLauncherSha256':hashlib.sha256((ROOT/'scripts/run-core-node-request.mjs').read_bytes()).hexdigest(),'harnessSha256':hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),'samplerSha256':hashlib.sha256((ROOT/'scripts/benchmark/process_metrics.py').read_bytes()).hexdigest(),'runs':runs}
+report={'valid':all(r['valid'] for r in runs) and validation['passed'],'backend':args.backend,'mode':args.mode,'turns':args.turns,'trial':args.trial,'sampleIntervalMs':args.interval*1000,'environment':{'node':subprocess.check_output(['node','--version'],text=True).strip(),'platform':platform.platform(),'cpus':cpus,'semiSpaceMiB':8,'profile':args.profile,'initialization':args.initialization,'wasmTiering':'liftoff-only' if args.profile=='request' else args.wasm_tiering,'maxOpt':args.max_opt,'allocator':{'MALLOC_ARENA_MAX':'1','MALLOC_TRIM_THRESHOLD_':'65536','MALLOC_MMAP_THRESHOLD_':'65536'}},'method':'Trusted native process tree PSS; external Python sampler excluded; 420ms scripted inference per turn; cache begins empty per trial; normal process exit (no forced exit); subreaper checks only trusted descendants; direct OpenClaw supervisor vs SDK supervisor still differ','summary':summary,'validation':validation,'benchmarkManifest':json.loads((ROOT/'artifacts/core/benchmark-manifest.json').read_text()),'entrySha256':hashlib.sha256((ROOT/entry).read_bytes()).hexdigest(),'requestLauncherSha256':hashlib.sha256((ROOT/'scripts/run-core-node-request.mjs').read_bytes()).hexdigest(),'harnessSha256':hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),'samplerSha256':hashlib.sha256((ROOT/'scripts/benchmark/process_metrics.py').read_bytes()).hexdigest(),'runs':runs}
 output.write_text(json.dumps(report,indent=2)+'\n');print(json.dumps({'output':str(output),'valid':report['valid'],'summary':summary}),flush=True)
 raise SystemExit(0 if report['valid'] else 1)

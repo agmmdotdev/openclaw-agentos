@@ -193,3 +193,15 @@ comparison runs, a 21-request continuity followup and a 19-case parser different
 pass. Idle resident RAM is unchanged. The historical 41-second startup remains
 unexplained; next CPU work is JavaScript module/schema/highlighter initialization.
 Protected-host acceptance and production execution remain disabled.
+
+### Lazy native initialization and package compatibility
+
+[Native lazy initialization](native-lazy-initialization.md) now defers the
+highlighter and root configuration schema while preserving eager locale setup
+and original validation. Twelve matched trials show another 8.5% reduction in
+cached-request CPU and approximately 11 MiB less resident idle PSS. A 21-request
+followup, eager/lazy behavior differentials and 50 SDK tests pass, including six
+real npm packages with mocked network transports. Parser-heavy throughput now
+quantifies the opt-in baseline-Wasm tradeoff: 54% more warm parsing time.
+The next CPU target is source loading/compilation and additional safe deferral;
+protected-host acceptance is still blocked.
