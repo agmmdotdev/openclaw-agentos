@@ -23,9 +23,9 @@ The new package has its own locked supplemental build dependencies. The build al
 
 ## Runtime API
 
-`src/index.ts` exports `runOpenClawCoreTurn(params)`. It accepts the existing embedded-worker turn parameters, with an optional `toolRuntime` containing the SDK's filesystem/backend context and process `spawn` method. The filesystem context uses OpenClaw's historical `sandbox` interface name; that name does not establish a security boundary.
+`src/index.ts` exports `runOpenClawCoreTurn(params)`. It accepts the existing embedded-worker turn parameters, with an optional `toolRuntime` containing the SDK's filesystem/backend context and process `supervisor`. The filesystem context uses OpenClaw's historical `sandbox` interface name; that name does not establish a security boundary.
 
-The embedded worker passes the context directly to tool construction. An async-local process route isolates overlapping turns and refuses retained spawn callbacks after the turn closes. This replaces the benchmark's reassignment of generated functions and the global supervisor's spawn method.
+The embedded worker passes the context directly to tool construction. An async-local route binds all supervisor methods to their owner and refuses retained callbacks after the turn closes. This replaces the benchmark's reassignment of generated functions and the global supervisor's spawn method.
 
 ## Source adaptations
 
@@ -54,13 +54,16 @@ The [source initialization pass](../../docs/source-core-initialization.md) separ
 ## Owned SDK integration and request state
 
 The package's `./tool-runtime` subpath exports `createAgentOsToolRuntime(vm, { env })`.
-Pass its result as `toolRuntime` to `runOpenClawCoreTurn`; create the native SDK
-handle first and dispose it in your caller's `finally` block. The `./request-state`
+Pass its `{ sandbox, supervisor }` result as `toolRuntime` to `runOpenClawCoreTurn`;
+create the native SDK handle first. Await `supervisor.shutdown()` during teardown,
+then dispose the handle in a `finally` block. The `./request-state`
 subpath exports `beginRequest(stateDir, turn)` for the existing single-session
-checkpoint protocol. Both are lightweight native ESM source modules.
+checkpoint protocol. Build the tool-runtime entry with `npm run source-core:build`;
+the checkpoint module remains native ESM source.
 
 `npm run test:source-runtime` checks these runtime boundaries. See the
 [optimization ownership audit](../../docs/source-optimization-migration.md) for
 the complete migration mapping, repaired stdin/timeout behavior, and remaining
-process-supervisor compatibility work. The bridge supports the measured foreground
-file/shell slice; it does not yet implement the full upstream supervisor contract.
+compatibility work. The [process supervision follow-up](../../docs/source-process-supervision.md)
+connects SDK commands beneath the shared supervisor, including background tools,
+scope cancellation and deadlines. It documents the remaining unsupported modes.

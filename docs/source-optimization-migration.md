@@ -70,6 +70,11 @@ In this table, `core/` means `packages/openclaw-core/upstream/src/`.
 
 ## Remaining work before default cutover
 
+Subsequent progress: the [SDK process supervision follow-up](source-process-supervision.md)
+implements the shared supervisor owner, full turn binding, deadlines/capture and
+real background-tool coverage. The findings below describe the state at this
+audit; consult that follow-up for the current process support and remaining limits.
+
 The bridge still supports the measured foreground file/shell slice. It does not
 claim the full upstream `SandboxContext`, filesystem bridge, or `ProcessSupervisor`
 contract. The next compatibility milestone is the process lifecycle owner:

@@ -16,25 +16,30 @@ const holder = resolveGlobalSingleton(
   },
 );
 
-const spawnContext = new AsyncLocalStorage<{ spawn: ProcessSupervisor["spawn"]; active: boolean }>();
+const supervisorContext = new AsyncLocalStorage<ProcessSupervisor>();
 
-/** Keep SDK process routing scoped to this turn and revoke retained async callbacks. */
-export async function withProcessSpawn<T>(spawn: ProcessSupervisor["spawn"], run: () => Promise<T>): Promise<T> {
-  const context = { spawn, active: true };
-  try { return await spawnContext.run(context, run); }
-  finally { context.active = false; }
+/** Bind every supervisor operation to one owner and revoke retained turn callbacks. */
+export async function withProcessSupervisor<T>(supervisor: ProcessSupervisor, run: () => Promise<T>): Promise<T> {
+  let active = true;
+  const guard = <Args extends unknown[], Result>(method: (...args: Args) => Result) =>
+    (...args: Args): Result => {
+      if (!active) throw new Error("Core process runtime is closed");
+      return method.apply(supervisor, args);
+    };
+  const scoped: ProcessSupervisor = {
+    spawn: guard(supervisor.spawn),
+    cancel: guard(supervisor.cancel),
+    cancelScope: guard(supervisor.cancelScope),
+    getRecord: guard(supervisor.getRecord),
+    ...(supervisor.waitForScope ? { waitForScope: guard(supervisor.waitForScope) } : {}),
+  };
+  try { return await supervisorContext.run(scoped, run); }
+  finally { active = false; }
 }
 
-/** Return the process-wide supervisor used by runtime code that does not inject one. */
+/** Resolve the current turn owner before initializing a host supervisor. */
 export function getProcessSupervisor(): ProcessSupervisor {
-  const supervisor = holder.current ??= createProcessSupervisor();
-  const context = spawnContext.getStore();
-  if (!context) return supervisor;
-  return { ...supervisor, spawn: (...args) => {
-    if (!context.active) throw new Error("Core process runtime is closed");
-    return context.spawn(...args);
-  } };
-
+  return supervisorContext.getStore() ?? (holder.current ??= createProcessSupervisor());
 }
 
 export type { ManagedRun, ProcessSupervisor } from "./types.js";
