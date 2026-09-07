@@ -256,3 +256,10 @@ operations to a turn. Real background-tool coverage includes input, polling and
 kill across bindings. Next is the remaining filesystem/tool contract surface and
 fresh performance evidence before default cutover; protected-host acceptance is
 still separate.
+
+The [SDK filesystem follow-up](source-filesystem-contract.md) now implements the
+required bridge methods and atomic creation through the SDK, including bounded
+reads and real patch add/move/delete coverage on both filesystem backends. Next:
+freeze external benchmark dependencies and refresh matched performance before
+considering the default switch; remaining startup deferral and broader skill
+compatibility still need evidence.

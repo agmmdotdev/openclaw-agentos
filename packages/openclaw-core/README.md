@@ -67,3 +67,10 @@ the complete migration mapping, repaired stdin/timeout behavior, and remaining
 compatibility work. The [process supervision follow-up](../../docs/source-process-supervision.md)
 connects SDK commands beneath the shared supervisor, including background tools,
 scope cancellation and deadlines. It documents the remaining unsupported modes.
+
+The [filesystem follow-up](../../docs/source-filesystem-contract.md) adds bounded
+reads, encoding/parent options, cancellation, stat/rename/remove and real atomic
+creation through both SDK backends. Real core read/write/edit/apply_patch coverage
+checks add, move and delete behavior. Rebuild the SDK with `npm run sdk:build`
+before building the core when updating this integration. Optional streaming copy
+is not advertised; cancellation does not roll back partial filesystem changes.
