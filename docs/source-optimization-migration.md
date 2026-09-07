@@ -136,3 +136,8 @@ The user's existing source-migration automated-review waiver remains applicable;
 manual review found no blocking regression in this bounded extraction, without
 a fresh automated-review claim. Full-upstream typechecking and live-provider
 tests have not run.
+
+The [post-compatibility revalidation](source-runtime-revalidation.md) adds copied
+SDK, runtime, parser and installed-package inputs with full dependency inventory
+verification at trial boundaries. The comparison now rejects mixed or unfrozen
+provenance by default; historical reports require explicit legacy mode.

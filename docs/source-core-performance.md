@@ -1,6 +1,6 @@
 # Source-core migration: measured trade-offs
 
-This report records the initial PR #19 comparison. The subsequent [source initialization pass](source-core-initialization.md) contains current measurements and validation.
+This report records the initial PR #19 comparison. The [source initialization pass](source-core-initialization.md) records the next experiment; the [post-compatibility revalidation](source-runtime-revalidation.md) provides the current comparison with copied dependency inputs.
 
 PR #18 is merged. Keep the merged artifact runtime as the default: the source-owned core passes the focused behavior checks, but cached requests still cost more CPU and latency. Source ownership enables core changes; it does not itself guarantee a speedup.
 
@@ -61,8 +61,8 @@ After the build prerequisites documented in `packages/openclaw-core/README.md`:
 ```sh
 npm run source-core:build:minified
 npm run test:source-core:minified
-python3 scripts/benchmark/compare-source-core.py --trials 26090700 26090701 26090702
-python3 scripts/benchmark/compare-source-core.py --source-layout minified --trials 26090710 26090711 26090712
+python3 scripts/benchmark/compare-source-core.py --allow-legacy --trials 26090700 26090701 26090702
+python3 scripts/benchmark/compare-source-core.py --allow-legacy --source-layout minified --trials 26090710 26090711 26090712
 ```
 
 For new trials, choose unused trial IDs and alternate the order:
