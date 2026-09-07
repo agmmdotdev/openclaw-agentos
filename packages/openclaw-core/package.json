@@ -4,7 +4,11 @@
   "private": true,
   "type": "module",
   "license": "MIT",
-  "exports": "./dist/index.mjs",
+  "exports": {
+    ".": "./dist/index.mjs",
+    "./tool-runtime": "./src/sdk-tool-runtime.mjs",
+    "./request-state": "./src/request-state.mjs"
+  },
   "scripts": { "build": "node build.mjs" },
   "dependencies": {
     "@opentelemetry/api": "1.9.0",

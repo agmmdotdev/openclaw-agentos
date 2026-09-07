@@ -5,7 +5,7 @@ import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { spawn } from 'node:child_process';
 import { once } from 'node:events';
-import { beginRequest } from '../scripts/core/request-state.mjs';
+import { beginRequest } from '../packages/openclaw-core/src/request-state.mjs';
 async function fixture(t) { const dir = await mkdtemp(join(tmpdir(), 'core-request-')); t.after(() => rm(dir, {recursive:true,force:true})); return dir; }
 test('checkpoint resumes in sequence and refuses duplicate/out-of-order turns', async t => {
  const dir=await fixture(t); const first=await beginRequest(dir,0);
@@ -29,7 +29,7 @@ test('corrupt and missing checkpoints refuse resume without erasing evidence', a
  }
 });
 test('manager SIGKILL preserves an interruption marker and prevents tool replay', {timeout:5000}, async t => {
- const dir=await fixture(t);const module=new URL('../scripts/core/request-state.mjs',import.meta.url).href;
+ const dir=await fixture(t);const module=new URL('../packages/openclaw-core/src/request-state.mjs',import.meta.url).href;
  const child=spawn(process.execPath,['--input-type=module','-e',`import {beginRequest} from ${JSON.stringify(module)};await beginRequest(process.argv[1],0);console.log('ready');setInterval(()=>{},1000);`,dir],{stdio:['ignore','pipe','pipe']});
  t.after(()=>child.kill('SIGKILL'));
  await once(child.stdout,'data');const done=once(child,'close');child.kill('SIGKILL');await done;
