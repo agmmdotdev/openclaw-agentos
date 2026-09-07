@@ -9,12 +9,13 @@ if (!/^\d+$/.test(trial ?? '')) throw new Error('Usage: node scripts/diagnostics
 const output = `artifacts/results/startup-initializers-${trial}.json`;
 const eager = process.argv.includes('--eager');
 const bundled = process.argv.includes('--bundled');
-if (eager && bundled) throw new Error('Choose at most one initialization control');
-const core = await readFile(eager ? 'artifacts/core/eager-native-core.mjs' : bundled ? 'artifacts/core/bundled-native-core.mjs' : 'artifacts/core/native-core.mjs', 'utf8');
+const beforeAllocations = process.argv.includes('--before-allocations');
+if ([eager, bundled, beforeAllocations].filter(Boolean).length > 1) throw new Error('Choose at most one initialization control');
+const core = await readFile(eager ? 'artifacts/core/eager-native-core.mjs' : beforeAllocations ? 'artifacts/core/before-allocations-native-core.mjs' : bundled ? 'artifacts/core/bundled-native-core.mjs' : 'artifacts/core/native-core.mjs', 'utf8');
 const manifest = JSON.parse(await readFile('artifacts/core/manifest.json', 'utf8'));
 const hash = value => createHash('sha256').update(value).digest('hex');
-if (hash(core) !== (eager ? manifest.eagerNativeCoreSha256 : bundled ? manifest.bundledNativeCoreSha256 : manifest.nativeCoreSha256)) throw new Error('Native core differs from manifest');
-if (!eager && !bundled && manifest.nativeLayout?.mode === 'split' && hash(await readFile('artifacts/core/native-highlight.cjs')) !== manifest.nativeLayout.highlight.moduleSha256) throw new Error('Highlighter differs from manifest');
+if (hash(core) !== (eager ? manifest.eagerNativeCoreSha256 : beforeAllocations ? manifest.beforeAllocationsNativeCoreSha256 : bundled ? manifest.bundledNativeCoreSha256 : manifest.nativeCoreSha256)) throw new Error('Native core differs from manifest');
+if (!eager && !bundled && !beforeAllocations && manifest.nativeLayout?.mode === 'split' && hash(await readFile('artifacts/core/native-highlight.cjs')) !== manifest.nativeLayout.highlight.moduleSha256) throw new Error('Highlighter differs from manifest');
 const prefix = `
 const __startupRows=[], __startupStack=[], __startupEvaluationStart=performance.now();
 function __startupWrap(helper,name,fn) { return helper(function(...args) {
@@ -57,14 +58,14 @@ for (const profile of ['default', 'request']) {
   const env = { ...process.env, MALLOC_ARENA_MAX: '1', MALLOC_TRIM_THRESHOLD_: '65536', MALLOC_MMAP_THRESHOLD_: '65536' };
   for (const key of ['NODE_OPTIONS', 'NODE_COMPILE_CACHE', 'NODE_DISABLE_COMPILE_CACHE', 'LD_PRELOAD']) delete env[key];
   const traceArgs = process.argv.includes('--trace-wasm') ? ['--trace-wasm-compilation-times'] : [];
-  const args = profile === 'request' ? ['scripts/run-core-node-request.mjs', ...traceArgs, entry] : ['--max-semi-space-size=8', ...traceArgs, entry];
+  const args = profile === 'request' ? ['scripts/run-core-node-request.sh', ...traceArgs, entry] : ['--max-semi-space-size=8', ...traceArgs, entry];
   const start = performance.now();
-  const result = spawnSync(process.execPath, args, { env, encoding: 'utf8', timeout: 30000, maxBuffer: 8 * 1024 * 1024 });
+  const result = spawnSync(profile === 'request' ? 'sh' : process.execPath, args, { env, encoding: 'utf8', timeout: 30000, maxBuffer: 8 * 1024 * 1024 });
   if (result.status !== 0) throw new Error(result.stderr || String(result.error));
   const lines = result.stdout.trim().split('\n');
   const payload = lines.filter(line => line.startsWith('{'));
   if (payload.length !== 1) throw new Error('Unexpected diagnostic output');
   runs.push({ profile, wallMs: performance.now() - start, ...JSON.parse(payload[0]), engineTrace: lines.filter(line => !line.startsWith('{')), stderr: result.stderr });
 }
-await writeFile(output, JSON.stringify({ instrumented: true, eager, bundled, nativeLayout: manifest.nativeLayout, deferredUse: process.argv.includes('--deferred-use'), initializerCount: count, coreSha256: hash(core), generatedSha256: hash(prefix + instrumented + suffix), runs }, null, 2) + '\n', { flag: 'wx' });
+await writeFile(output, JSON.stringify({ instrumented: true, eager, bundled, beforeAllocations, nativeLayout: manifest.nativeLayout, deferredUse: process.argv.includes('--deferred-use'), initializerCount: count, coreSha256: hash(core), generatedSha256: hash(prefix + instrumented + suffix), runs }, null, 2) + '\n', { flag: 'wx' });
 console.log(output);

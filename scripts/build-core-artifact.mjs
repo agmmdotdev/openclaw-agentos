@@ -90,6 +90,7 @@ await mkdir(output, { recursive: true });
 const nativeInitMode = process.env.NATIVE_CORE_INIT ?? (profile === 'core' ? 'lazy' : 'eager');
 if (!['eager', 'lazy'].includes(nativeInitMode) || (profile !== 'core' && nativeInitMode === 'lazy')) throw new Error('Invalid NATIVE_CORE_INIT for this profile');
 const nativePrepared = nativeInitMode === 'lazy' ? deferNativeCoreInitialization(prepared.source) : { source: prepared.source, report: { mode: 'eager' } };
+await writeFile(`${output}/before-allocations-native-core.mjs`, nativePrepared.beforeAllocationsSource ?? nativePrepared.source);
 // Matched trials show a small RAM benefit but no consistent CPU win. Opt in.
 const nativeLayout = process.env.NATIVE_CORE_LAYOUT ?? 'bundled';
 if (!['split', 'bundled'].includes(nativeLayout) || (nativeLayout === 'split' && nativeInitMode !== 'lazy')) throw new Error('Invalid NATIVE_CORE_LAYOUT for this initialization mode');
@@ -119,6 +120,7 @@ manifest.nativeCoreSha256 = createHash('sha256').update(nativeSource).digest('he
 manifest.nativeInitialization = nativePrepared.report;
 manifest.nativeLayout = { mode: nativeLayout, ...(split ? { highlight: split.report } : {}) };
 manifest.bundledNativeCoreSha256 = createHash('sha256').update(nativePrepared.source).digest('hex');
+manifest.beforeAllocationsNativeCoreSha256 = createHash('sha256').update(nativePrepared.beforeAllocationsSource ?? nativePrepared.source).digest('hex');
 manifest.eagerNativeCoreSha256 = createHash('sha256').update(prepared.source).digest('hex');
 await writeFile(`${output}/manifest.json`, JSON.stringify(manifest, null, 2) + '\n');
 console.log(JSON.stringify({ output, inputSha256: sha256, replacements: replacements.length }));
