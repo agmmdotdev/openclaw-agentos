@@ -239,3 +239,9 @@ The [highlighter module experiment](docs/native-highlight-module.md) removes
 1.03 MiB from the native entry and saves 3.6 MiB of resident idle PSS. Eighteen
 matched trials pass, but CPU/latency results are mixed, so `NATIVE_CORE_LAYOUT=split`
 remains opt-in and the bundled lazy core remains the default.
+
+The [startup-tail investigation](docs/native-startup-tail.md) adds phase/CPU
+capture tools and a request launcher that starts Node once. Fresh matched trials
+show 8.5% less cached-request CPU and 5.6% lower latency with essentially unchanged
+RAM. The historical startup spikes remain unexplained. The same pinned Wasm
+request profile stays opt-in; `--request-launcher execve` retains the old control.

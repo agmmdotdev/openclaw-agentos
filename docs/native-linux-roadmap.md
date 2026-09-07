@@ -215,3 +215,14 @@ The entry shrinks 7.4%; resident idle PSS falls 3.6 MiB in 18 matched trials wit
 opt-in. A new 5.7-second cached startup outlier is retained in the report.
 Next: capture CPU profiles for delays before `worker-ready`, rather than assuming
 further source splitting will improve end-to-end performance.
+
+### Startup-tail diagnostics and single-start request launching
+
+[Startup-tail investigation](native-startup-tail.md) captures 93 instrumented
+requests without reproducing the historical isolated stalls. A separate verified
+improvement removes the first of two Node startups from request launching, while
+retaining the version guard, V8 flags and allocator. Six matched uninstrumented
+trials show 8.5% lower CPU and 5.6% lower subsequent-request latency; RAM is
+essentially unchanged. Seven focused tests and 710 real tool calls pass overall.
+The rare stalls remain open: use phase capture to locate a repeatable slow stage
+before attributing them to compilation, GC or SDK setup.
