@@ -8,11 +8,11 @@ const root = dirname(fileURLToPath(import.meta.url));
 const packageRequire = createRequire(await realpath(join(root, '../../node_modules/openclaw/package.json')));
 const nodePaths = [join(root, 'node_modules'), ...packageRequire.resolve.paths('dependency')];
 await mkdir(join(root, 'dist'), { recursive: true });
-const entry = process.env.CORE_DIAGNOSTICS === '1' ? 'diagnostics' : 'index';
+const entry = process.env.CORE_DIAGNOSTICS === '1' ? 'diagnostics' : process.env.CORE_TOOL_RUNTIME === '1' ? 'sdk-tool-runtime' : 'index';
 const minified = process.env.CORE_MINIFY === '1';
 const outputEntry = `${minified ? 'minified-' : ''}${entry}`;
 const result = await build({
-  absWorkingDir: root, entryPoints: [`src/${entry}.ts`], outfile: `dist/${outputEntry}.mjs`,
+  absWorkingDir: root, entryPoints: [`src/${entry}.${entry === 'sdk-tool-runtime' ? 'mjs' : 'ts'}`], outfile: `dist/${outputEntry}.mjs`,
   bundle: true, platform: 'node', format: 'esm', target: 'node24',
   minify: minified, keepNames: minified,
   metafile: true, sourcemap: true, nodePaths, loader: { '.sql': 'text' },

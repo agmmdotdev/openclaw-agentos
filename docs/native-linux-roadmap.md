@@ -249,3 +249,10 @@ work to its current owners and moves SDK tool integration and request checkpoint
 into the core package. Next compatibility work is complete process lifecycle
 routing and broader real-tool coverage before default cutover. Benchmark and
 deployment scripts remain tooling; further module deferral is a performance task.
+
+The [SDK supervision follow-up](source-process-supervision.md) now reuses the
+canonical process lifecycle owner for native SDK commands and binds all supervisor
+operations to a turn. Real background-tool coverage includes input, polling and
+kill across bindings. Next is the remaining filesystem/tool contract surface and
+fresh performance evidence before default cutover; protected-host acceptance is
+still separate.

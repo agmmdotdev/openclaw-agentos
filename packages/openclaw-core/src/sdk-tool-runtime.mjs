@@ -1,5 +1,6 @@
 import { resolve, relative, sep } from 'node:path';
-import { StringDecoder } from 'node:string_decoder';
+import { createProcessSupervisorWithAdapter } from '../upstream/src/process/supervisor/supervisor-runtime.js';
+import { createSdkProcessAdapter } from './sdk-process-adapter.mjs';
 
 // Adapts an existing SDK handle; its caller owns creation and disposal.
 // OpenClaw's historical "sandbox" name does not imply an isolation guarantee.
@@ -50,47 +51,6 @@ export function createAgentOsToolRuntime(vm, { env = {} } = {}) {
       },
     },
   };
-  async function spawn(spec) {
-    if (spec.backendId !== 'exec-sandbox' || spec.argv?.[0] !== 'native-sdk-shell') {
-      throw new Error('Unexpected execution route');
-    }
-    const out = new StringDecoder('utf8'), err = new StringDecoder('utf8');
-    const process = await vm.process.spawn('sh', ['-c', spec.argv[2]], {
-      cwd: workspacePath(spec.argv[1]), env: spec.env, timeoutMs: spec.timeoutMs,
-      onStdout: bytes => spec.onStdout?.(out.write(bytes)),
-      onStderr: bytes => spec.onStderr?.(err.write(bytes)), output: { retainEvents: false },
-    });
-    const done = vm.process.wait(process.pid);
-    let cancelled;
-    return {
-      pid: process.pid,
-      stdin: {
-        write(bytes, callback) {
-          const written = vm.process.writeStdin(process.pid, bytes);
-          // OpenClaw's process tool awaits the Node-style callback. Direct SDK
-          // callers can still await the promise when no callback is supplied.
-          return callback ? written.then(() => callback(), error => callback(error)) : written;
-        },
-        end: () => vm.process.closeStdin(process.pid),
-      },
-      cancel(reason = 'manual-cancel') {
-        cancelled = reason;
-        void vm.process.kill(process.pid).catch(error => console.error('SDK cancellation failed', error));
-      },
-      async wait() {
-        const exit = await done;
-        const stdout = out.end(), stderr = err.end();
-        if (stdout) spec.onStdout?.(stdout);
-        if (stderr) spec.onStderr?.(stderr);
-        const reason = cancelled ?? (exit.outcome === 'timed_out' ? 'overall-timeout'
-          : exit.outcome === 'exited' ? 'exit' : 'signal');
-        return {
-          exitCode: exit.exitCode, exitSignal: exit.signal, reason,
-          timedOut: exit.outcome === 'timed_out' || reason === 'overall-timeout' || reason === 'no-output-timeout',
-          noOutputTimedOut: reason === 'no-output-timeout',
-        };
-      },
-    };
-  }
-  return { sandbox, spawn };
+  const supervisor = createProcessSupervisorWithAdapter(input => createSdkProcessAdapter(vm, workspacePath, input));
+  return { sandbox, supervisor };
 }

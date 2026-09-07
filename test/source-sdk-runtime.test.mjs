@@ -4,18 +4,20 @@ import { mkdtemp, mkdir, rm, symlink } from 'node:fs/promises';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { AgentOs } from '../packages/agentos-sdk/dist/native-entry.js';
-import { createAgentOsToolRuntime } from '../packages/openclaw-core/src/sdk-tool-runtime.mjs';
+const prefix = process.env.CORE_MINIFY === '1' ? 'minified-' : '';
+const { createAgentOsToolRuntime } = await import(`../packages/openclaw-core/dist/${prefix}sdk-tool-runtime.mjs`);
 
 async function fixture(t, filesystemBackend = 'node') {
   const root = await mkdtemp(join(tmpdir(), 'source-sdk-runtime-'));
-  t.after(() => rm(root, { recursive: true, force: true }));
+
   await mkdir(join(root, 'workspace'));
   await symlink(join(root, 'workspace'), join(root, 'alias'));
   const vm = await AgentOs.create({ backend: 'native-node', security: 'trusted-only',
     workspaceDir: join(root, 'alias'), filesystemBackend });
-  t.after(() => vm.dispose());
+
   const runtime = createAgentOsToolRuntime(vm);
-  const spawn = async (command, options = {}) => runtime.spawn({
+  t.after(async () => {try {await runtime.supervisor.shutdown();} finally {await vm.dispose();await rm(root,{recursive:true,force:true});}});
+  const spawn = async (command, options = {}) => runtime.supervisor.spawn({
     mode: 'child', backendId: 'exec-sandbox', timeoutMs: 2000,
     ...await runtime.sandbox.backend.buildExecSpec({ command, workdir: vm.workspaceDir, env: {}, usePty: false }),
     ...options,
@@ -36,7 +38,7 @@ for (const backend of ['node', 'linux-openat2']) {
     await assert.rejects(fs.readFile({ filePath: '../outside' }), /Outside workspace/);
     await assert.rejects(runtime.sandbox.backend.validateWorkdir(join(vm.workspaceDir, 'nested/input.txt')), /Invalid cwd/);
     await assert.rejects(runtime.sandbox.backend.buildExecSpec({ usePty: true }), /PTY unsupported/);
-    await assert.rejects(runtime.spawn({ backendId: 'exec-host', argv: ['sh'] }), /Unexpected execution route/);
+    await assert.rejects(runtime.supervisor.spawn({ backendId: 'exec-host', argv: ['sh'] }), /Unexpected execution route/);
     assert.equal(vm.capabilities.sandboxed, false);
   });
 }
@@ -58,7 +60,7 @@ test('SDK stdin callback completes and propagates write errors, with real EOF an
   assert.equal(exit.timedOut, false);
   assert.equal(stdout, input.toString());
   assert.equal(stderr, 'stderr 🐈');
-  await assert.rejects(new Promise((resolve, reject) => run.stdin.write('late', error => error ? reject(error) : resolve())), { code: 'STDIN_CLOSED' });
+  await assert.rejects(new Promise((resolve, reject) => run.stdin.write('late', error => error ? reject(error) : resolve())), /stdin is not writable/);
   // The bridge borrows its handle; the caller remains responsible for teardown.
   await vm.filesystem.writeFile('still-open', 'owned by caller');
 });

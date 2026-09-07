@@ -6,10 +6,10 @@
   "license": "MIT",
   "exports": {
     ".": "./dist/index.mjs",
-    "./tool-runtime": "./src/sdk-tool-runtime.mjs",
+    "./tool-runtime": "./dist/sdk-tool-runtime.mjs",
     "./request-state": "./src/request-state.mjs"
   },
-  "scripts": { "build": "node build.mjs" },
+  "scripts": { "build": "CORE_TOOL_RUNTIME=1 node build.mjs && node build.mjs" },
   "dependencies": {
     "@opentelemetry/api": "1.9.0",
     "libphonenumber-js": "1.13.11",

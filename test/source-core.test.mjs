@@ -29,17 +29,24 @@ test('source config results match merged core for all 28 existing cases', async 
   assert.deepEqual(results[1],results[0]);
 });
 
-test('source SDK process routing isolates overlapping turns and revokes retained callbacks', async () => {
-  const {withProcessSpawn,getProcessSupervisor} = await import(diagnostics);
+test('source supervisor routing isolates all operations and revokes retained callbacks', async () => {
+  const {withProcessSupervisor,getProcessSupervisor} = await import(diagnostics);
   let retained;
-  const routes = await Promise.all(['a','b'].map(name => withProcessSpawn(async()=>name,async()=> {
-    await new Promise(resolve=>setImmediate(resolve));
-    const supervisor=getProcessSupervisor();
-    if(name==='a') retained=supervisor.spawn;
-    return supervisor.spawn({});
-  })));
-  assert.deepEqual(routes,['a','b']);
-  assert.throws(()=>retained({}),/runtime is closed/);
+  const operations=['spawn','cancel','cancelScope','getRecord','waitForScope'];
+  const routes=await Promise.all(['a','b'].map(name=>withProcessSupervisor(
+    Object.fromEntries(operations.map(method=>[method,()=>name])),async()=>{
+      await new Promise(resolve=>setImmediate(resolve));
+      const supervisor=getProcessSupervisor();
+      if(name==='a') retained=supervisor;
+      return operations.map(method=>supervisor[method]({}));
+    })));
+  assert.deepEqual(routes,[Array(5).fill('a'),Array(5).fill('b')]);
+  for(const method of operations)assert.throws(()=>retained[method]({}),/runtime is closed/);
+  const host=getProcessSupervisor();
+  const run=await host.spawn({mode:'child',backendId:'exec-host',sessionId:'source-host-proof',
+    argv:[process.execPath,'-e','process.stdout.write("default host")'],stdinMode:'pipe-closed'});
+  assert.equal((await run.wait()).stdout,'default host');
+  assert.equal(host.getRecord(run.runId).state,'exited');
 });
 
 test('source core resumes three separate processes with five real SDK tools each', async () => {

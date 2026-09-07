@@ -13,14 +13,15 @@ const setup = `
 import * as fs from 'node:fs';
 import { runOpenClawCoreTurn as runCore } from '../../packages/openclaw-core/dist/${prefix}index.mjs';
 import { createNativeSdkAdapter } from '../../scripts/benchmark/native-sdk-adapter.mjs';
+import { createAgentOsToolRuntime } from '../../packages/openclaw-core/dist/${prefix}sdk-tool-runtime.mjs';
 import { beginRequest } from '../../packages/openclaw-core/src/request-state.mjs';
 const check = (condition, message) => { if (!condition) throw new Error(message); };
 const started = performance.now();
 function mark(label, data = {}) { console.log('BENCH_EVENT=' + JSON.stringify({ label, atMs: performance.now()-started, instance: 0, ...data })); }
-const hybrid = await createNativeSdkAdapter(process.env.BENCH_ROOT);
+const hybrid = await createNativeSdkAdapter(process.env.BENCH_ROOT, createAgentOsToolRuntime);
 globalThis.__benchmarkWorkspaceBridge = hybrid.sandbox.fsBridge;
 if (process.env.BENCH_REQUEST_TURN !== undefined) globalThis.__benchmarkRequestState = await beginRequest(process.env.BENCH_ROOT + '/state', Number(process.env.BENCH_REQUEST_TURN));
-function runOpenClawCoreTurn(params) { return runCore({ ...params, toolRuntime: { sandbox: hybrid.sandbox, spawn: hybrid.spawn } }); }
+function runOpenClawCoreTurn(params) { return runCore({ ...params, toolRuntime: { sandbox: hybrid.sandbox, supervisor: hybrid.supervisor } }); }
 const { DatabaseSync: BenchDatabase } = await import('node:sqlite');
 fs.writeFileSync(process.env.BENCH_ROOT + '/workspace/seed.txt', 'benchmark-seed\\n');
 mark('worker-ready');

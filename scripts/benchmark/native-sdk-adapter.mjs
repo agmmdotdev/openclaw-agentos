@@ -1,8 +1,8 @@
 // Trusted-only diagnostic backend. This adapter does NOT establish a sandbox.
 import { AgentOs } from '../../packages/agentos-sdk/dist/native-entry.js';
 import { join } from 'node:path';
-import { createAgentOsToolRuntime } from '../../packages/openclaw-core/src/sdk-tool-runtime.mjs';
-export async function createNativeSdkAdapter(root) {
+export async function createNativeSdkAdapter(root, createRuntime) {
+ const createAgentOsToolRuntime=createRuntime??(await import('../../packages/openclaw-core/dist/sdk-tool-runtime.mjs')).createAgentOsToolRuntime;
  const workspace=join(root,'workspace');
  const experiment=process.env.AGENTOS_LINUX_EXPERIMENT==='1';
  const vm=experiment
@@ -15,6 +15,7 @@ export async function createNativeSdkAdapter(root) {
   readFile(...args){counts.read++;return bridge.readFile(...args);},
   stat(...args){counts.stat++;return bridge.stat(...args);},
  }};
- function spawn(...args){counts.shell++;return runtime.spawn(...args);}
- return {vm,sandbox,spawn,counts,dispose:()=>vm.dispose()};
+ const supervisor={...runtime.supervisor,spawn(...args){counts.shell++;return runtime.supervisor.spawn(...args);}};
+ const spawn=supervisor.spawn;
+ return {vm,sandbox,supervisor,spawn,counts,async dispose(){try {await supervisor.shutdown();} finally {await vm.dispose();}}};
 }
