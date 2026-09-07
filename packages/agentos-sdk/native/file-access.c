@@ -94,7 +94,7 @@ int main(int argc, char **argv) {
   char *end;
   errno = 0;
   unsigned long limit = strtoul(argv[3], &end, 10);
-  if (errno || !*argv[3] || *end || !limit || limit > 16777216) {
+  if (errno || !*argv[3] || *end || limit > 16777216) {
     errno = EINVAL; fail("limit");
   }
   struct stat root;
@@ -150,11 +150,12 @@ int main(int argc, char **argv) {
       s.st_ctim.tv_sec * 1000.0 + s.st_ctim.tv_nsec / 1000000.0);
     close(fd); return 0;
   }
-  if (strcmp(op, "read") && strcmp(op, "write")) { errno = EINVAL; fail("operation"); }
+  if (strcmp(op, "read") && strcmp(op, "write") && strcmp(op, "write-exclusive")) { errno = EINVAL; fail("operation"); }
   char *data = malloc(limit + 1);
   if (!data) fail("allocate");
   size_t size = 0;
-  int writing = !strcmp(op, "write");
+  int exclusive = !strcmp(op, "write-exclusive");
+  int writing = !strcmp(op, "write") || exclusive;
   // Fully bound input before opening/truncating the destination.
   if (writing) {
     while (size <= limit) {
@@ -166,7 +167,7 @@ int main(int argc, char **argv) {
     }
     if (size > limit) { errno = EFBIG; fail("input-limit"); }
   }
-  int fd = beneath(path, (writing ? O_WRONLY | O_CREAT : O_RDONLY) | O_NONBLOCK,
+  int fd = beneath(path, (writing ? O_WRONLY | O_CREAT | (exclusive ? O_EXCL : 0) : O_RDONLY) | O_NONBLOCK,
     writing ? 0600 : 0);
   struct stat s;
   if (fstat(fd, &s)) fail("stat");

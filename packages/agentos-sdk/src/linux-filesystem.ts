@@ -4,28 +4,31 @@ import { spawn, type ChildProcess } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { getSystemErrorName } from 'node:util';
 import { resolve, posix } from 'node:path';
-import type { FileApi } from './contracts.js';
+import type { NativeFileApi, FileOperationOptions } from './contracts.js';
 import { SdkError, positive, rejectUnknown } from './contracts.js';
+import { checkFileOptions, readLimit } from './file-options.js';
 
 const helper = fileURLToPath(new URL('./linux-file-access', import.meta.url));
 // A bounded SDK transport for the native file primitive, not a process sandbox.
 // No fallback to the ordinary Node filesystem is permitted on this selection.
 export class LinuxFileAccess {
-  readonly api: FileApi;
+  readonly api: NativeFileApi;
   #active = new Map<ChildProcess, Promise<Buffer>>();
   #closed = false;
   #disposal?: Promise<void>;
   private constructor(private root: FileHandle, private maxBytes: number, private workspace: string) {
-    const readFile: FileApi['readFile'] = path => this.#run('read', path);
-    const writeFile: FileApi['writeFile'] = async (path, content) => {
+    const readFile: NativeFileApi['readFile'] = async (path, options = {}) => this.#run('read', path, undefined, undefined, options, readLimit(options, maxBytes));
+    const write = async (path: string, content: string | Uint8Array, options: FileOperationOptions = {}, exclusive = false) => {
+      checkFileOptions(options);
       this.#assertOpen();
       if (typeof content !== 'string' && !(content instanceof Uint8Array)) throw new SdkError('INVALID_INPUT', 'Expected text or bytes');
       const length = typeof content === 'string' ? Buffer.byteLength(content) : content.byteLength;
       if (length > maxBytes) throw new SdkError('FILE_SIZE_LIMIT', `Write exceeds maxFileBytes=${maxBytes}`);
-      await this.#run('write', path, Buffer.from(content));
+      await this.#run(exclusive ? 'write-exclusive' : 'write', path, Buffer.from(content), undefined, options);
     };
-    const stat: FileApi['stat'] = async path => {
-      const s = JSON.parse((await this.#run('stat', path)).toString());
+    const stat: NativeFileApi['stat'] = async (path, options = {}) => {
+      checkFileOptions(options);
+      const s = JSON.parse((await this.#run('stat', path, undefined, undefined, options)).toString());
       return { ...s, sizeExact: BigInt(s.sizeExact), inoExact: BigInt(s.inoExact), nlinkExact: BigInt(s.nlinkExact) };
     };
     const entries = async (path: string) => {
@@ -40,10 +43,10 @@ export class LinuxFileAccess {
       }) : [];
     };
     this.api = {
-      readFile, writeFile, stat,
-      mkdir: async (path, options = {}) => { rejectUnknown(options, ['recursive'], 'mkdir'); await this.#run(options.recursive ? 'mkdir-recursive' : 'mkdir', path); },
-      move: async (from, to) => { this.#validatePath(to); await this.#run('move', from, undefined, to); },
-      remove: async (path, options = {}) => { rejectUnknown(options, ['recursive'], 'remove'); await this.#run(options.recursive ? 'remove-recursive' : 'remove', path); },
+      readFile, writeFile: write, createFileExclusive: (path, content, options) => write(path, content, options, true), stat,
+      mkdir: async (path, options = {}) => { checkFileOptions(options, ['recursive']); await this.#run(options.recursive ? 'mkdir-recursive' : 'mkdir', path, undefined, undefined, options); },
+      move: async (from, to, options = {}) => { checkFileOptions(options); this.#validatePath(to); await this.#run('move', from, undefined, to, options); },
+      remove: async (path, options = {}) => { checkFileOptions(options, ['recursive']); await this.#run(options.recursive ? 'remove-recursive' : 'remove', path, undefined, undefined, options); },
       readdir: async path => (await entries(path)).map(e => e.name),
       readdirEntries: async path => (await entries(path)).map(({ size, ...entry }) => entry),
       readdirRecursive: async (path, options = {}) => {
@@ -51,7 +54,7 @@ export class LinuxFileAccess {
         const maxDepth = options.maxDepth ?? 32;
         if (!Number.isInteger(maxDepth) || maxDepth < 0 || maxDepth > 64) throw new SdkError('INVALID_OPTION', 'maxDepth must be 0..64');
         if (options.exclude && (!Array.isArray(options.exclude) || options.exclude.some(x => typeof x !== 'string'))) throw new SdkError('INVALID_OPTION', 'exclude must contain names');
-        const result: Awaited<ReturnType<FileApi['readdirRecursive']>> = [];
+        const result: Awaited<ReturnType<NativeFileApi['readdirRecursive']>> = [];
         const walk = async (directory: string, depth: number) => {
           for (const entry of await entries(directory)) {
             if (options.exclude?.includes(entry.name)) continue;
@@ -83,7 +86,7 @@ export class LinuxFileAccess {
         if (entries.length > 1024) throw new SdkError('BATCH_LIMIT', 'At most 1024 files per batch');
         const result = [];
         for (const entry of entries) {
-          try { await writeFile(entry.path, entry.content); result.push({ path: entry.path, success: true }); }
+          try { await write(entry.path, entry.content); result.push({ path: entry.path, success: true }); }
           catch (e) { result.push({ path: entry.path, success: false, error: String(e) }); }
         }
         return result;
@@ -102,25 +105,30 @@ export class LinuxFileAccess {
   #validatePath(path: string) {
     if (typeof path !== 'string' || !path || path.includes('\0') || path.startsWith('/') || Buffer.from(path).toString() !== path) throw new SdkError('INVALID_PATH', 'linux-openat2 requires a nonempty relative UTF-8 path');
   }
-  #run(operation: 'read' | 'write' | 'stat' | 'list' | 'mkdir' | 'mkdir-recursive' | 'move' | 'remove' | 'remove-recursive', path: string, input?: Buffer, target?: string): Promise<Buffer> {
+  #run(operation: 'read' | 'write' | 'write-exclusive' | 'stat' | 'list' | 'mkdir' | 'mkdir-recursive' | 'move' | 'remove' | 'remove-recursive', path: string, input?: Buffer, target?: string, options: FileOperationOptions = {}, limit = this.maxBytes): Promise<Buffer> {
     try {
       this.#assertOpen();
+      options.signal?.throwIfAborted();
       this.#validatePath(path);
       if (this.#active.size >= 4) throw new SdkError('FILE_OPERATION_LIMIT', 'At most four active native file operations');
     } catch (e) { return Promise.reject(e); }
-    const child = spawn(helper, [operation, path, String(this.maxBytes), ...(target === undefined ? [] : [target])], { env: {}, stdio: ['pipe', 'pipe', 'pipe', this.root.fd] });
+    const child = spawn(helper, [operation, path, String(limit), ...(target === undefined ? [] : [target])], { env: {}, stdio: ['pipe', 'pipe', 'pipe', this.root.fd] });
     let complete!: (value: Buffer) => void, reject!: (reason: unknown) => void;
     const done = new Promise<Buffer>((ok, no) => { complete = ok; reject = no; });
     this.#active.set(child, done);
-    let failure: Error | undefined, size = 0, errorSize = 0;
+    let failure: unknown, size = 0, errorSize = 0;
     const output: Buffer[] = [], errors: Buffer[] = [];
-    const stop = (error: Error) => { failure ??= error; child.kill('SIGKILL'); };
+    let stopped = false;
+    const stop = (error: unknown) => { if (!stopped) failure = error; stopped = true; child.kill('SIGKILL'); };
+    const abort = () => stop(options.signal!.reason);
+    options.signal?.addEventListener('abort', abort, { once: true });
+    if (options.signal?.aborted) abort();
     const timer = setTimeout(() => stop(new SdkError('FILE_OPERATION_TIMEOUT', 'Native file operation exceeded 5 seconds')), 5000);
-    child.on('error', e => { failure ??= e; });
+    child.on('error', e => { if (!stopped) failure ??= e; });
     child.stdin!.on('error', e => { if ((e as NodeJS.ErrnoException).code !== 'EPIPE') stop(e); });
     child.stdout!.on('data', (b: Buffer) => {
       size += b.length;
-      if (size > (operation === 'stat' ? 4096 : operation === 'list' ? 1048576 : this.maxBytes)) stop(new SdkError('FILE_HELPER_OUTPUT_LIMIT', 'File helper exceeded output bound'));
+      if (size > (operation === 'stat' ? 4096 : operation === 'list' ? 1048576 : limit)) stop(new SdkError('FILE_HELPER_OUTPUT_LIMIT', 'File helper exceeded output bound'));
       else output.push(b);
     });
     child.stderr!.on('data', (b: Buffer) => {
@@ -129,16 +137,16 @@ export class LinuxFileAccess {
       else errors.push(b);
     });
     child.on('close', (code, signal) => {
-      clearTimeout(timer); this.#active.delete(child);
-      if (this.#closed) failure ??= new SdkError('DISPOSED', 'Filesystem disposed during operation');
-      if (!failure && code !== 0) {
+      clearTimeout(timer); options.signal?.removeEventListener('abort', abort); this.#active.delete(child);
+      if (this.#closed && !stopped) failure ??= new SdkError('DISPOSED', 'Filesystem disposed during operation');
+      if (!stopped && !failure && code !== 0) {
         try {
           const error = JSON.parse(Buffer.concat(errors).toString());
           const name = getSystemErrorName(-error.errno);
           failure = new SdkError(name === 'EFBIG' ? 'FILE_SIZE_LIMIT' : name, `Native file operation failed at ${error.stage}`, error);
         } catch { failure = new SdkError('FILE_HELPER_FAILED', `Native file helper failed (${code ?? signal})`); }
       }
-      if (failure) reject(failure); else complete(Buffer.concat(output, size));
+      if (stopped || failure) reject(failure); else complete(Buffer.concat(output, size));
     });
     child.stdin!.end(input);
     return done;

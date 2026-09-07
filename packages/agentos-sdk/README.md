@@ -224,3 +224,17 @@ The extractor verifies the checkout commit. `upstream-contract-check.ts` ensures
 selected type signatures match the installed 0.2.19 package. Upgrading the SDK
 requires refreshing provenance and re-running runtime contract tests, not only
 accepting a TypeScript build.
+
+## Native filesystem options
+
+The native handle exposes `NativeFileApi`, an extension of the unchanged extracted
+`FileApi`. `readFile(path, { maxBytes, signal })` enforces a non-negative per-read
+byte bound capped by `maxFileBytes`. `writeFile`, `stat`, `mkdir`, `move`, and
+`remove` accept `signal` in their options; `mkdir`/`remove` retain `recursive`.
+`createFileExclusive(path, content, { signal })` atomically reserves an absent
+path with `O_EXCL` and rejects `EEXIST`; it does not create parent directories.
+
+Cancellation can leave partial changes after dispatch. Native Node operations
+check before dispatch, while Linux operations kill and drain their helper. These
+options do not change the existing trusted-only or filesystem restrictions. See
+[the core filesystem integration report](../../docs/source-filesystem-contract.md).

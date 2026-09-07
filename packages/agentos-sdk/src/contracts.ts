@@ -1,8 +1,20 @@
 import type { ProcessExit, ProcessOutputEvent, ProcessDescriptor } from "./language-execution.js";
 import type { FileApi, ProcessApi, JavaScriptApi } from "./sdk-surface.js";
 export type { FileApi, ProcessApi, JavaScriptApi } from "./sdk-surface.js";
+// Native extensions leave the extracted agentOS declaration slice unchanged.
+export interface FileOperationOptions { signal?: AbortSignal; }
+export interface FileReadOptions extends FileOperationOptions { maxBytes?: number; }
+export interface NativeFileApi extends FileApi {
+ readFile(path: string, options?: FileReadOptions): Promise<Uint8Array>;
+ writeFile(path: string, content: string | Uint8Array, options?: FileOperationOptions): Promise<void>;
+ createFileExclusive(path: string, content: string | Uint8Array, options?: FileOperationOptions): Promise<void>;
+ stat(path: string, options?: FileOperationOptions): ReturnType<FileApi['stat']>;
+ mkdir(path: string, options?: FileOperationOptions & { recursive?: boolean }): Promise<void>;
+ move(from: string, to: string, options?: FileOperationOptions): Promise<void>;
+ remove(path: string, options?: FileOperationOptions & { recursive?: boolean }): Promise<void>;
+}
 export interface Backend {
- readonly filesystem: FileApi;
+ readonly filesystem: NativeFileApi;
  readonly process: ProcessApi;
  readonly javascript: JavaScriptApi;
  readonly workspaceDir: string;
