@@ -1,6 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { type Static, type TSchema, Type } from "typebox";
 import { Compile } from "typebox/compile";
+import { Memory } from "typebox/system";
 import type {
   OpenClawPluginNodeHostCommand,
   OpenClawPluginNodeHostCommandAvailabilityContext,
@@ -464,13 +465,24 @@ export function compileComputerUseValidator<const Schema extends TSchema>(
   return (value: unknown): value is Static<Schema> => validator.Check(value);
 }
 
-const validateComputerActParams = compileComputerUseValidator(ComputerActParamsSchema);
-const validateComputerActResult = compileComputerUseValidator(ComputerActResultSchema);
-const validateComputerUseCapabilityDescriptor = compileComputerUseValidator(
+function deferComputerUseValidator<const Schema extends TSchema>(
+  schema: Schema,
+): ComputerUseValidator<Static<Schema>> {
+  // These exported schemas can be mutated by consumers. Preserve the original
+  // wire constraints while deferring code generation until this parser is used.
+  const snapshot = Memory.Clone(schema);
+  let validate: ComputerUseValidator<Static<Schema>> | undefined;
+  return (value: unknown): value is Static<Schema> =>
+    (validate ??= compileComputerUseValidator(snapshot))(value);
+}
+
+const validateComputerActParams = deferComputerUseValidator(ComputerActParamsSchema);
+const validateComputerActResult = deferComputerUseValidator(ComputerActResultSchema);
+const validateComputerUseCapabilityDescriptor = deferComputerUseValidator(
   ComputerUseCapabilityDescriptorSchema,
 );
-const validateScreenSnapshotParams = compileComputerUseValidator(ScreenSnapshotParamsSchema);
-const validateScreenSnapshotResult = compileComputerUseValidator(ScreenSnapshotResultSchema);
+const validateScreenSnapshotParams = deferComputerUseValidator(ScreenSnapshotParamsSchema);
+const validateScreenSnapshotResult = deferComputerUseValidator(ScreenSnapshotResultSchema);
 
 function parseParamsJSON<Value>(
   paramsJSON: string | null | undefined,

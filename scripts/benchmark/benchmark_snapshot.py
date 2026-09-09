@@ -14,6 +14,18 @@ from pathlib import Path
 
 VERSION = 1
 MANIFEST = 'benchmark-snapshot.json'
+SOURCE_LAYOUTS = ('standard', 'minified', 'baseline-minified')
+
+
+def source_runtime_files(layout):
+    if layout not in SOURCE_LAYOUTS:
+        raise ValueError(f'Unsupported snapshot source layout: {layout}')
+    prefix = '' if layout == 'standard' else layout + '-'
+    return [f'artifacts/core/{prefix}source-native-sdk-core-benchmark.mjs'] + [
+        f'packages/openclaw-core/dist/{prefix}{name}.{suffix}'
+        for name in ['index', 'sdk-tool-runtime'] for suffix in ['mjs', 'manifest.json']]
+
+
 RUNTIME_FILES = [
     'package.json', 'pnpm-lock.yaml',
     'packages/agentos-sdk/package.json', 'packages/openclaw-core/package.json',
@@ -30,11 +42,8 @@ RUNTIME_FILES = [
     'artifacts/core/native-sdk-core-benchmark.mjs', 'artifacts/core/native-highlight.cjs',
     'artifacts/core/web-tree-sitter.wasm', 'packages/openclaw-core/dist/web-tree-sitter.wasm',
 ]
-for prefix in ['', 'minified-']:
-    RUNTIME_FILES.append(f'artifacts/core/{prefix}source-native-sdk-core-benchmark.mjs')
-    for name in ['index', 'sdk-tool-runtime']:
-        for suffix in ['mjs', 'manifest.json']:
-            RUNTIME_FILES.append(f'packages/openclaw-core/dist/{prefix}{name}.{suffix}')
+for layout in SOURCE_LAYOUTS[:2]:
+    RUNTIME_FILES.extend(source_runtime_files(layout))
 TREES = ['node_modules', 'packages/openclaw-core/node_modules', 'packages/agentos-sdk/dist',
          'artifacts/core/node_modules', 'packages/openclaw-core/dist/node_modules']
 
@@ -79,7 +88,7 @@ def check_parent_resolution(root):
         raise ValueError('Snapshot has an ancestor node_modules; resolution could escape the copy')
 
 
-def create_snapshot(source, destination):
+def create_snapshot(source, destination, include_baseline_minified=False):
     source, destination = Path(source).resolve(), Path(destination).absolute()
     if destination.exists():
         raise FileExistsError('Snapshot destination already exists')
@@ -87,9 +96,11 @@ def create_snapshot(source, destination):
     if destination.is_relative_to(source):
         raise ValueError('Snapshot must be outside the source checkout')
     check_parent_resolution(destination)
+    layouts = list(SOURCE_LAYOUTS if include_baseline_minified else SOURCE_LAYOUTS[:2])
+    runtime_files = RUNTIME_FILES + (source_runtime_files('baseline-minified') if include_baseline_minified else [])
     destination.mkdir(parents=True)
     try:
-        for local in RUNTIME_FILES:
+        for local in runtime_files:
             target = destination / local
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(source / local, target)
@@ -97,7 +108,8 @@ def create_snapshot(source, destination):
             shutil.copytree(source / local, destination / local, symlinks=True)
         # Keep package-manager links internal; reject external/absolute links.
         entries = inventory(destination)
-        for prefix in ['', 'minified-']:
+        for layout in layouts:
+            prefix = '' if layout == 'standard' else layout + '-'
             for name in ['index', 'sdk-tool-runtime']:
                 local = f'packages/openclaw-core/dist/{prefix}{name}'
                 if json.loads((destination / (local + '.manifest.json')).read_text())['sha256'] != sha256(destination / (local + '.mjs')):
@@ -106,7 +118,7 @@ def create_snapshot(source, destination):
             if local in entries and entries[local].get('sha256') != expected:
                 raise ValueError(f'Stale benchmark build manifest: {local}')
         node = Path(shutil.which('node')).resolve()
-        manifest = {'version': VERSION, 'files': entries, 'filesSha256': digest(entries),
+        manifest = {'version': VERSION, 'sourceLayouts': layouts, 'files': entries, 'filesSha256': digest(entries),
                     'node': {'path': str(node), 'sha256': sha256(node),
                              'version': subprocess.check_output([str(node), '--version'], text=True).strip()},
                     'sourceCommit': subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=source, text=True).strip(),
@@ -127,6 +139,16 @@ class Snapshot:
         if self.manifest['version'] != VERSION or digest(self.manifest['files']) != self.manifest['filesSha256']:
             raise ValueError('Invalid snapshot inventory')
         self.verify(full=True)
+
+    def require_source_layout(self, layout):
+        required = source_runtime_files(layout)
+        # Version 1 snapshots created before optional baselines contain only the
+        # two default layouts. Never infer an extra layout from a loose file.
+        if layout not in self.manifest.get('sourceLayouts', SOURCE_LAYOUTS[:2]):
+            raise ValueError(f'Source layout not captured in snapshot: {layout}')
+        for local in required:
+            if self.manifest['files'].get(local, {}).get('kind') != 'file':
+                raise ValueError(f'Source artifact not captured in snapshot: {local}')
 
     def verify(self, full=False):
         check_parent_resolution(self.root)
@@ -158,7 +180,9 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--source', type=Path, default=Path(__file__).resolve().parents[2])
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--include-baseline-minified', action='store_true',
+                        help='Also copy the preserved baseline-minified core, SDK runtime, manifests and fixture')
     args = parser.parse_args()
-    result = create_snapshot(args.source, args.output)
+    result = create_snapshot(args.source, args.output, args.include_baseline_minified)
     print(json.dumps({'output': str(args.output), 'filesSha256': result['filesSha256'],
                       'fileCount': len(result['files'])}))

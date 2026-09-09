@@ -269,3 +269,11 @@ the current source runtime against fresh controls: cached peak PSS is 8.4% lower
 while seven-turn CPU is 3.8% higher and cached latency 1.7% higher. All 88 turns
 and 440 real tools pass. Keep the default unchanged and use refreshed source
 startup profiles to select the next module-initialization change.
+
+The [validator initialization follow-up](source-validator-initialization.md) now
+defers model/theme schema construction and computer-use validator compilation in
+source. Frozen before/after comparisons show 2.8% less request CPU, 2.7% lower
+cached latency and 2.8% lower cached peak PSS versus the previous source. All
+126 benchmark turns, 630 real tools and 82 focused checks pass. Resident results
+remain mixed, and the default stays unchanged. Next: separate terminal rendering
+from headless tool execution across the tool-definition owners.

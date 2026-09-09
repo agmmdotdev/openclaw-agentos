@@ -1,0 +1,66 @@
+{
+  "scope": "Focused local proof, not upstream CI or live-provider parity",
+  "tests": {
+    "standardRuntime": 25,
+    "standardSource": 12,
+    "minifiedRuntime": 25,
+    "minifiedSource": 12,
+    "benchmarkProvenance": 8,
+    "total": 82
+  },
+  "commands": [
+    "npm run source-core:build",
+    "npm run source-core:build:minified",
+    "npm run test:source-runtime",
+    "npm run test:source-core",
+    "node --test --test-name-pattern=real\\ headless\\ requests test/source-computer-validators.test.mjs",
+    "CORE_MINIFY=1 npm run test:source-runtime",
+    "npm run test:source-core:minified",
+    "python3 test/benchmark-snapshot.test.py"
+  ],
+  "standardSourceNote": "Initial source suite passed 11 checks; the added headless-demand check then passed separately after its addition. All 12 checks ran together in the minified suite.",
+  "realCoreToolCalls": {
+    "standard": 64,
+    "minified": 64,
+    "diagnosticProfiles": 40
+  },
+  "beforeFailures": {
+    "computerImportCompiles": {
+      "actual": 5,
+      "expected": 0
+    },
+    "privateImport": {
+      "models": {
+        "schemaObjects": 13,
+        "compile": 1
+      },
+      "theme": {
+        "schemaObjects": 3,
+        "compile": 1
+      }
+    }
+  },
+  "productionSourceSha256": {
+    "packages/openclaw-core/upstream/src/agents/modes/interactive/theme/theme.ts": "36bbd71f5290692f8965a4c0e4a503e508de1cd7935131b2c6712563a741c930",
+    "packages/openclaw-core/upstream/src/agents/sessions/model-registry.ts": "e7498b349b5b00eea65080bd4ad9840c421f76d32a2f9bdd4bc391f17c37d68a",
+    "packages/openclaw-core/upstream/src/plugins/computer-use-contract.ts": "ad09d1709754e5804d8204546dfad4c85fb613550966ea134b93c9f57e630e46"
+  },
+  "runtimeManifests": {
+    "before": {
+      "upstreamCommit": "ea806575e6450e4d1efdfc72c19f04be982a1b9b",
+      "sourceBuilt": true,
+      "minified": true,
+      "keepNames": true,
+      "bytes": 12304242,
+      "sha256": "170cd90a8ba4e72db9633ca27bc193a5dbc5f80182092efb83fc5c17493682ef"
+    },
+    "after": {
+      "upstreamCommit": "ea806575e6450e4d1efdfc72c19f04be982a1b9b",
+      "sourceBuilt": true,
+      "minified": true,
+      "keepNames": true,
+      "bytes": 12304280,
+      "sha256": "3616b199ab064f992a8bd7bbdeb3a87f898ae2f7b689578beca374157d8a3276"
+    }
+  }
+}

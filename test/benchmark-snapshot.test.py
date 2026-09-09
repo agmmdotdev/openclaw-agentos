@@ -23,6 +23,9 @@ class SnapshotTests(unittest.TestCase):
         subprocess.run(['git', '-c', 'user.name=Snapshot test', '-c', 'user.email=snapshot@example.invalid', 'commit', '--allow-empty', '-qm', 'fixture'], cwd=self.source, check=True)
         self.files = ['sdk/native.js', 'artifacts/core/benchmark-manifest.json']
         for prefix in ['', 'minified-']:
+            local = f'artifacts/core/{prefix}source-native-sdk-core-benchmark.mjs'
+            self.files.append(local)
+            self.write(local, 'export const fixture = true;')
             for name in ['index', 'sdk-tool-runtime']:
                 local = f'packages/openclaw-core/dist/{prefix}{name}'
                 self.files.extend([local + '.mjs', local + '.manifest.json'])
@@ -98,6 +101,42 @@ class SnapshotTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'ancestor node_modules'):
             self.create()
 
+    def test_baseline_is_explicit_complete_and_manifest_validated(self):
+        with self.assertRaises(FileNotFoundError):
+            snapshot.create_snapshot(self.source, self.output, include_baseline_minified=True)
+        self.assertFalse(self.output.exists())
+        for local in snapshot.source_runtime_files('baseline-minified'):
+            original = self.source / local.replace('baseline-minified-', 'minified-')
+            self.write(local, original.read_text())
+        for name in ['index', 'sdk-tool-runtime']:
+            local = f'packages/openclaw-core/dist/baseline-minified-{name}.manifest.json'
+            original = (self.source / local).read_text()
+            self.write(local, json.dumps({'sha256': 'stale'}))
+            with self.assertRaisesRegex(ValueError, 'Stale core build manifest'):
+                snapshot.create_snapshot(self.source, self.output, include_baseline_minified=True)
+            self.assertFalse(self.output.exists())
+            self.write(local, original)
+        snapshot.create_snapshot(self.source, self.output, include_baseline_minified=True)
+        captured = snapshot.Snapshot(self.output)
+        captured.require_source_layout('baseline-minified')
+        self.assertEqual(captured.manifest['sourceLayouts'], list(snapshot.SOURCE_LAYOUTS))
+        for local in snapshot.source_runtime_files('baseline-minified'):
+            self.assertIn(local, captured.manifest['files'])
+        missing = 'packages/openclaw-core/dist/baseline-minified-sdk-tool-runtime.mjs'
+        del captured.manifest['files'][missing]
+        with self.assertRaisesRegex(ValueError, 'Source artifact not captured'):
+            captured.require_source_layout('baseline-minified')
+
+    def test_snapshot_rejects_uncaptured_and_unknown_source_layouts(self):
+        captured = self.create()
+        captured.require_source_layout('standard')
+        captured.require_source_layout('minified')
+        with self.assertRaisesRegex(ValueError, 'Source layout not captured'):
+            captured.require_source_layout('baseline-minified')
+        for layout in ['unknown', '../minified', 'minified/../../other']:
+            with self.assertRaisesRegex(ValueError, 'Unsupported snapshot source layout'):
+                captured.require_source_layout(layout)
+
     def test_comparison_rejects_unfrozen_mixed_snapshots_and_mixed_entries(self):
         script = self.root / 'scripts/benchmark/compare-source-core.py'
         script.parent.mkdir(parents=True)
@@ -121,6 +160,64 @@ class SnapshotTests(unittest.TestCase):
         rejects('Mixed dependency snapshots')
         report('sdk-source', 1); report('sdk', 2, entry='changed')
         rejects('Mixed core entries', ['1', '2'])
+
+    def test_initialization_comparison_validates_frozen_variants_and_both_modes(self):
+        script = self.root / 'scripts/benchmark/summarize-source-initialization.py'
+        script.parent.mkdir(parents=True)
+        script.write_bytes((ROOT / 'scripts/benchmark/summarize-source-initialization.py').read_bytes())
+        results = self.root / 'artifacts/results'
+        results.mkdir(parents=True)
+
+        def reports(mode):
+            paths = {}
+            for name, layout, cpu in [('before', 'baseline-minified', 10), ('after', 'minified', 8), ('merged', None, 9)]:
+                backend = 'sdk-source' if layout else 'sdk'
+                label = backend + ('-'+layout if layout else '')
+                data = {'valid': True, 'backend': backend, 'mode': mode, 'trial': 1,
+                        'entrySha256': name, 'environment': {}, 'turns': 7, 'sampleIntervalMs': 40,
+                        'benchmarkManifest': {}, 'requestLauncherSha256': 'launcher',
+                        'samplerSha256': 'sampler', 'harnessSha256': 'harness',
+                        'dependencySnapshot': {'manifestSha256': 'same', 'filesSha256': 'files'},
+                        'summary': {'totalCpuSeconds': cpu, 'peakPssMiB': 100, 'firstProcessMs': 30,
+                                    'subsequentProcessMedianMs': 20 if mode == 'request-cache' else None,
+                                    'subsequentCpuMedianSeconds': 1 if mode == 'request-cache' else None,
+                                    'warmTurnMedianMs': 5, 'idleCorePssMiB': 80 if mode == 'resident' else 0},
+                        'runs': [{'logs': [], 'wallMs': 30, 'cpuSeconds': 2, 'peakPssMiB': 100}]
+                                * (7 if mode == 'request-cache' else 1)}
+                if layout:
+                    data.update(sourceLayout=layout, sourceCoreSha256=name,
+                                sourceCoreManifest={'sha256': name}, sourceToolRuntimeSha256='runtime',
+                                sourceToolRuntimeManifest={'sha256': 'runtime'}, sourceFixtureBuilderSha256='builder')
+                path = results / f'lifecycle-{label}-{mode}-1.json'
+                path.write_text(json.dumps(data)); paths[name] = path
+            return paths
+
+        def run(mode):
+            return subprocess.run(['python3', str(script), '--before-trials', '1', '--after-trials', '1', '--mode', mode], capture_output=True, text=True)
+
+        for mode in ['request-cache', 'resident']:
+            paths = reports(mode)
+            result = run(mode)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            summary = json.loads(result.stdout)
+            self.assertAlmostEqual(summary['afterVsBeforePercent']['totalCpuSeconds'], -20)
+            self.assertEqual('cachedProcessPeakPssMiB' in summary['summary']['after'], mode == 'request-cache')
+            self.assertEqual(summary['snapshotManifestSha256'], 'same')
+            original = json.loads(paths['after'].read_text())
+            for change, message in [
+                ({'dependencySnapshot': None}, 'Unfrozen dependencies'),
+                ({'dependencySnapshot': {'manifestSha256': 'different'}}, 'Mixed dependency snapshots'),
+                ({'dependencySnapshot': {'manifestSha256': 'same', 'filesSha256': 'different'}}, 'Unmatched dependencySnapshot'),
+                ({'sourceCoreManifest': {'sha256': 'stale'}}, 'Stale source manifest'),
+                ({'sourceToolRuntimeManifest': {'sha256': 'stale'}}, 'Stale source manifest'),
+                ({'sourceLayout': 'baseline-minified'}, 'Mismatched source layout'),
+                ({'environment': {'cpus': [9]}}, 'Unmatched environment'),
+            ]:
+                paths['after'].write_text(json.dumps({**original, **change}))
+                result = run(mode)
+                self.assertNotEqual(result.returncode, 0)
+                self.assertIn(message, result.stderr)
+            paths['after'].write_text(json.dumps(original))
 
 
 if __name__ == '__main__':
