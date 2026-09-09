@@ -6,11 +6,12 @@
 import { readFileSync, statSync } from "node:fs";
 import path from "node:path";
 import { createInterface } from "node:readline";
-import { Text } from "@earendil-works/pi-tui";
+import type { Text } from "@earendil-works/pi-tui";
 import { resolveNonNegativeIntegerOption } from "@openclaw/normalization-core/number-coercion";
 import { Type } from "typebox";
 import { releaseChildProcessOutputAfterExit } from "../../../process/child-process.js";
 import { spawnCommand } from "../../../process/exec.js";
+import { getTerminalRuntime } from "../../modes/interactive/terminal.runtime.js";
 import type { AgentTool } from "../../runtime/index.js";
 import { ensureTool } from "../../utils/tools-manager.js";
 import type { ToolDefinition, ToolRenderResultOptions } from "../extensions/types.js";
@@ -458,12 +459,14 @@ export function createGrepToolDefinition(
       });
     },
     renderCall(args, theme, context) {
-      const text = (context.lastComponent as Text | undefined) ?? new Text("", 0, 0);
+      const text =
+        (context.lastComponent as Text | undefined) ?? new (getTerminalRuntime().Text)("", 0, 0);
       text.setText(formatGrepCall(args, theme));
       return text;
     },
     renderResult(result, optionsLocal, theme, context) {
-      const text = (context.lastComponent as Text | undefined) ?? new Text("", 0, 0);
+      const text =
+        (context.lastComponent as Text | undefined) ?? new (getTerminalRuntime().Text)("", 0, 0);
       text.setText(formatGrepResult(result, optionsLocal, theme, context.showImages));
       return text;
     },

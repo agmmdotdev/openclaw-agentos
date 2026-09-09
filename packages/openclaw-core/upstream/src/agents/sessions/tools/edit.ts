@@ -10,10 +10,11 @@ import {
   stat as fsStat,
   writeFile as fsWriteFile,
 } from "node:fs/promises";
-import { Box, Container, Spacer, Text } from "@earendil-works/pi-tui";
+import type { Box, Container, Text } from "@earendil-works/pi-tui";
 import { truncateUtf16Safe } from "@openclaw/normalization-core/utf16-slice";
 import { Type } from "typebox";
 import { normalizeToLF } from "../../line-endings.js";
+import { getTerminalRuntime } from "../../modes/interactive/terminal.runtime.js";
 import { renderDiff } from "../../modes/interactive/components/diff.js";
 import type { AgentTool } from "../../runtime/index.js";
 import { textResult } from "../../tools/common.js";
@@ -228,7 +229,7 @@ type EditCallRenderComponent = Box & {
 };
 
 function createEditCallRenderComponent(): EditCallRenderComponent {
-  return Object.assign(new Box(1, 1, (text: string) => text), {
+  return Object.assign(new (getTerminalRuntime().Box)(1, 1, (text: string) => text), {
     preview: undefined as EditPreview | undefined,
     previewArgsKey: undefined as string | undefined,
     previewPending: false,
@@ -240,7 +241,7 @@ function getEditCallRenderComponent(
   state: EditRenderState,
   lastComponent: unknown,
 ): EditCallRenderComponent {
-  if (lastComponent instanceof Box) {
+  if (lastComponent instanceof getTerminalRuntime().Box) {
     const component = lastComponent as EditCallRenderComponent;
     state.callComponent = component;
     return component;
@@ -350,7 +351,7 @@ function buildEditCallComponent(
 ): EditCallRenderComponent {
   component.setBgFn(getEditHeaderBg(component.preview, component.settledError, theme));
   component.clear();
-  component.addChild(new Text(formatEditCall(args, theme), 0, 0));
+  component.addChild(new (getTerminalRuntime().Text)(formatEditCall(args, theme), 0, 0));
 
   if (!component.preview) {
     return component;
@@ -360,8 +361,8 @@ function buildEditCallComponent(
     "error" in component.preview
       ? theme.fg("error", component.preview.error)
       : renderDiff(component.preview.diff);
-  component.addChild(new Spacer(1));
-  component.addChild(new Text(body, 0, 0));
+  component.addChild(new (getTerminalRuntime().Spacer)(1));
+  component.addChild(new (getTerminalRuntime().Text)(body, 0, 0));
   return component;
 }
 
@@ -600,13 +601,14 @@ export function createEditToolDefinition(
       }
 
       const output = formatEditResult(callComponent?.preview, typedResult, theme, context.isError);
-      const component = (context.lastComponent as Container | undefined) ?? new Container();
+      const component =
+        (context.lastComponent as Container | undefined) ?? new (getTerminalRuntime().Container)();
       component.clear();
       if (!output) {
         return component;
       }
-      component.addChild(new Spacer(1));
-      component.addChild(new Text(output, 1, 0));
+      component.addChild(new (getTerminalRuntime().Spacer)(1));
+      component.addChild(new (getTerminalRuntime().Text)(output, 1, 0));
       return component;
     },
   };

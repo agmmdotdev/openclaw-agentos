@@ -1,7 +1,7 @@
 import { constants } from "node:fs";
 import { access as fsAccess, readdir as fsReaddir, stat as fsStat } from "node:fs/promises";
 import { basename, dirname, isAbsolute, relative, resolve as resolvePath, sep } from "node:path";
-import { Text } from "@earendil-works/pi-tui";
+import type { Text } from "@earendil-works/pi-tui";
 import { hasErrnoCode, toErrorObject } from "../../../infra/errors.js";
 import { readRegularFile } from "../../../infra/regular-file.js";
 import { decodeWindowsTextFileBuffer } from "../../../infra/windows-encoding.js";
@@ -19,6 +19,7 @@ import {
 import { normalizeNativePathSeparators } from "../../../shared/ignore-rules.js";
 import { levenshteinDistance } from "../../../shared/levenshtein-distance.js";
 import { getReadmePath } from "../../config.js";
+import { getTerminalRuntime } from "../../modes/interactive/terminal.runtime.js";
 import { keyHint, keyText } from "../../modes/interactive/components/keybinding-hints.js";
 import {
   getLanguageFromPath,
@@ -619,7 +620,8 @@ export function createReadToolDefinition(
       });
     },
     renderCall(args, theme, context) {
-      const text = (context.lastComponent as Text | undefined) ?? new Text("", 0, 0);
+      const text =
+        (context.lastComponent as Text | undefined) ?? new (getTerminalRuntime().Text)("", 0, 0);
       const classification = !context.expanded
         ? getCompactReadClassification(args, context.cwd)
         : undefined;
@@ -631,7 +633,8 @@ export function createReadToolDefinition(
       return text;
     },
     renderResult(result, optionsLocal, theme, context) {
-      const text = (context.lastComponent as Text | undefined) ?? new Text("", 0, 0);
+      const text =
+        (context.lastComponent as Text | undefined) ?? new (getTerminalRuntime().Text)("", 0, 0);
       text.setText(
         formatReadResult(
           context.args,

@@ -5,9 +5,10 @@
  */
 import { existsSync, readdirSync, statSync } from "node:fs";
 import nodePath from "node:path";
-import { Text } from "@earendil-works/pi-tui";
+import type { Text } from "@earendil-works/pi-tui";
 import { Type } from "typebox";
 import { toErrorObject } from "../../../infra/errors.js";
+import { getTerminalRuntime } from "../../modes/interactive/terminal.runtime.js";
 import type { AgentTool } from "../../runtime/index.js";
 import type { ToolDefinition, ToolRenderResultOptions } from "../extensions/types.js";
 import { normalizePositiveLimit } from "./limits.js";
@@ -224,12 +225,14 @@ export function createLsToolDefinition(
       }
     },
     renderCall(args, theme, context) {
-      const text = (context.lastComponent as Text | undefined) ?? new Text("", 0, 0);
+      const text =
+        (context.lastComponent as Text | undefined) ?? new (getTerminalRuntime().Text)("", 0, 0);
       text.setText(formatLsCall(args, theme));
       return text;
     },
     renderResult(result, optionsLocal, theme, context) {
-      const text = (context.lastComponent as Text | undefined) ?? new Text("", 0, 0);
+      const text =
+        (context.lastComponent as Text | undefined) ?? new (getTerminalRuntime().Text)("", 0, 0);
       text.setText(formatLsResult(result, optionsLocal, theme, context.showImages));
       return text;
     },

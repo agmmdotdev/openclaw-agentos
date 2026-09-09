@@ -1,0 +1,36 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> @agmmdotdev/openclaw-agentos@0.1.0 test:source-core
+> node --test --test-concurrency=1 test/source-core.test.mjs test/source-install-records.test.mjs test/source-schema-helpers.test.mjs test/source-process-tools.test.mjs test/source-filesystem-tools.test.mjs test/source-computer-validators.test.mjs test/source-private-validators.test.mjs test/source-terminal-rendering.test.mjs
+
+✔ computer parsers compile on demand, cache independently, and keep wire constraints (615.157478ms)
+✔ real headless requests leave terminal rendering and unused validators undemanded (5875.045048ms)
+✔ source config results match merged core for all 28 existing cases (1551.744059ms)
+✔ source supervisor routing isolates all operations and revokes retained callbacks (813.494059ms)
+✔ source core resumes three separate processes with five real SDK tools each (5932.039583ms)
+✔ highlighter demand caches once and explicit replacements cancel pending demand (62.416871ms)
+✔ real core filesystem tools add, edit, move and delete through node (673.338094ms)
+ℹ 8 actual OpenClaw filesystem tool calls through node
+✔ real core filesystem tools add, edit, move and delete through linux-openat2 (88.791596ms)
+ℹ 8 actual OpenClaw filesystem tool calls through linux-openat2
+✔ install helpers defer validators and preserve persisted-record parsing contracts (586.803117ms)
+[agents/model-registry] model catalog load issue: Invalid models.json schema:
+  - providers.broken.models.0.id: must be string
+
+File: /tmp/source-private-validators-pTRrhe/models.json
+[agents/model-registry] model catalog load issue: Failed to load models.json: Provider broken: "baseUrl" is required when defining custom models.
+
+File: /tmp/source-private-validators-pTRrhe/models.json
+✔ private model/theme validators initialize on parsing and retain validation behavior (1711.602648ms)
+✔ real core process tools continue SDK commands, isolate scopes, cancel, and report deadlines (2292.524266ms)
+ℹ 18 actual OpenClaw exec/process tool calls through the native SDK
+✔ DM policy and SecretRef consumers preserve validation without loading the broad config schema (637.243018ms)
+✔ session tools defer terminal initialization and preserve real synchronous rendering (1559.561899ms)
+ℹ tests 13
+ℹ suites 0
+ℹ pass 13
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 23053.968727

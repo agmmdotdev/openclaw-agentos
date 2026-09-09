@@ -277,3 +277,11 @@ cached latency and 2.8% lower cached peak PSS versus the previous source. All
 126 benchmark turns, 630 real tools and 82 focused checks pass. Resident results
 remain mixed, and the default stays unchanged. Next: separate terminal rendering
 from headless tool execution across the tool-definition owners.
+
+The [terminal initialization follow-up](source-terminal-initialization.md) now
+defers terminal dependency loading across seven tool definitions and their shared
+rendering helpers. All 126 benchmark turns, 630 real tools and 76 focused checks
+pass. Versus previous source, request CPU changes -2.7%, cached latency
+-1.3% and cached peak PSS -1.3%. The default stays unchanged.
+Next compatibility repair: write-result component reuse across success/error
+transitions; remaining startup candidates need refreshed profiles.

@@ -2,7 +2,8 @@
  * Utilities for formatting keybinding hints in the UI.
  */
 
-import { getKeybindings, type Keybinding, type KeyId } from "@earendil-works/pi-tui";
+import type { Keybinding, KeyId } from "@earendil-works/pi-tui";
+import { getTerminalRuntime } from "../terminal.runtime.js";
 import { interactiveAgentTheme as theme } from "../theme/theme.js";
 
 function formatKeyPart(part: string): string {
@@ -29,7 +30,7 @@ function formatKeys(keys: KeyId[]): string {
 }
 
 export function keyText(keybinding: Keybinding): string {
-  return formatKeys(getKeybindings().getKeys(keybinding));
+  return formatKeys(getTerminalRuntime().getKeybindings().getKeys(keybinding));
 }
 
 export function keyHint(keybinding: Keybinding, description: string): string {

@@ -4,8 +4,8 @@
  * Normalizes paths/text/image fallbacks before tool results are styled or truncated.
  */
 import * as os from "node:os";
-import { getCapabilities, getImageDimensions, imageFallback } from "@earendil-works/pi-tui";
 import { shortenPathWithHome } from "../../../infra/home-display.js";
+import { getTerminalRuntime } from "../../modes/interactive/terminal.runtime.js";
 import { keyHint } from "../../modes/interactive/components/keybinding-hints.js";
 import type { Theme } from "../../modes/interactive/theme/theme.js";
 import { sanitizeBinaryOutput } from "../../shell-utils.js";
@@ -59,6 +59,7 @@ export function getTextOutput(
     .map((c) => sanitizeBinaryOutput(c.text || "", { ansiMode: "compat" }).replace(/\r/g, ""))
     .join("\n");
 
+  const { getCapabilities, getImageDimensions, imageFallback } = getTerminalRuntime();
   const caps = getCapabilities();
   if (imageBlocks.length > 0 && (!caps.images || !showImages)) {
     // When inline images are unavailable, preserve visible evidence that media was returned.

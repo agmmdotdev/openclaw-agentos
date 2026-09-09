@@ -3,7 +3,7 @@
  * Used by both tool-execution.ts and bash-execution.ts for consistent behavior.
  */
 
-import { Text } from "@earendil-works/pi-tui";
+import { getTerminalRuntime } from "../terminal.runtime.js";
 
 interface VisualTruncateResult {
   /** The visual lines to display */
@@ -35,7 +35,7 @@ export function truncateToVisualLines(
   }
 
   // Create a temporary Text component to render and get visual lines
-  const tempText = new Text(text, paddingX, 0);
+  const tempText = new (getTerminalRuntime().Text)(text, paddingX, 0);
   const allVisualLines = tempText.render(width);
 
   if (allVisualLines.length <= maxVisualLines) {
