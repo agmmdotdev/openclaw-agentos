@@ -4,12 +4,12 @@
  * Validates theme JSON, resolves color variables, watches custom theme files, and exposes terminal styling helpers.
  */
 import * as fs from "node:fs";
-import { getCapabilities } from "@earendil-works/pi-tui";
 import chalk from "chalk";
 import { type Static, Type } from "typebox";
 import { Compile } from "typebox/compile";
 import type { SourceInfo } from "../../../sessions/source-info.js";
 import { highlight, supportsLanguage } from "../../../utils/syntax-highlight.js";
+import { getTerminalRuntime } from "../terminal.runtime.js";
 
 // ============================================================================
 // Types & Schema
@@ -511,7 +511,8 @@ function parseThemeJsonContent(label: string, content: string): ThemeJson {
 }
 
 function createTheme(themeJson: ThemeJson, mode?: ColorMode, sourcePath?: string): Theme {
-  const colorMode = mode ?? (getCapabilities().trueColor ? "truecolor" : "256color");
+  const colorMode =
+    mode ?? (getTerminalRuntime().getCapabilities().trueColor ? "truecolor" : "256color");
   const resolvedColors = resolveThemeColors(themeJson.colors, themeJson.vars);
   const fgColors: Record<ThemeColor, string | number> = {} as Record<ThemeColor, string | number>;
   const bgColors: Record<ThemeBg, string | number> = {} as Record<ThemeBg, string | number>;

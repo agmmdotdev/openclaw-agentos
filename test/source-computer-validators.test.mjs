@@ -62,7 +62,7 @@ test('computer parsers compile on demand, cache independently, and keep wire con
   assert.equal(validate({screenIndex: -1}), false);
 });
 
-test('real headless requests leave computer, model-file and theme-file validators undemanded', async () => {
+test('real headless requests leave terminal rendering and unused validators undemanded', async () => {
   const root = await mkdtemp(join(tmpdir(), 'source-validator-demand-'));
   const entry = `artifacts/core/${prefix}source-validator-demand.mjs`;
   try {
@@ -71,7 +71,7 @@ test('real headless requests leave computer, model-file and theme-file validator
     const boundary = `/dist/${prefix}index.mjs`;
     assert.equal(fixture.split(boundary).length, 2);
     await writeFile(entry, fixture.replace(boundary, `/dist/${prefix}diagnostics.mjs`) + `
-console.log('VALIDATOR_DEMAND=' + JSON.stringify({computerCompiles: globalThis.__sourceComputerCompiles ?? 0, privateSchemas: globalThis.__sourcePrivateSchemaInit ?? {}}));
+console.log('VALIDATOR_DEMAND=' + JSON.stringify({computerCompiles: globalThis.__sourceComputerCompiles ?? 0, privateSchemas: globalThis.__sourcePrivateSchemaInit ?? {}, terminal: globalThis.__sourceTerminalInit ?? {}}));
 `);
     const turns = [];
     for (let turn = 0; turn < 3; turn++) {
@@ -81,7 +81,7 @@ console.log('VALIDATOR_DEMAND=' + JSON.stringify({computerCompiles: globalThis._
       assert.doesNotMatch(stderr, /failed to asynchronously prepare wasm|Aborted\(/);
       const lines = stdout.split('\n');
       const demand = JSON.parse(lines.find(line => line.startsWith('VALIDATOR_DEMAND=')).slice(17));
-      assert.deepEqual(demand, {computerCompiles: 0, privateSchemas: {}});
+      assert.deepEqual(demand, {computerCompiles: 0, privateSchemas: {}, terminal: {}});
       const complete = lines.filter(line => line.startsWith('BENCH_EVENT=')).map(line => JSON.parse(line.slice(12))).find(event => event.label === 'representative:complete');
       assert.equal(complete.nextTurn, turn + 1);
       assert.deepEqual(complete.toolCounts, {read: 1, exec: 2, edit: 1, write: 1});
@@ -89,7 +89,7 @@ console.log('VALIDATOR_DEMAND=' + JSON.stringify({computerCompiles: globalThis._
       turns.push({turn, demand, toolCounts: complete.toolCounts, transcriptMessages: complete.transcriptMessages});
     }
     const manifest = JSON.parse(await readFile(`packages/openclaw-core/dist/${prefix}diagnostics.manifest.json`, 'utf8'));
-    await writeFile(`artifacts/results/source-validator-demand-${prefix || 'standard-'}result.json`, JSON.stringify({diagnostic: true, manifest, turns}, null, 2) + '\n');
+    await writeFile(`artifacts/results/source-terminal-demand-${prefix || 'standard-'}result.json`, JSON.stringify({diagnostic: true, manifest, turns}, null, 2) + '\n');
   } finally {
     await rm(entry, {force: true});
     await rm(root, {recursive: true, force: true});

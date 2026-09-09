@@ -1,0 +1,38 @@
+npm warn Unknown env config "http-proxy". This will stop working in the next major version of npm.
+
+> @agmmdotdev/openclaw-agentos@0.1.0 test:source-runtime
+> node --test --test-concurrency=1 test/source-sdk-runtime.test.mjs test/source-filesystem.test.mjs test/source-supervision.test.mjs test/request-state.test.mjs
+
+✔ checkpoint resumes in sequence and refuses duplicate/out-of-order turns (14.245736ms)
+✔ corrupt and missing checkpoints refuse resume without erasing evidence (12.331875ms)
+✔ manager SIGKILL preserves an interruption marker and prevents tool replay (62.543401ms)
+✔ node bridge honors bounds, encoding, parent creation, stat and mutations (19.751742ms)
+✔ node exclusive creation has one winner and never overwrites existing entries (8.700871ms)
+✔ node cancellation preserves reasons, prevents pre-aborted mutations and releases listeners (3.259532ms)
+✔ linux-openat2 bridge honors bounds, encoding, parent creation, stat and mutations (43.249901ms)
+✔ linux-openat2 exclusive creation has one winner and never overwrites existing entries (26.218262ms)
+✔ linux-openat2 cancellation preserves reasons, prevents pre-aborted mutations and releases listeners (13.596996ms)
+✔ Node bounded reader detects real file growth after its initial stat and closes the descriptor (3.943696ms)
+✔ Node special files are classified correctly and rejected without blocking (5.386595ms)
+✔ owned SDK bridge uses canonical paths and real node file operations (12.488962ms)
+✔ owned SDK bridge uses canonical paths and real linux-openat2 file operations (29.149981ms)
+✔ SDK stdin callback completes and propagates write errors, with real EOF and exit output (9.90856ms)
+✔ SDK deadlines and explicit cancellation use OpenClaw termination reasons (42.799591ms)
+✔ supervisor captures bounded output, raw bytes, full results and stdin EOF (25.998035ms)
+✔ no-output deadlines reset on real output and classify the quiet interval (411.120267ms)
+✔ scope cancellation, record snapshots and duplicate identity share one owner (5.777246ms)
+✔ cancelled replacement fences preserve later runs during delayed SDK admission (4.995956ms)
+✔ shutdown waits for admitted SDK startup and rejects new work (4.709984ms)
+✔ output detachment stops delivery while capture and process completion continue (3.293003ms)
+✔ graceful cancellation escalates when the SDK command ignores SIGTERM (5029.288767ms)
+✔ SDK output failures stay failures and rejected modes never launch a child (17.832082ms)
+✔ throwing output callbacks and rejected initial stdin settle with their actual errors (15.10241ms)
+✔ interactive stdin errors do not kill a command that intentionally closes input (108.811769ms)
+ℹ tests 25
+ℹ suites 0
+ℹ pass 25
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 6257.552204

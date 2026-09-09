@@ -85,3 +85,8 @@ moves custom-model and theme schema construction, plus computer-use validator
 compilation, to their existing parsing boundaries. Both build layouts now run
 37 focused source/runtime tests. The benchmark snapshot can include a preserved
 `baseline-minified` layout for source-before/source-after/control comparisons.
+
+The [terminal initialization follow-up](../../docs/source-terminal-initialization.md)
+keeps `pi-tui` dormant during headless tool execution and loads its shared bindings
+synchronously on rendering demand. Both layouts now pass 38 focused source/runtime
+checks, including seven-tool renderer parity against the previous source.

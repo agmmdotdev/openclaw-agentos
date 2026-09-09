@@ -10,10 +10,11 @@ import {
   writeFile as fsWriteFile,
 } from "node:fs/promises";
 import { dirname } from "node:path";
-import { Container, Text } from "@earendil-works/pi-tui";
+import type { Container, Text } from "@earendil-works/pi-tui";
 import { structuredPatch } from "diff";
 import { Type } from "typebox";
 import { isMissingPathError } from "../../../infra/errors.js";
+import { getTerminalRuntime } from "../../modes/interactive/terminal.runtime.js";
 import { keyHint } from "../../modes/interactive/components/keybinding-hints.js";
 import { getLanguageFromPath, highlightCode } from "../../modes/interactive/theme/theme.js";
 import type { AgentTool } from "../../runtime/index.js";
@@ -150,13 +151,7 @@ type WriteHighlightCache = {
   highlightedLines: string[];
 };
 
-class WriteCallRenderComponent extends Text {
-  cache?: WriteHighlightCache;
-
-  constructor() {
-    super("", 0, 0);
-  }
-}
+type WriteCallRenderComponent = Text & { cache?: WriteHighlightCache };
 
 const WRITE_PARTIAL_FULL_HIGHLIGHT_LINES = 50;
 
@@ -598,9 +593,9 @@ export function createWriteToolDefinition(
         | undefined;
       const rawPath = str(renderArgs?.file_path ?? renderArgs?.path);
       const fileContent = str(renderArgs?.content);
-      const component =
+      const component: WriteCallRenderComponent =
         (context.lastComponent as WriteCallRenderComponent | undefined) ??
-        new WriteCallRenderComponent();
+        new (getTerminalRuntime().Text)("", 0, 0);
       if (fileContent !== null) {
         component.cache = context.argsComplete
           ? rebuildWriteHighlightCacheFull(rawPath, fileContent)
@@ -622,11 +617,13 @@ export function createWriteToolDefinition(
       void optionsLocal;
       const output = formatWriteResult({ ...result, isError: context.isError }, theme);
       if (!output) {
-        const component = (context.lastComponent as Container | undefined) ?? new Container();
+        const component =
+          (context.lastComponent as Container | undefined) ?? new (getTerminalRuntime().Container)();
         component.clear();
         return component;
       }
-      const text = (context.lastComponent as Text | undefined) ?? new Text("", 0, 0);
+      const text =
+        (context.lastComponent as Text | undefined) ?? new (getTerminalRuntime().Text)("", 0, 0);
       text.setText(output);
       return text;
     },

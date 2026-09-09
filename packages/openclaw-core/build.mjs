@@ -17,6 +17,10 @@ const result = await build({
   minify: minified, keepNames: minified,
   metafile: true, sourcemap: true, nodePaths, loader: { '.sql': 'text' },
   plugins: entry === 'diagnostics' ? [{ name: 'initialization-observation', setup(builder) {
+    builder.onLoad({filter: /[\\/]pi-tui[\\/]dist[\\/](?:index|utils)\.js$/}, async ({path}) => ({
+      contents: (await readFile(path, 'utf8')) + `\nglobalThis.__sourceTerminalInit ??= {}; globalThis.__sourceTerminalInit[${JSON.stringify(path.split('/').at(-1))}] = (globalThis.__sourceTerminalInit[${JSON.stringify(path.split('/').at(-1))}] ?? 0) + 1;`,
+      loader: 'js',
+    }));
     builder.onLoad({filter: /[\\/](?:model-registry|theme)\.ts$/}, async ({path}) => {
       const source = await readFile(path, 'utf8');
       const factory = path.endsWith('/sessions/model-registry.ts') ? 'createModelsConfigSchema'

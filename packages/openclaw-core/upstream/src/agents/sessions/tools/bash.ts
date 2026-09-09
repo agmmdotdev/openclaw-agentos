@@ -4,7 +4,7 @@
  * Executes local shell commands with streaming output accumulation and TUI renderers.
  */
 import { existsSync } from "node:fs";
-import { Container, Text, truncateToWidth } from "@earendil-works/pi-tui";
+import type { Container, Text } from "@earendil-works/pi-tui";
 import { resolveTimerTimeoutMs } from "@openclaw/normalization-core/number-coercion";
 import { Type } from "typebox";
 import { toErrorObject } from "../../../infra/errors.js";
@@ -13,6 +13,7 @@ import { releaseChildProcessOutputAfterExit } from "../../../process/child-proce
 import { COMMAND_PROCESS_TREE_KILL_GRACE_MS } from "../../../process/exec-spawn.js";
 import { createCommandTerminationController } from "../../../process/exec-termination.js";
 import { spawnCommand } from "../../../process/exec.js";
+import { getTerminalRuntime } from "../../modes/interactive/terminal.runtime.js";
 import { keyHint } from "../../modes/interactive/components/keybinding-hints.js";
 import { truncateToVisualLines } from "../../modes/interactive/components/visual-truncate.js";
 import { interactiveAgentTheme as theme } from "../../modes/interactive/theme/theme.js";
@@ -221,13 +222,7 @@ type BashResultRenderState = {
   cachedSkipped: number | undefined;
 };
 
-class BashResultRenderComponent extends Container {
-  state: BashResultRenderState = {
-    cachedWidth: undefined,
-    cachedLines: undefined,
-    cachedSkipped: undefined,
-  };
-}
+type BashResultRenderComponent = Container & { state: BashResultRenderState };
 
 function formatBashCall(args: { command?: string; timeout?: number } | undefined): string {
   const command = str(args?.command);
@@ -269,7 +264,7 @@ function rebuildBashResultRenderComponent(
       .join("\n");
 
     if (options.expanded) {
-      component.addChild(new Text(`\n${styledOutput}`, 0, 0));
+      component.addChild(new (getTerminalRuntime().Text)(`\n${styledOutput}`, 0, 0));
     } else {
       component.addChild({
         render: (width: number) => {
@@ -283,7 +278,11 @@ function rebuildBashResultRenderComponent(
             const hint =
               theme.fg("muted", `... (${state.cachedSkipped} earlier lines,`) +
               ` ${keyHint("app.tools.expand", "to expand")})`;
-            return ["", truncateToWidth(hint, width, "..."), ...(state.cachedLines ?? [])];
+            return [
+              "",
+              getTerminalRuntime().truncateToWidth(hint, width, "..."),
+              ...(state.cachedLines ?? []),
+            ];
           }
           return ["", ...(state.cachedLines ?? [])];
         },
@@ -312,14 +311,16 @@ function rebuildBashResultRenderComponent(
         );
       }
     }
-    component.addChild(new Text(`\n${theme.fg("warning", `[${warnings.join(". ")}]`)}`, 0, 0));
+    component.addChild(
+      new (getTerminalRuntime().Text)(`\n${theme.fg("warning", `[${warnings.join(". ")}]`)}`, 0, 0),
+    );
   }
 
   if (startedAt !== undefined) {
     const label = options.isPartial ? "Elapsed" : "Took";
     const endTime = endedAt ?? Date.now();
     component.addChild(
-      new Text(
+      new (getTerminalRuntime().Text)(
         `\n${theme.fg("muted", `${label} ${formatDurationSeconds(endTime - startedAt)}`)}`,
         0,
         0,
@@ -493,7 +494,8 @@ export function createBashToolDefinition(
         state.startedAt = Date.now();
         state.endedAt = undefined;
       }
-      const text = (context.lastComponent as Text | undefined) ?? new Text("", 0, 0);
+      const text =
+        (context.lastComponent as Text | undefined) ?? new (getTerminalRuntime().Text)("", 0, 0);
       text.setText(formatBashCall(args));
       return text;
     },
@@ -512,7 +514,9 @@ export function createBashToolDefinition(
       }
       const component =
         (context.lastComponent as BashResultRenderComponent | undefined) ??
-        new BashResultRenderComponent();
+        Object.assign(new (getTerminalRuntime().Container)(), {
+          state: { cachedWidth: undefined, cachedLines: undefined, cachedSkipped: undefined },
+        });
       rebuildBashResultRenderComponent(
         component,
         result,
